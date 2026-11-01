@@ -10,6 +10,8 @@ import { AppController } from './app.controller';
 import { AiModule } from './ai/ai.module';
 import { SouvenirsModule } from './souvenirs/souvenirs.module';
 import { MediasModule } from './medias/medias.module';
+import { GeographieModule } from './geographie/geographie.module';
+import { GouvernanceModule } from './gouvernance/gouvernance.module';
 
 @Module({
   controllers: [AppController],
@@ -24,6 +26,8 @@ import { MediasModule } from './medias/medias.module';
     AiModule,
     SouvenirsModule,
     MediasModule,
+    GeographieModule,
+    GouvernanceModule,
   ],
 })
 export class AppModule {}

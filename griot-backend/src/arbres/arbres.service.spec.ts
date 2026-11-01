@@ -9,6 +9,7 @@ describe('ArbresService dashboard', () => {
   const prisma = {
     arbre: {
       findUnique: jest.fn(),
+      findMany: jest.fn(),
     },
     membreArbre: {
       findFirst: jest.fn(),
@@ -75,5 +76,26 @@ describe('ArbresService dashboard', () => {
 
     await expect(service.getDashboard('tree-1', 'user-2')).rejects.toThrow(ForbiddenException);
     expect(prisma.personne.count).not.toHaveBeenCalled();
+  });
+
+  it('only searches public trees and returns aggregate counts, not family records', async () => {
+    prisma.arbre.findMany.mockResolvedValue([]);
+
+    await service.findPublic('Mvondo');
+
+    expect(prisma.arbre.findMany).toHaveBeenCalledWith({
+      where: {
+        visibilite: { in: ['public', 'publique'] },
+        nom: { contains: 'Mvondo', mode: 'insensitive' },
+      },
+      select: {
+        id: true,
+        nom: true,
+        dateCreation: true,
+        _count: { select: { personnes: true } },
+      },
+      orderBy: { dateCreation: 'desc' },
+      take: 20,
+    });
   });
 });

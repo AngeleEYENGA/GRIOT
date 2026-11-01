@@ -33,9 +33,10 @@ export class MembresArbreController {
   updateRole(
     @Param('arbreId') arbreId: string,
     @Param('membreId') membreId: string,
+    @Req() req,
     @Body() dto: UpdateRoleDto,
   ) {
-    return this.membresArbreService.updateRole(arbreId, membreId, dto);
+    return this.membresArbreService.updateRole(arbreId, membreId, req.user.id, dto);
   }
 
   @Post(':membreId/accepter')

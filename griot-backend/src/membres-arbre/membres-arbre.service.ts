@@ -49,10 +49,21 @@ export class MembresArbreService {
     });
   }
 
-  async updateRole(arbreId: string, membreId: string, dto: UpdateRoleDto) {
+  async updateRole(arbreId: string, membreId: string, acteurId: string, dto: UpdateRoleDto) {
     const membre = await this.prisma.membreArbre.findUnique({ where: { id: membreId } });
     if (!membre || membre.arbreId !== arbreId) {
       throw new NotFoundException('Membre introuvable sur cet arbre.');
+    }
+    if (membre.utilisateurId === acteurId && membre.role !== dto.role) {
+      throw new BadRequestException('Vous ne pouvez pas modifier votre propre rôle.');
+    }
+    if (membre.role === 'admin' && membre.statut === 'actif' && dto.role !== 'admin') {
+      const activeAdmins = await this.prisma.membreArbre.count({
+        where: { arbreId, role: 'admin', statut: 'actif' },
+      });
+      if (activeAdmins <= 1) {
+        throw new BadRequestException("L'arbre doit conserver au moins un administrateur actif.");
+      }
     }
     return this.prisma.membreArbre.update({ where: { id: membreId }, data: { role: dto.role } });
   }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/useAuth';
 import { GoogleLogin } from '@react-oauth/google';
 
-export default function LoginPage({ onSwitchToRegister }) {
+export default function LoginPage({ onSwitchToRegister, onBackToHome }) {
   const { login, loginWithGoogle, error } = useAuth();
   const [loading, setLoading] = useState(false);
   const [formError, setFormError] = useState('');
@@ -44,8 +44,9 @@ export default function LoginPage({ onSwitchToRegister }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
+    <div className="griot-auth-page">
+      <div className="griot-auth-card">
+        <button className="griot-auth-back" onClick={onBackToHome}>← Retour à l’accueil</button>
         <h1 className="mb-6">
           <img
             src="/griot-logo.jpeg"
@@ -56,7 +57,7 @@ export default function LoginPage({ onSwitchToRegister }) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {(formError || error) && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="griot-auth-error">
               {formError || error}
             </div>
           )}
@@ -90,7 +91,7 @@ export default function LoginPage({ onSwitchToRegister }) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white font-bold py-2 rounded-lg transition"
+            className="griot-button griot-button-primary"
           >
             {loading ? 'Connexion...' : 'Se connecter'}
           </button>
@@ -109,7 +110,7 @@ export default function LoginPage({ onSwitchToRegister }) {
           </div>
         )}
 
-        <div className="mt-6 text-center">
+        <div className="griot-auth-switch">
           <p className="text-gray-600">Pas encore inscrit ?</p>
           <button
             onClick={onSwitchToRegister}

@@ -2,19 +2,34 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 import FamilyTreeView from '../components/FamilyTreeView';
+import {
+  AssistantPanel,
+  DemoPanel,
+  GovernancePanel,
+  OriginsPanel,
+  StylePanel,
+} from '../components/TreeExtraScreens';
 
-export default function TreeDetailPage({ treeId, onBack }) {
+export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabProp, onTabChange }) {
   const { user } = useAuth();
   const [tree, setTree] = useState(null);
   const [personnes, setPersonnes] = useState([]);
   const [relations, setRelations] = useState([]);
   const [membres, setMembers] = useState([]);
   const [souvenirs, setSouvenirs] = useState([]);
+  const [migrations, setMigrations] = useState([]);
+  const [preuves, setPreuves] = useState([]);
+  const [institution, setInstitution] = useState(null);
   const [dashboard, setDashboard] = useState(null);
   const [dashboardLoading, setDashboardLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('tableau');
+  const [fallbackTab, setFallbackTab] = useState('tableau');
+  const activeTab = activeTabProp ?? fallbackTab;
+  const setActiveTab = (tab) => {
+    setFallbackTab(tab);
+    onTabChange?.(tab);
+  };
   const [showAddPersonForm, setShowAddPersonForm] = useState(false);
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
   const [showAddSouvenirForm, setShowAddSouvenirForm] = useState(false);
@@ -56,18 +71,24 @@ export default function TreeDetailPage({ treeId, onBack }) {
     try {
       setLoading(true);
       setError('');
-      const [treeData, personnesData, relationsData, membresData, souvenirsData] = await Promise.all([
+      const [treeData, personnesData, relationsData, membresData, souvenirsData, migrationsData, preuvesData, institutionData] = await Promise.all([
         api.getArbre(treeId),
         api.getPersonnes(treeId),
         api.getRelations(treeId),
         api.getMembers(treeId),
         api.getSouvenirs(treeId),
+        api.getMigrations(treeId),
+        api.getProofs(treeId),
+        api.getInstitution(treeId),
       ]);
       setTree(treeData);
       setPersonnes(Array.isArray(personnesData) ? personnesData : personnesData.personnes || []);
       setRelations(Array.isArray(relationsData) ? relationsData : relationsData.relations || []);
       setMembers(Array.isArray(membresData) ? membresData : membresData.membres || []);
       setSouvenirs(Array.isArray(souvenirsData) ? souvenirsData : souvenirsData.souvenirs || []);
+      setMigrations(Array.isArray(migrationsData) ? migrationsData : []);
+      setPreuves(Array.isArray(preuvesData) ? preuvesData : []);
+      setInstitution(institutionData);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -240,6 +261,18 @@ export default function TreeDetailPage({ treeId, onBack }) {
     }
   };
 
+  const handleUpdateMemberRole = async (memberId, role) => {
+    setError('');
+    try {
+      const updatedMember = await api.updateMemberRole(treeId, memberId, role);
+      setMembers((current) => current.map((member) => (
+        member.id === updatedMember.id ? { ...member, ...updatedMember } : member
+      )));
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   const roleCourant = tree?.membres?.find((member) => member.utilisateurId === user?.id)?.role;
   const peutAjouterPersonne = ['admin', 'editeur', 'contributeur'].includes(roleCourant);
   const peutGererArbre = ['admin', 'editeur'].includes(roleCourant);
@@ -257,14 +290,14 @@ export default function TreeDetailPage({ treeId, onBack }) {
     const loadPhotos = async () => {
       setPhotosLoading(true);
       try {
-        const photos = await api.getPersonPhotos(treeId, selectedPersonId);
+        const photos = await api.getPersonMedias(treeId, selectedPersonId);
         const loadedPhotos = [];
         for (const photo of photos) {
-          const blob = await api.getPersonPhotoBlob(treeId, photo.id);
+          const blob = await api.getPersonMediaBlob(treeId, photo.id);
           if (cancelled) return;
           const src = URL.createObjectURL(blob);
           objectUrls.push(src);
-          loadedPhotos.push({ ...photo, src });
+          loadedPhotos.push({ ...photo, src, contentType: blob.type });
         }
         if (!cancelled) setPersonPhotos(loadedPhotos);
       } catch (err) {
@@ -288,7 +321,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
     try {
       setUploadingPhoto(true);
       setPersonError('');
-      await api.uploadPersonPhoto(treeId, selectedPersonId, file);
+      await api.uploadPersonMedia(treeId, selectedPersonId, file);
       setPhotosRefresh((current) => current + 1);
     } catch (err) {
       setPersonError(err.message);
@@ -343,7 +376,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
-            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
+            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'demo', 'style'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -359,6 +392,11 @@ export default function TreeDetailPage({ treeId, onBack }) {
                 {tab === 'relations' && '🤝 Relations'}
                 {tab === 'souvenirs' && '📜 Souvenirs'}
                 {tab === 'membres' && '👥 Équipe'}
+                {tab === 'origines' && '⌖ Carte des origines'}
+                {tab === 'chefferie' && '⌂ Espace chefferie'}
+                {tab === 'assistant' && '✦ Demander à GRIOT'}
+                {tab === 'demo' && '▣ Démo multi-écrans'}
+                {tab === 'style' && '◐ Charte graphique'}
               </button>
             ))}
           </div>
@@ -831,13 +869,23 @@ export default function TreeDetailPage({ treeId, onBack }) {
         {activeTab === 'membres' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Équipe</h2>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Rôles & permissions</h2>
+                <p className="text-gray-600 mt-1">Les accès sont définis par arbre familial.</p>
+              </div>
               {peutGererMembres && <button
                 onClick={() => setShowAddMemberForm(!showAddMemberForm)}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
               >
                 {showAddMemberForm ? 'Annuler' : '+ Inviter un collaborateur'}
               </button>}
+            </div>
+
+            <div className="griot-role-cards">
+              <article><strong>Administrateur</strong><span>Gère les membres et les réglages de l’arbre.</span></article>
+              <article><strong>Éditeur</strong><span>Modifie les personnes, relations et contenus.</span></article>
+              <article><strong>Contributeur</strong><span>Ajoute des informations et des souvenirs.</span></article>
+              <article><strong>Lecteur</strong><span>Consulte les informations auxquelles il a accès.</span></article>
             </div>
 
             {showAddMemberForm && (
@@ -894,7 +942,21 @@ export default function TreeDetailPage({ treeId, onBack }) {
                     {membres.map((member) => (
                       <tr key={member.id} className="border-b border-gray-200 hover:bg-gray-50">
                         <td className="px-6 py-3 text-sm text-gray-900">{member.utilisateur?.email}</td>
-                        <td className="px-6 py-3 text-sm text-gray-600">{member.role}</td>
+                        <td className="px-6 py-3 text-sm text-gray-600">
+                          {peutGererMembres && member.utilisateurId !== user?.id ? (
+                            <select
+                              className="griot-role-select"
+                              aria-label={`Rôle de ${member.utilisateur?.email || 'ce membre'}`}
+                              value={member.role}
+                              onChange={(event) => handleUpdateMemberRole(member.id, event.target.value)}
+                            >
+                              <option value="lecteur">Lecteur</option>
+                              <option value="contributeur">Contributeur</option>
+                              <option value="editeur">Éditeur</option>
+                              <option value="admin">Administrateur</option>
+                            </select>
+                          ) : member.role}
+                        </td>
                         <td className="px-6 py-3 text-sm">
                           <span
                             className={`px-3 py-1 rounded-full text-xs font-medium ${
@@ -913,6 +975,35 @@ export default function TreeDetailPage({ treeId, onBack }) {
               </div>
             )}
           </div>
+        )}
+        {activeTab === 'origines' && (
+          <OriginsPanel
+            arbreId={treeId}
+            migrations={migrations}
+            personnes={personnes}
+            role={roleCourant}
+            onRefresh={loadTreeData}
+          />
+        )}
+        {activeTab === 'chefferie' && (
+          <GovernancePanel
+            arbreId={treeId}
+            institution={institution}
+            preuves={preuves}
+            personnes={personnes}
+            role={roleCourant}
+            onRefresh={loadTreeData}
+          />
+        )}
+        {activeTab === 'assistant' && <AssistantPanel arbreId={treeId} />}
+        {activeTab === 'style' && <StylePanel />}
+        {activeTab === 'demo' && (
+          <DemoPanel
+            arbre={tree}
+            personnes={personnes}
+            souvenirs={souvenirs}
+            onNavigate={setActiveTab}
+          />
         )}
       </main>
       {selectedPerson && personDraft && (
@@ -1023,13 +1114,13 @@ export default function TreeDetailPage({ treeId, onBack }) {
               <div className="p-6 space-y-6">
                 <section>
                   <div className="flex items-center justify-between gap-4">
-                    <h3 className="font-semibold text-gray-900">Photographies privées</h3>
+                    <h3 className="font-semibold text-gray-900">Médias privés</h3>
                     {peutAjouterPersonne && (
                       <label className="px-3 py-2 text-sm text-white bg-green-700 hover:bg-green-800 rounded-lg cursor-pointer">
-                        {uploadingPhoto ? 'Envoi...' : 'Ajouter une photo'}
+                        {uploadingPhoto ? 'Envoi...' : 'Ajouter un fichier'}
                         <input
                           type="file"
-                          accept="image/jpeg,image/png,image/webp"
+                          accept="image/jpeg,image/png,image/webp,audio/mpeg,audio/mp4,audio/ogg,audio/wav,audio/webm,video/mp4,video/webm,application/pdf"
                           className="sr-only"
                           disabled={uploadingPhoto}
                           onChange={handleUploadPhoto}
@@ -1042,19 +1133,30 @@ export default function TreeDetailPage({ treeId, onBack }) {
                   ) : personPhotos.length ? (
                     <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
                       {personPhotos.map((photo) => (
-                        <img
-                          key={photo.id}
-                          src={photo.src}
-                          alt={`Photo de ${selectedPerson.prenom} ${selectedPerson.nom}`}
-                          className="w-full aspect-square object-cover rounded-lg border border-gray-200"
-                        />
+                        <article key={photo.id} className="griot-media-item">
+                          {photo.type === 'photo' && (
+                            <img
+                              src={photo.src}
+                              alt={`Photo de ${selectedPerson.prenom} ${selectedPerson.nom}`}
+                            />
+                          )}
+                          {photo.type === 'audio' && (
+                            <div><p>Enregistrement audio</p><audio controls preload="metadata" src={photo.src}>Votre navigateur ne prend pas en charge la lecture audio.</audio></div>
+                          )}
+                          {photo.type === 'video' && (
+                            <video controls preload="metadata" src={photo.src}>Votre navigateur ne prend pas en charge la lecture vidéo.</video>
+                          )}
+                          {photo.type === 'document' && (
+                            <a href={photo.src} target="_blank" rel="noreferrer">Ouvrir le document PDF ↗</a>
+                          )}
+                        </article>
                       ))}
                     </div>
                   ) : (
-                    <p className="mt-2 text-sm text-gray-500">Aucune photo pour le moment.</p>
+                    <p className="mt-2 text-sm text-gray-500">Aucun média pour le moment.</p>
                   )}
                   <p className="mt-2 text-xs text-gray-500">
-                    JPEG, PNG ou WebP, 4 Mio maximum. Les photos sont visibles uniquement par les membres de l’arbre.
+                    Images, audio, vidéo ou PDF · 4 Mio maximum par fichier. Les médias sont visibles uniquement par les membres de l’arbre.
                   </p>
                 </section>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">

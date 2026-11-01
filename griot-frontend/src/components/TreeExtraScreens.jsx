@@ -1,0 +1,335 @@
+import { useState } from 'react';
+import api from '../api/client';
+
+function PageIntro({ eyebrow, title, description, children }) {
+  return (
+    <section className="griot-panel-intro">
+      <p className="griot-eyebrow">{eyebrow}</p>
+      <div className="griot-panel-intro-row">
+        <div><h2>{title}</h2><p>{description}</p></div>
+        {children}
+      </div>
+    </section>
+  );
+}
+
+export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }) {
+  const [formOpen, setFormOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+  const [draft, setDraft] = useState({ personneId: '', lieu: '', pays: '', dateEvenement: '', latitude: '', longitude: '' });
+  const canEdit = ['admin', 'editeur', 'contributeur'].includes(role);
+  const mapped = migrations.filter((item) => item.lieu.latitude !== null && item.lieu.longitude !== null);
+
+  const saveMigration = async (event) => {
+    event.preventDefault();
+    setError('');
+    setSaving(true);
+    try {
+      await api.createMigration(arbreId, {
+        personneId: draft.personneId,
+        lieu: draft.lieu,
+        pays: draft.pays || undefined,
+        dateEvenement: draft.dateEvenement || undefined,
+        latitude: draft.latitude === '' ? undefined : Number(draft.latitude),
+        longitude: draft.longitude === '' ? undefined : Number(draft.longitude),
+        ordre: migrations.length,
+      });
+      setDraft({ personneId: '', lieu: '', pays: '', dateEvenement: '', latitude: '', longitude: '' });
+      setFormOpen(false);
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const removeMigration = async (id) => {
+    if (!window.confirm('Retirer cette étape du parcours familial ?')) return;
+    setError('');
+    try {
+      await api.deleteMigration(arbreId, id);
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  };
+
+  return (
+    <div className="griot-feature-screen">
+      <PageIntro
+        eyebrow="ORIGINES FAMILIALES"
+        title="Carte des origines"
+        description="Retracez les lieux et les étapes transmis par les membres de la famille."
+      >
+        {canEdit && <button className="griot-button griot-button-primary" onClick={() => setFormOpen(!formOpen)}>+ Ajouter un lieu</button>}
+      </PageIntro>
+
+      {error && <p className="griot-inline-error" role="alert">{error}</p>}
+
+      {formOpen && (
+        <form className="griot-form-card griot-grid-form" onSubmit={saveMigration}>
+          <label>Personne concernée
+            <select required value={draft.personneId} onChange={(event) => setDraft({ ...draft, personneId: event.target.value })}>
+              <option value="">Choisir une personne</option>
+              {personnes.map((personne) => <option key={personne.id} value={personne.id}>{personne.prenom} {personne.nom}</option>)}
+            </select>
+          </label>
+          <label>Lieu
+            <input required maxLength={120} value={draft.lieu} onChange={(event) => setDraft({ ...draft, lieu: event.target.value })} placeholder="Village, ville…" />
+          </label>
+          <label>Pays
+            <input maxLength={120} value={draft.pays} onChange={(event) => setDraft({ ...draft, pays: event.target.value })} placeholder="Cameroun" />
+          </label>
+          <label>Date ou période
+            <input type="date" value={draft.dateEvenement} onChange={(event) => setDraft({ ...draft, dateEvenement: event.target.value })} />
+          </label>
+          <label>Latitude (facultative)
+            <input type="number" step="any" min="-90" max="90" value={draft.latitude} onChange={(event) => setDraft({ ...draft, latitude: event.target.value })} />
+          </label>
+          <label>Longitude (facultative)
+            <input type="number" step="any" min="-180" max="180" value={draft.longitude} onChange={(event) => setDraft({ ...draft, longitude: event.target.value })} />
+          </label>
+          <div className="griot-form-actions">
+            <button type="button" className="griot-button griot-button-quiet" onClick={() => setFormOpen(false)}>Annuler</button>
+            <button className="griot-button griot-button-primary" disabled={saving}>{saving ? 'Enregistrement…' : 'Enregistrer le lieu'}</button>
+          </div>
+        </form>
+      )}
+
+      {migrations.length === 0 ? (
+        <div className="griot-empty-state"><span>⌖</span><h3>Le parcours familial commence ici</h3><p>Ajoutez les lieux associés aux personnes pour documenter les origines et les migrations.</p></div>
+      ) : (
+        <>
+          {mapped.length > 0 && (
+            <section className="griot-map-card" aria-label="Carte des lieux saisis">
+              <div className="griot-map-heading"><div><h3>Repères géographiques</h3><p>Positionnés à partir des coordonnées fournies par la famille.</p></div><span>{mapped.length} lieu{mapped.length === 1 ? '' : 'x'} géolocalisé{mapped.length === 1 ? '' : 's'}</span></div>
+              <svg className="griot-map" viewBox="0 0 720 280" role="img" aria-label="Carte des lieux familiaux">
+                <rect width="720" height="280" rx="14" fill="#efe4d0" />
+                {[1, 2, 3].map((line) => <line key={`v-${line}`} x1={line * 180} x2={line * 180} y1="0" y2="280" stroke="#ddcaa9" strokeDasharray="4 7" />)}
+                {[1, 2].map((line) => <line key={`h-${line}`} x1="0" x2="720" y1={line * 90} y2={line * 90} stroke="#ddcaa9" strokeDasharray="4 7" />)}
+                {mapped.length > 1 && <polyline points={mapped.map(({ lieu }) => `${((lieu.longitude + 180) / 360) * 680 + 20},${((90 - lieu.latitude) / 180) * 240 + 20}`).join(' ')} fill="none" stroke="#b5502a" strokeWidth="3" strokeDasharray="6 6" />}
+                {mapped.map((item) => {
+                  const x = ((item.lieu.longitude + 180) / 360) * 680 + 20;
+                  const y = ((90 - item.lieu.latitude) / 180) * 240 + 20;
+                  return <g key={item.id}><circle cx={x} cy={y} r="8" fill="#b5502a" stroke="#fffbf3" strokeWidth="3" /><title>{item.lieu.nom} · {item.personne.prenom} {item.personne.nom}</title></g>;
+                })}
+              </svg>
+            </section>
+          )}
+
+          <div className="griot-route-list">
+            {migrations.map((item, index) => (
+              <article key={item.id} className="griot-route-item">
+                <span className="griot-route-index">{String(index + 1).padStart(2, '0')}</span>
+                <div className="griot-route-copy">
+                  <h3>{item.lieu.nom}{item.lieu.pays ? `, ${item.lieu.pays}` : ''}</h3>
+                  <p>{item.personne.prenom} {item.personne.nom}{item.dateEvenement ? ` · ${new Date(item.dateEvenement).toLocaleDateString('fr-FR')}` : ''}</p>
+                </div>
+                {canEdit && <button className="griot-text-button" onClick={() => removeMigration(item.id)}>Retirer</button>}
+              </article>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+export function GovernancePanel({ arbreId, institution, preuves, personnes, role, onRefresh }) {
+  const [institutionDraft, setInstitutionDraft] = useState({ nom: '', type: 'chefferie' });
+  const [proofDraft, setProofDraft] = useState({ type: 'témoignage familial', personneId: '', urlDocument: '' });
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const canManage = ['admin', 'editeur'].includes(role);
+  const canCreate = ['admin', 'editeur', 'contributeur'].includes(role);
+
+  const createInstitution = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      await api.createInstitution(arbreId, institutionDraft);
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addProof = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      await api.createProof(arbreId, {
+        ...proofDraft,
+        urlDocument: proofDraft.urlDocument || undefined,
+        personneId: proofDraft.personneId || undefined,
+      });
+      setProofDraft({ type: 'témoignage familial', personneId: '', urlDocument: '' });
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const reviewProof = async (proofId, status) => {
+    setError('');
+    try {
+      await api.updateProof(arbreId, proofId, status);
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    }
+  };
+
+  return (
+    <div className="griot-feature-screen">
+      <PageIntro
+        eyebrow="TRANSMISSION & CONFIANCE"
+        title="Espace chefferie"
+        description="Suivez les preuves partagées et les demandes de vérification liées à cet arbre."
+      />
+      {error && <p className="griot-inline-error" role="alert">{error}</p>}
+
+      <section className="griot-institution-card">
+        <div>
+          <p className="griot-eyebrow">ORGANISME ASSOCIÉ</p>
+          <h3>{institution?.nom || 'Aucune institution déclarée'}</h3>
+          <p>{institution ? `${institution.type} · ${institution.statutVerification === 'verifie_chefferie' ? 'Vérifiée par la chefferie' : 'Vérification institutionnelle en attente'}` : 'Les données ne sont pas présentées comme vérifiées par une institution.'}</p>
+        </div>
+        {!institution && role === 'admin' && (
+          <form className="griot-inline-form" onSubmit={createInstitution}>
+            <input aria-label="Nom de l’institution" required maxLength={160} value={institutionDraft.nom} onChange={(event) => setInstitutionDraft({ ...institutionDraft, nom: event.target.value })} placeholder="Nom de la chefferie ou de l’archive" />
+            <select aria-label="Type d’institution" value={institutionDraft.type} onChange={(event) => setInstitutionDraft({ ...institutionDraft, type: event.target.value })}>
+              <option value="chefferie">Chefferie</option><option value="archive">Archive</option><option value="association">Association</option>
+            </select>
+            <button className="griot-button griot-button-primary" disabled={saving}>{saving ? 'Enregistrement…' : 'Déclarer'}</button>
+          </form>
+        )}
+      </section>
+
+      <section className="griot-governance-grid">
+        <div className="griot-form-card">
+          <div className="griot-section-heading"><div><h3>Soumettre une preuve</h3><p>Reliez une source à une personne pour documenter sa biographie.</p></div></div>
+          {canCreate ? (
+            <form className="griot-stack-form" onSubmit={addProof}>
+              <label>Personne
+                <select required value={proofDraft.personneId} onChange={(event) => setProofDraft({ ...proofDraft, personneId: event.target.value })}>
+                  <option value="">Choisir une personne</option>
+                  {personnes.map((personne) => <option key={personne.id} value={personne.id}>{personne.prenom} {personne.nom}</option>)}
+                </select>
+              </label>
+              <label>Type de source
+                <input required maxLength={80} value={proofDraft.type} onChange={(event) => setProofDraft({ ...proofDraft, type: event.target.value })} />
+              </label>
+              <label>Lien de référence (facultatif)
+                <input type="url" maxLength={2000} value={proofDraft.urlDocument} onChange={(event) => setProofDraft({ ...proofDraft, urlDocument: event.target.value })} placeholder="https://…" />
+              </label>
+              <button className="griot-button griot-button-primary" disabled={saving}>{saving ? 'Envoi…' : 'Envoyer pour validation'}</button>
+            </form>
+          ) : <p className="griot-muted">Votre rôle ne permet pas de soumettre une preuve.</p>}
+        </div>
+
+        <div className="griot-form-card">
+          <div className="griot-section-heading"><div><h3>File de validation</h3><p>{preuves.filter((preuve) => preuve.statutValidation === 'en_attente').length} en attente · {preuves.length} preuve{preuves.length === 1 ? '' : 's'} au total</p></div></div>
+          {preuves.length === 0 ? <p className="griot-muted">Aucune preuve n’a encore été soumise.</p> : (
+            <div className="griot-proof-list">
+              {preuves.map((preuve) => (
+                <article key={preuve.id} className="griot-proof-item">
+                  <div><h4>{preuve.type}</h4><p>{preuve.personne ? `${preuve.personne.prenom} ${preuve.personne.nom}` : preuve.souvenir?.titre} · {preuve.auteur.prenom} {preuve.auteur.nom}</p></div>
+                  <span className={`griot-status griot-status-${preuve.statutValidation}`}>{preuve.statutValidation === 'en_attente' ? 'En attente' : preuve.statutValidation === 'validee' ? 'Validée' : 'Rejetée'}</span>
+                  {preuve.urlDocument && <a href={preuve.urlDocument} target="_blank" rel="noreferrer">Ouvrir la source</a>}
+                  {canManage && preuve.statutValidation === 'en_attente' && <div className="griot-proof-actions"><button onClick={() => reviewProof(preuve.id, 'validee')}>Valider par la famille</button><button onClick={() => reviewProof(preuve.id, 'rejetee')}>Rejeter</button></div>}
+                </article>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+      <p className="griot-governance-note">Une validation familiale n’équivaut pas à une certification officielle. Le statut institutionnel reste distinct et visible.</p>
+    </div>
+  );
+}
+
+export function AssistantPanel({ arbreId }) {
+  const [question, setQuestion] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const prompts = ['Qui est la personne la plus ancienne ?', 'Quelles relations manquent dans mon arbre ?', 'Comment compléter les origines familiales ?'];
+
+  const ask = async (value) => {
+    if (value.trim().length < 2) return;
+    setLoading(true);
+    setError('');
+    setAnswer('');
+    try {
+      const response = await api.askAI(value.trim(), arbreId);
+      setAnswer(response.answer);
+      setSuggestions(response.suggestions || []);
+      setQuestion('');
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="griot-feature-screen">
+      <PageIntro eyebrow="ASSISTANT FAMILIAL" title="Demander à GRIOT" description="Posez une question sur les informations déjà enregistrées dans cet arbre." />
+      <section className="griot-assistant-card">
+        <div className="griot-assistant-mark">G</div>
+        <div className="griot-assistant-content">
+          <h3>Votre mémoire familiale, à portée de question.</h3>
+          <p>Les réponses utilisent le contexte de cet arbre; elles ne remplacent pas une source ou une preuve.</p>
+          <div className="griot-prompt-list">{prompts.map((prompt) => <button key={prompt} onClick={() => ask(prompt)} disabled={loading}>{prompt}</button>)}</div>
+          <form className="griot-assistant-form" onSubmit={(event) => { event.preventDefault(); ask(question); }}>
+            <input value={question} onChange={(event) => setQuestion(event.target.value)} minLength={2} maxLength={1000} placeholder="Écrivez votre question…" aria-label="Question à GRIOT" />
+            <button className="griot-button griot-button-primary" disabled={loading}>{loading ? 'Réflexion…' : 'Envoyer'}</button>
+          </form>
+          {error && <p className="griot-inline-error" role="alert">{error}</p>}
+          {answer && <div className="griot-assistant-answer"><p>{answer}</p>{suggestions.length > 0 && <div>{suggestions.map((item) => <button key={item} onClick={() => ask(item)}>{item}</button>)}</div>}</div>}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+export function StylePanel() {
+  const colors = [
+    { title: 'Terre cuite', hex: '#B5502A', note: 'Héritage' },
+    { title: 'Or', hex: '#C9932E', note: 'Transmission' },
+    { title: 'Vert olive', hex: '#4B5D3B', note: 'Vie' },
+    { title: 'Encre', hex: '#2B1B12', note: 'Mémoire' },
+    { title: 'Crème', hex: '#F6EFE1', note: 'Accueil' },
+  ];
+  return (
+    <div className="griot-feature-screen">
+      <PageIntro eyebrow="IDENTITÉ VISUELLE" title="Charte graphique GRIOT" description="Une interface chaleureuse, lisible et conçue pour mettre les récits familiaux au premier plan." />
+      <div className="griot-swatches">{colors.map((color) => <article key={color.hex}><span style={{ backgroundColor: color.hex }} /><h3>{color.title}</h3><p>{color.note} · {color.hex}</p></article>)}</div>
+      <section className="griot-type-sample"><div><small>TITRES · SERIF</small><h2>Racines & mémoire</h2></div><div><small>INTERFACE · SANS SERIF</small><p>Moderne, lisible et chaleureux. Les personnes et leurs récits restent au centre de chaque écran.</p></div></section>
+    </div>
+  );
+}
+
+export function DemoPanel({ arbre, personnes, souvenirs, onNavigate }) {
+  return (
+    <div className="griot-feature-screen">
+      <PageIntro eyebrow="PARCOURS CONNECTÉ" title="Démo multi-écrans" description="Explorez les principaux écrans avec les données réelles de l’arbre sélectionné." />
+      <div className="griot-demo-grid">
+        <button onClick={() => onNavigate('tableau')}><small>01 · APERÇU</small><strong>{arbre.nom}</strong><span>Tableau de bord familial</span><b>{personnes.length} personnes · {souvenirs.length} souvenirs</b></button>
+        <button onClick={() => onNavigate('genealogie')}><small>02 · GÉNÉALOGIE</small><strong>Les liens</strong><span>Visualisez les relations enregistrées.</span><b>Ouvrir l’arbre →</b></button>
+        <button onClick={() => onNavigate('origines')}><small>03 · ORIGINES</small><strong>Les parcours</strong><span>Retracez les lieux transmis par la famille.</span><b>Explorer la carte →</b></button>
+        <button onClick={() => onNavigate('souvenirs')}><small>04 · MÉMOIRE</small><strong>Les récits</strong><span>Retrouvez les souvenirs de votre famille.</span><b>Ouvrir les souvenirs →</b></button>
+      </div>
+    </div>
+  );
+}

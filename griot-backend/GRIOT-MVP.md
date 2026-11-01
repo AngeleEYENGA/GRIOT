@@ -2,17 +2,18 @@
 
 **Projet :** GRIOT — mémoire numérique des familles africaines
 **Porté par :** GAM Labs (contact.gamlabs@proton.me)
-**Statut :** Prototype de démonstration investisseurs (données fictives, non connecté à un backend)
-**Dernière mise à jour :** 19 juillet 2026 (v7)
+**Statut :** Prototype HTML de démonstration et application web React connectée au backend PostgreSQL
+**Dernière mise à jour :** 1 novembre 2026
 **Documents associés :** `GRIOT-Conception-SI.md` (architecture système) · `griot-backend/` (code du backend — Lot 1)
 
 ---
 
 ## 1. Ce que c'est
 
-Un prototype interactif, livré sous forme d'**un seul fichier HTML autonome** (`griot-prototype.html`), qui simule l'expérience complète de l'application GRIOT : de la découverte du produit à la gestion d'un arbre généalogique familial, en passant par la préservation de mémoire culturelle (histoires, traditions, frise historique).
+Le dépôt contient deux expériences distinctes :
 
-Il n'y a **pas de backend** : toutes les données (personnes, familles, traditions...) sont fictives et codées en dur. Les interactions (cocher une mission, changer un avatar, etc.) fonctionnent en direct dans le navigateur mais ne sont **pas sauvegardées** — tout se réinitialise au rechargement de la page.
+- `griot-prototype.html` est une maquette autonome : ses familles et interactions de démonstration sont fictives et réinitialisées au rechargement.
+- `griot-frontend/` est l'application React connectée à l'API NestJS et à PostgreSQL. L'authentification, les arbres, les personnes, les relations, les souvenirs, les membres, les médias privés, les origines et les preuves sont persistés et soumis aux permissions de l'arbre.
 
 ## 2. Comment l'ouvrir
 
@@ -58,11 +59,15 @@ Navigables depuis le rail de gauche du prototype :
 - **Responsive** : démonstration animée de l'app sur mobile/tablette/desktop.
 - **Personnalisation** : affichage de l'arbre configurable, avatars de profil personnalisables (couleur, emoji, ou simulation photo).
 
-## 6. Limites connues (à garder en tête pour les questions investisseurs)
+## 6. Limites connues
 
-- Aucune persistance de données (tout est en mémoire, perdu au rechargement)
+- La maquette HTML reste non persistante; elle ne représente pas les données de production
+- La recherche publique n'expose que le nom et le nombre de personnes des arbres explicitement déclarés publics; les profils et souvenirs restent privés
+- Les vérifications proposées dans l'espace de gouvernance sont des validations familiales. L'application ne certifie pas encore l'identité d'une chefferie ni une validation institutionnelle indépendante
+- L'assistant GRIOT répond à partir de règles et des statistiques de l'arbre; aucun fournisseur de modèle génératif n'est configuré
+- La carte positionne uniquement les coordonnées saisies par un membre; aucun géocodeur ni fond cartographique externe n'est utilisé
+- Les migrations de données hors ligne, l'arbitrage des conflits et la synchronisation différée ne sont pas encore implémentés
 - Aucun vrai moteur de recherche/navigation pour un arbre de centaines de personnes (zoom infini, regroupement — non implémenté, à ne pas simuler en démo live)
-- Le mode hors ligne réel (stockage local, synchronisation, résolution de conflits) reste à concevoir pour la version production
 - Chiffres d'usage retirés de l'accueil pour rester honnête sur le stade de lancement
 
 ## 7. Roadmap identifiée (retours investisseurs / mentors)
@@ -76,6 +81,17 @@ Navigables depuis le rail de gauche du prototype :
 ---
 
 ## Changelog
+
+### 1 novembre 2026 — écrans du prototype reliés aux données réelles
+- Refonte de l'accueil, de l'authentification, de la navigation latérale et des styles responsive selon la charte GRIOT
+- Recherche publique limitée aux arbres explicitement publics, avec exposition du nom et d'un décompte agrégé uniquement
+- Ajout et suppression de lieux/migrations rattachés à des personnes de l'arbre, avec coordonnées facultatives
+- Ajout des preuves familiales, de leur file de validation, et de la déclaration d'une institution associée à un arbre
+- Écrans rôles, assistant, mémoire, charte et démonstration affichant les données réelles de l'arbre sélectionné
+- Upload privé des photos, enregistrements audio, vidéos et PDF liés aux fiches personnes (4 Mio maximum par fichier)
+- Protection des changements de rôle contre l'auto-rétrogradation et la suppression du dernier administrateur actif
+- Aucun nouveau modèle Prisma n'est requis : ces services utilisent les entités Migration, Lieu, Preuve et Institution déjà présentes
+- Les vérifications institutionnelles indépendantes et la synchronisation hors ligne restent à mettre en œuvre
 
 ### 1 novembre 2026 — tableau de bord connecté aux données réelles
 - Ajout d'un tableau de bord par arbre avec statistiques réelles sur les personnes, relations, souvenirs et collaborateurs

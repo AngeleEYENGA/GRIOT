@@ -5,51 +5,100 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import TreesPage from './pages/TreesPage';
 import TreeDetailPage from './pages/TreeDetailPage';
+import HomePage from './pages/HomePage';
+import AppShell from './components/AppShell';
 import './index.css';
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
-  const [authMode, setAuthMode] = useState('login');
+  const [authMode, setAuthMode] = useState('home');
   const [selectedTreeId, setSelectedTreeId] = useState(null);
+  const [activePanel, setActivePanel] = useState('tableau');
+
+  const navigate = (panel) => {
+    setActivePanel(panel);
+    if (panel === 'tableau') setSelectedTreeId(null);
+  };
+  const handleLogout = () => {
+    setSelectedTreeId(null);
+    setActivePanel('tableau');
+    setAuthMode('home');
+    logout();
+  };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <div className="griot-loading">
+        <img src="/griot-logo.jpeg" alt="GRIOT" />
+        <span>Préparation de votre espace familial…</span>
       </div>
     );
   }
 
   if (!user) {
+    if (authMode === 'home') {
+      return (
+        <HomePage
+          onLogin={() => setAuthMode('login')}
+          onRegister={() => setAuthMode('register')}
+        />
+      );
+    }
+
     if (authMode === 'login') {
       return (
         <LoginPage
           onSwitchToRegister={() => setAuthMode('register')}
+          onBackToHome={() => setAuthMode('home')}
         />
       );
     } else {
       return (
         <RegisterPage
           onSwitchToLogin={() => setAuthMode('login')}
+          onBackToHome={() => setAuthMode('home')}
         />
       );
     }
   }
 
-  if (selectedTreeId) {
-    return (
-      <TreeDetailPage
-        treeId={selectedTreeId}
-        onBack={() => setSelectedTreeId(null)}
-      />
-    );
-  }
-
   return (
-    <TreesPage
-      onSelectTree={setSelectedTreeId}
-      onLogout={logout}
-    />
+    <AppShell
+      activePanel={activePanel}
+      onLogout={handleLogout}
+      onNavigate={navigate}
+      user={user}
+    >
+      {selectedTreeId ? (
+        <TreeDetailPage
+          key={selectedTreeId}
+          treeId={selectedTreeId}
+          activeTab={activePanel}
+          onTabChange={setActivePanel}
+          onBack={() => {
+            setSelectedTreeId(null);
+            setActivePanel('tableau');
+          }}
+        />
+      ) : (
+        <>
+          {activePanel !== 'tableau' && (
+            <section className="griot-select-tree">
+              <p className="griot-eyebrow">ESPACE FAMILIAL</p>
+              <h2>Choisissez un arbre pour continuer</h2>
+              <p>Les personnes, souvenirs, origines et droits sont liés à un arbre familial.</p>
+            </section>
+          )}
+          <TreesPage
+            onSelectTree={(treeId) => {
+              setSelectedTreeId(treeId);
+              setActivePanel('tableau');
+            }}
+            onLogout={handleLogout}
+          />
+        </>
+      )}
+    </AppShell>
   );
 }
 

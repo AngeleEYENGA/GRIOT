@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateArbreDto } from './dto/create-arbre.dto';
 
@@ -38,6 +38,30 @@ export class ArbresService {
     return this.prisma.arbre.findMany({
       where: { membres: { some: { utilisateurId, statut: 'actif' } } },
       include: { membres: true },
+    });
+  }
+
+  async findPublic(search?: string) {
+    const normalizedSearch = search?.trim();
+    if (normalizedSearch && normalizedSearch.length > 100) {
+      throw new BadRequestException('La recherche ne peut pas dépasser 100 caractères.');
+    }
+
+    return this.prisma.arbre.findMany({
+      where: {
+        visibilite: { in: ['public', 'publique'] },
+        ...(normalizedSearch
+          ? { nom: { contains: normalizedSearch, mode: 'insensitive' } }
+          : {}),
+      },
+      select: {
+        id: true,
+        nom: true,
+        dateCreation: true,
+        _count: { select: { personnes: true } },
+      },
+      orderBy: { dateCreation: 'desc' },
+      take: 20,
     });
   }
 

@@ -30,7 +30,7 @@ Ne jamais placer `JWT_SECRET`, un secret OAuth Google ou un mot de passe de base
 
 Le store privé `griot-backend-blob` est créé en région `fra1` et relié au projet `griot-backend` pour Production et Preview. Vercel fournit `BLOB_STORE_ID` et l'authentification OIDC au runtime. Aucun jeton Blob n'est stocké dans le dépôt ni exposé au frontend. Après toute modification de cette liaison, redéployer le backend pour qu'il récupère les variables.
 
-Le backend enregistre uniquement le chemin interne du Blob, jamais une URL publique. La lecture passe par une route API authentifiée, vérifie l'appartenance à l'arbre et relaie le fichier; le navigateur n'accède donc pas directement au store. Les membres admin, éditeur et contributeur peuvent charger des images JPEG, PNG ou WebP de 4 Mio maximum sur les profils. Tous les membres actifs de l'arbre peuvent les consulter.
+Le backend enregistre uniquement le chemin interne du Blob, jamais une URL publique. La lecture passe par une route API authentifiée, vérifie l'appartenance à l'arbre et relaie le fichier; le navigateur n'accède donc pas directement au store. Les membres admin, éditeur et contributeur peuvent charger des photos JPEG/PNG/WebP, des enregistrements MP3/M4A/OGG/WAV/WebM, des vidéos MP4/WebM ou des PDF de 4 Mio maximum sur les profils. Le backend contrôle le type réel du fichier. Tous les membres actifs de l'arbre peuvent consulter les médias.
 
 Le projet Vercel est sur l'offre Hobby : le quota inclus affiché pour ce store est de 1 Go de stockage moyen, 10 000 opérations simples, 2 000 avancées et 10 Go de transfert. Blob est gratuit sur Hobby dans ces limites; si elles sont dépassées, l'accès au stockage est suspendu jusqu'au renouvellement du quota, sans facturation d'usage supplémentaire. Voir la [tarification officielle Vercel Blob](https://vercel.com/docs/vercel-blob/usage-and-pricing).
 
@@ -45,6 +45,12 @@ Dans Google Cloud Console, le client OAuth **Application Web** `GRIOT Web Client
 **État actuel :** la base Neon est créée et reliée au projet backend. `DATABASE_URL` et `DATABASE_URL_UNPOOLED` sont gérées par l’intégration Vercel. Des `JWT_SECRET` distincts pour Production et Preview sont générés directement dans les variables Vercel. Configurer la commande de build du projet backend sur `npm run build:vercel`, puis redéployer : `prisma migrate deploy` appliquera les migrations de façon idempotente au build avant le démarrage de l’API. Ne jamais utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction.
 
 La migration `20261101000000_google_oauth` ajoute la table des identités Google et rend le mot de passe facultatif pour les comptes OAuth. Conserver une sauvegarde de la base avant toute migration en production.
+
+## Écrans connectés et ordre de déploiement
+
+La nouvelle interface utilise les routes API de recherche des arbres publics, des migrations, des preuves et des institutions. Elle s’appuie sur les tables Prisma déjà existantes (`Arbre`, `Migration`, `Lieu`, `Preuve`, `Institution`) et n’ajoute donc pas de migration de schéma. Lors de sa publication, déployer d’abord le backend puis le frontend afin que les routes soient disponibles avant que l’interface les appelle.
+
+La recherche publique ne retourne que le nom de l’arbre et un décompte de personnes pour les arbres ayant explicitement la visibilité `public`. Les profils, souvenirs et médias restent protégés par l’authentification et l’appartenance à l’arbre. Les coordonnées de la carte sont saisies par les membres; aucune API de géocodage externe n’est appelée.
 
 ## Développement local
 

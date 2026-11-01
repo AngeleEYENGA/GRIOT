@@ -8,6 +8,7 @@ export default function TreesPage({ onSelectTree, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [newTreeName, setNewTreeName] = useState('');
+  const [newTreeVisibility, setNewTreeVisibility] = useState('prive');
   const [creatingTree, setCreatingTree] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
 
@@ -33,9 +34,10 @@ export default function TreesPage({ onSelectTree, onLogout }) {
 
     try {
       setCreatingTree(true);
-      const response = await api.createArbre(newTreeName.trim());
+      const response = await api.createArbre(newTreeName.trim(), newTreeVisibility);
       setTrees([...trees, response]);
       setNewTreeName('');
+      setNewTreeVisibility('prive');
       setShowCreateForm(false);
     } catch (err) {
       setError(err.message);
@@ -98,6 +100,23 @@ export default function TreesPage({ onSelectTree, onLogout }) {
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   required
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="tree-visibility">
+                  Visibilité
+                </label>
+                <select
+                  id="tree-visibility"
+                  value={newTreeVisibility}
+                  onChange={(event) => setNewTreeVisibility(event.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
+                >
+                  <option value="prive">Privé — réservé aux membres invités</option>
+                  <option value="public">Public — nom et nombre de personnes visibles dans l’exploration</option>
+                </select>
+                <p className="mt-2 text-xs text-gray-600">
+                  Les profils et souvenirs restent réservés aux membres, même si l’arbre est public.
+                </p>
               </div>
               <button
                 type="submit"

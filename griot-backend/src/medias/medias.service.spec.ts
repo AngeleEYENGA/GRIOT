@@ -99,6 +99,44 @@ describe('MediasService', () => {
     expect(put).not.toHaveBeenCalled();
   });
 
+  it('stores supported audio and PDF files as private media records', async () => {
+    const audio = {
+      buffer: Buffer.from('audio-data'),
+      mimetype: 'audio/mpeg',
+      size: 10,
+    };
+
+    await service.uploadPersonMedia('tree-1', 'person-1', audio);
+
+    expect(put).toHaveBeenCalledWith(
+      expect.stringMatching(/^arbres\/tree-1\/personnes\/person-1\/audio\/.+\.mp3$/),
+      audio.buffer,
+      { access: 'private', contentType: 'audio/mpeg' },
+    );
+    expect(prisma.media.create).toHaveBeenCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ type: 'audio' }),
+    }));
+
+    await service.uploadPersonMedia('tree-1', 'person-1', {
+      buffer: Buffer.from('pdf-data'),
+      mimetype: 'application/pdf',
+      size: 8,
+    });
+    expect(prisma.media.create).toHaveBeenLastCalledWith(expect.objectContaining({
+      data: expect.objectContaining({ type: 'document' }),
+    }));
+  });
+
+  it('keeps the photo endpoint restricted to image formats', async () => {
+    await expect(service.uploadPersonPhoto('tree-1', 'person-1', {
+      buffer: Buffer.from('audio-data'),
+      mimetype: 'audio/mpeg',
+      size: 10,
+    })).rejects.toThrow(BadRequestException);
+
+    expect(put).not.toHaveBeenCalled();
+  });
+
   it('does not expose a photo for a person outside the requested tree', async () => {
     prisma.personne.findFirst.mockResolvedValueOnce(null);
 

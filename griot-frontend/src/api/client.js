@@ -103,6 +103,11 @@ class GriotAPI {
     return this.request('/arbres');
   }
 
+  searchPublicTrees(recherche = '') {
+    const query = recherche.trim();
+    return this.request(`/arbres/publics${query ? `?recherche=${encodeURIComponent(query)}` : ''}`);
+  }
+
   getArbre(arbreId) {
     return this.request(`/arbres/${arbreId}`);
   }
@@ -157,6 +162,10 @@ class GriotAPI {
     return this.request(`/arbres/${arbreId}/personnes/${personneId}/photos`);
   }
 
+  getPersonMedias(arbreId, personneId) {
+    return this.request(`/arbres/${arbreId}/personnes/${personneId}/medias`);
+  }
+
   uploadPersonPhoto(arbreId, personneId, file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -166,7 +175,20 @@ class GriotAPI {
     });
   }
 
+  uploadPersonMedia(arbreId, personneId, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.request(`/arbres/${arbreId}/personnes/${personneId}/medias`, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
   getPersonPhotoBlob(arbreId, mediaId) {
+    return this.requestBlob(`/arbres/${arbreId}/medias/${mediaId}/contenu`);
+  }
+
+  getPersonMediaBlob(arbreId, mediaId) {
     return this.requestBlob(`/arbres/${arbreId}/medias/${mediaId}/contenu`);
   }
 
@@ -207,6 +229,52 @@ class GriotAPI {
     return this.request(`/arbres/${arbreId}/membres`);
   }
 
+  getMigrations(arbreId) {
+    return this.request(`/arbres/${arbreId}/migrations`);
+  }
+
+  createMigration(arbreId, data) {
+    return this.request(`/arbres/${arbreId}/migrations`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  deleteMigration(arbreId, migrationId) {
+    return this.request(`/arbres/${arbreId}/migrations/${migrationId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  getInstitution(arbreId) {
+    return this.request(`/arbres/${arbreId}/institution`);
+  }
+
+  createInstitution(arbreId, data) {
+    return this.request(`/arbres/${arbreId}/institution`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  getProofs(arbreId) {
+    return this.request(`/arbres/${arbreId}/preuves`);
+  }
+
+  createProof(arbreId, data) {
+    return this.request(`/arbres/${arbreId}/preuves`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  updateProof(arbreId, proofId, statutValidation) {
+    return this.request(`/arbres/${arbreId}/preuves/${proofId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ statutValidation }),
+    });
+  }
+
   updateMemberRole(arbreId, membreId, role) {
     return this.request(`/arbres/${arbreId}/membres/${membreId}/role`, {
       method: 'PATCH',
@@ -239,10 +307,10 @@ class GriotAPI {
   }
 
   // 🤖 AI
-  askAI(question) {
+  askAI(question, arbreId) {
     return this.request('/ai/ask', {
       method: 'POST',
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ query: question, arbreId }),
     });
   }
 }
