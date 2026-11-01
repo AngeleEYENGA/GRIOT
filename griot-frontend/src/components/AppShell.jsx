@@ -9,7 +9,6 @@ const navigation = [
   { id: 'souvenirs', label: 'Mémoire familiale', icon: '▤' },
   { id: 'chefferie', label: 'Espace chefferie', icon: '⌂' },
   { id: 'assistant', label: 'Demander à GRIOT', icon: '✦' },
-  { id: 'demo', label: 'Démo multi-écrans', icon: '▣' },
   { id: 'style', label: 'Charte graphique', icon: '◐' },
 ];
 

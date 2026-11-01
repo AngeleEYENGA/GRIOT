@@ -15,6 +15,8 @@ Le dépôt contient deux expériences distinctes :
 - `griot-prototype.html` est une maquette autonome : ses familles et interactions de démonstration sont fictives et réinitialisées au rechargement.
 - `griot-frontend/` est l'application React connectée à l'API NestJS et à PostgreSQL. L'authentification, les arbres, les personnes, les relations, les souvenirs, les membres, les médias privés, les origines et les preuves sont persistés et soumis aux permissions de l'arbre.
 
+La navigation « Démo multi-écrans » présente uniquement la maquette destinée aux investisseurs; elle ne fait pas partie du produit final et n'est pas proposée dans l'application.
+
 ## 2. Comment l'ouvrir
 
 Double-cliquer sur `griot-prototype.html`, ou le glisser dans un onglet de navigateur. **Fonctionne sans connexion internet** une fois le fichier téléchargé (voir §5).
@@ -87,7 +89,7 @@ Navigables depuis le rail de gauche du prototype :
 - Recherche publique limitée aux arbres explicitement publics, avec exposition du nom et d'un décompte agrégé uniquement
 - Ajout et suppression de lieux/migrations rattachés à des personnes de l'arbre, avec coordonnées facultatives
 - Ajout des preuves familiales, de leur file de validation, et de la déclaration d'une institution associée à un arbre
-- Écrans rôles, assistant, mémoire, charte et démonstration affichant les données réelles de l'arbre sélectionné
+- Écrans rôles, assistant, mémoire et charte affichant les données réelles de l'arbre sélectionné; retrait de la navigation « Démo multi-écrans » réservée à la présentation investisseurs
 - Upload privé des photos, enregistrements audio, vidéos et PDF liés aux fiches personnes (4 Mio maximum par fichier)
 - Protection des changements de rôle contre l'auto-rétrogradation et la suppression du dernier administrateur actif
 - Aucun nouveau modèle Prisma n'est requis : ces services utilisent les entités Migration, Lieu, Preuve et Institution déjà présentes

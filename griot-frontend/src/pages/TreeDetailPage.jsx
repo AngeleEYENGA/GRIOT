@@ -4,7 +4,6 @@ import { useAuth } from '../contexts/useAuth';
 import FamilyTreeView from '../components/FamilyTreeView';
 import {
   AssistantPanel,
-  DemoPanel,
   GovernancePanel,
   OriginsPanel,
   StylePanel,
@@ -376,7 +375,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
-            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'demo', 'style'].map((tab) => (
+            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -395,7 +394,6 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 {tab === 'origines' && '⌖ Carte des origines'}
                 {tab === 'chefferie' && '⌂ Espace chefferie'}
                 {tab === 'assistant' && '✦ Demander à GRIOT'}
-                {tab === 'demo' && '▣ Démo multi-écrans'}
                 {tab === 'style' && '◐ Charte graphique'}
               </button>
             ))}
@@ -997,14 +995,6 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         )}
         {activeTab === 'assistant' && <AssistantPanel arbreId={treeId} />}
         {activeTab === 'style' && <StylePanel />}
-        {activeTab === 'demo' && (
-          <DemoPanel
-            arbre={tree}
-            personnes={personnes}
-            souvenirs={souvenirs}
-            onNavigate={setActiveTab}
-          />
-        )}
       </main>
       {selectedPerson && personDraft && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

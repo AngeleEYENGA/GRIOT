@@ -319,17 +319,3 @@ export function StylePanel() {
     </div>
   );
 }
-
-export function DemoPanel({ arbre, personnes, souvenirs, onNavigate }) {
-  return (
-    <div className="griot-feature-screen">
-      <PageIntro eyebrow="PARCOURS CONNECTÉ" title="Démo multi-écrans" description="Explorez les principaux écrans avec les données réelles de l’arbre sélectionné." />
-      <div className="griot-demo-grid">
-        <button onClick={() => onNavigate('tableau')}><small>01 · APERÇU</small><strong>{arbre.nom}</strong><span>Tableau de bord familial</span><b>{personnes.length} personnes · {souvenirs.length} souvenirs</b></button>
-        <button onClick={() => onNavigate('genealogie')}><small>02 · GÉNÉALOGIE</small><strong>Les liens</strong><span>Visualisez les relations enregistrées.</span><b>Ouvrir l’arbre →</b></button>
-        <button onClick={() => onNavigate('origines')}><small>03 · ORIGINES</small><strong>Les parcours</strong><span>Retracez les lieux transmis par la famille.</span><b>Explorer la carte →</b></button>
-        <button onClick={() => onNavigate('souvenirs')}><small>04 · MÉMOIRE</small><strong>Les récits</strong><span>Retrouvez les souvenirs de votre famille.</span><b>Ouvrir les souvenirs →</b></button>
-      </div>
-    </div>
-  );
-}
