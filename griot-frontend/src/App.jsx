@@ -10,6 +10,8 @@ import AppShell from './components/AppShell';
 import { StylePanel } from './components/TreeExtraScreens';
 import InstitutionSpacePage from './pages/InstitutionSpacePage';
 import AccountPage from './pages/AccountPage';
+import NavigationGuide from './pages/NavigationGuide';
+import WelcomeGuide from './components/WelcomeGuide';
 import './index.css';
 
 function AppContent() {
@@ -76,7 +78,10 @@ function AppContent() {
       onNavigate={navigate}
       user={user}
     >
-      {activePanel === 'compte' ? (
+      {activePanel === 'tableau' && <WelcomeGuide key={user.id} onOpen={() => setActivePanel('guide')} />}
+      {activePanel === 'guide' ? (
+        <NavigationGuide onNavigate={navigate} />
+      ) : activePanel === 'compte' ? (
         <AccountPage onLogout={handleLogout} onBack={() => setActivePanel('tableau')} />
       ) : activePanel === 'institutions' ? (
         <InstitutionSpacePage />

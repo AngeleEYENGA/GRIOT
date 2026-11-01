@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import api from '../api/client';
+import PlaceFields from './PlaceFields';
 
 function PageIntro({ eyebrow, title, description, children }) {
   return (
@@ -121,12 +122,7 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
               {personnes.map((personne) => <option key={personne.id} value={personne.id}>{personne.prenom} {personne.nom}</option>)}
             </select>
           </label>
-          <label>Lieu
-            <input required maxLength={120} value={draft.lieu} onChange={(event) => setDraft({ ...draft, lieu: event.target.value })} placeholder="Village, ville…" />
-          </label>
-          <label>Pays
-            <input maxLength={120} value={draft.pays} onChange={(event) => setDraft({ ...draft, pays: event.target.value })} placeholder="Cameroun" />
-          </label>
+          <PlaceFields value={draft} onChange={setDraft} />
           <label>Date ou période
             <input type="date" value={draft.dateEvenement} onChange={(event) => setDraft({ ...draft, dateEvenement: event.target.value })} />
           </label>
@@ -149,7 +145,7 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
         <>
           {mapped.length > 0 && (
             <section className="griot-map-card" aria-label="Carte des lieux saisis">
-              <div className="griot-map-heading"><div><h3>Repères géographiques</h3><p>Positionnés à partir des coordonnées fournies par la famille.</p></div><span>{mapped.length} lieu{mapped.length === 1 ? '' : 'x'} géolocalisé{mapped.length === 1 ? '' : 's'}</span></div>
+              <div className="griot-map-heading"><div><h3>Repères géographiques</h3><p>Coordonnées proposées ou saisies, puis confirmées par la famille.</p></div><span>{mapped.length} lieu{mapped.length === 1 ? '' : 'x'} géolocalisé{mapped.length === 1 ? '' : 's'}</span></div>
               <svg className="griot-map" viewBox="0 0 720 280" role="img" aria-label="Carte des lieux familiaux">
                 <rect width="720" height="280" rx="14" fill="#efe4d0" />
                 {[1, 2, 3].map((line) => <line key={`v-${line}`} x1={line * 180} x2={line * 180} y1="0" y2="280" stroke="#ddcaa9" strokeDasharray="4 7" />)}

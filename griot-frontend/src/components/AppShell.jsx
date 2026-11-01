@@ -14,10 +14,12 @@ const navigation = [
   { id: 'assistant', label: 'Demander à GRIOT' },
   { id: 'style', label: 'Charte graphique' },
   { id: 'compte', label: 'Mon compte' },
+  { id: 'guide', label: 'Guide de navigation' },
 ];
 
 function NavigationIcon({ name }) {
   const icons = {
+    guide: <><circle cx="12" cy="12" r="9" /><path d="M9.5 8a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1-1.5 3m0 3h.01" /></>,
     tableau: <><path d="m3 10 9-7 9 7" /><path d="M5 9v11h14V9M9 20v-6h6v6" /></>,
     genealogie: <><circle cx="12" cy="5" r="2" /><circle cx="6" cy="19" r="2" /><circle cx="18" cy="19" r="2" /><path d="M12 7v5m-6 5v-2a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v2" /></>,
     personnes: <><circle cx="12" cy="8" r="3" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
@@ -93,6 +95,7 @@ export default function AppShell({
             <span>{treeName || activePage?.label || 'Votre espace familial'}</span>
           </div>
           <div className="griot-user-menu">
+            <button className="griot-help-trigger" onClick={() => navigate('guide')} aria-label="Ouvrir le guide de navigation" title="Guide de navigation">?</button>
             <NotificationCenter />
             <InstallAppButton compact />
             <button className="griot-account-trigger" onClick={() => navigate('compte')} aria-label="Ouvrir mon compte" aria-current={active === 'compte' ? 'page' : undefined}>

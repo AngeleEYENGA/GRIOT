@@ -1,0 +1,34 @@
+import { useState } from 'react';
+
+const steps = [
+  { title: 'Retrouvez votre famille', panel: 'tableau', action: 'Ouvrir le tableau de bord', text: 'Le tableau de bord est votre point de départ. Choisissez un arbre existant ou créez votre premier arbre avec « Nouvel arbre ». Dans un arbre, « Retour » vous ramène à la liste de vos familles.', tip: 'Un arbre est un espace partagé : plusieurs proches peuvent y construire la même histoire.' },
+  { title: 'Ajoutez les visages, puis les liens', panel: 'personnes', action: 'Voir les fiches personnes', text: 'Dans « Fiche personne », ajoutez un prénom, un nom, puis les dates, le lieu d’origine et une biographie. Ouvrez une fiche pour consulter ses détails et ses médias. Dans l’onglet « Relations », reliez deux personnes ; l’arbre généalogique représente ensuite ces liens.', tip: 'Commencez par vous, vos parents et vos grands-parents. Complétez les détails à votre rythme.' },
+  { title: 'Conservez une histoire', panel: 'souvenirs', action: 'Explorer la mémoire familiale', text: 'Dans « Mémoire familiale », créez un souvenir et associez-le si besoin à une personne. Vous pouvez conserver des histoires, des traditions et des médias. Le tableau de bord propose des questions pour vous aider à commencer.', tip: 'Une recette, une expression, une photo ou un souvenir d’enfance peuvent devenir un premier récit.' },
+  { title: 'Situez vos racines', panel: 'origines', action: 'Ouvrir la carte des origines', text: 'Choisissez « Ajouter un lieu », puis la personne concernée, le pays et la ville. Sélectionnez une suggestion pour remplir les coordonnées. Un village absent peut être saisi librement. La position actuelle est facultative : elle décrit votre appareil, pas automatiquement le lieu d’origine d’un proche.', tip: 'Vérifiez toujours le pays, la ville et la période avant d’enregistrer une étape familiale.' },
+  { title: 'Invitez et construisez ensemble', panel: 'membres', action: 'Comprendre les rôles', text: 'La rubrique « Rôles & permissions » rassemble les membres et leurs invitations. Un administrateur peut inviter un proche disposant déjà d’un compte GRIOT. Le proche accepte l’invitation depuis la cloche des notifications.', tip: 'Lecteur : consulter. Contributeur : ajouter ou proposer. Éditeur : modifier. Administrateur : gérer les membres et les réglages. Les actions disponibles dépendent du rôle.' },
+  { title: 'Gardez vos repères', panel: 'compte', action: 'Ouvrir mon compte', text: 'Votre avatar ouvre « Mon compte » : informations personnelles, téléphone et mot de passe. Sur ordinateur, utilisez le menu de gauche. Sur mobile, les raccourcis sont en bas ; « Plus » affiche les autres rubriques. Le bouton « ? » permet de retrouver ce guide à tout moment.', tip: 'Vous pouvez revenir au tableau de bord sans perdre les informations déjà enregistrées.' },
+];
+
+export default function NavigationGuide({ onNavigate }) {
+  const [current, setCurrent] = useState(0);
+  const [read, setRead] = useState([]);
+  const step = steps[current];
+  const visit = (index) => {
+    setRead((items) => items.includes(current) ? items : [...items, current]);
+    setCurrent(index);
+  };
+  return <div className="griot-guide-page">
+    <header className="griot-guide-hero"><p className="griot-eyebrow">BIENVENUE DANS GRIOT</p><h1>Vos premiers pas, simplement.</h1><p>Une famille, des liens et des récits. Ce guide vous accompagne pour trouver votre chemin et commencer à transmettre.</p><span>6 repères · À consulter à votre rythme</span></header>
+    <div className="griot-guide-layout">
+      <nav className="griot-guide-steps" aria-label="Étapes du guide">{steps.map((item, index) => <button key={item.panel} className={current === index ? 'is-active' : ''} onClick={() => visit(index)} aria-current={current === index ? 'step' : undefined}><span aria-hidden="true">{read.includes(index) ? '✓' : `0${index + 1}`}</span>{item.title}</button>)}</nav>
+      <section className="griot-guide-detail" aria-labelledby="guide-step-title" aria-live="polite"><p className="griot-eyebrow">ÉTAPE {current + 1} SUR {steps.length}</p><h2 id="guide-step-title">{step.title}</h2><p>{step.text}</p><aside><strong>Le conseil GRIOT</strong><p>{step.tip}</p></aside><button className="griot-button griot-button-primary" onClick={() => onNavigate(step.panel)}>{step.action} →</button><div className="griot-guide-pagination"><button className="griot-button griot-button-quiet" disabled={current === 0} onClick={() => visit(current - 1)}>← Précédent</button>{current < steps.length - 1 ? <button className="griot-button griot-button-outline" onClick={() => visit(current + 1)}>Suivant →</button> : <button className="griot-button griot-button-outline" onClick={() => onNavigate('tableau')}>Commencer avec GRIOT →</button>}</div></section>
+    </div>
+    <section className="griot-guide-faq"><h2>Besoin d’un repère ?</h2>
+      <details><summary>Je ne vois pas de bouton pour ajouter ou modifier.</summary><p>Votre rôle peut limiter ces actions. Consultez « Rôles & permissions » dans l’arbre et contactez un administrateur si vous devez contribuer. Si aucun arbre n’est ouvert, choisissez-en d’abord un depuis le tableau de bord.</p></details>
+      <details><summary>Comment accepter une invitation ?</summary><p>Ouvrez la cloche en haut de l’écran et acceptez l’invitation. Revenez ensuite au tableau de bord ; si la liste n’a pas encore changé, rechargez la page.</p></details>
+      <details><summary>Ma famille est-elle visible publiquement ?</summary><p>Les profils, souvenirs et médias sont réservés aux membres autorisés. Pour un arbre déclaré public, la recherche publique montre son nom et son nombre de personnes.</p></details>
+      <details><summary>Mon village n’apparaît pas dans les suggestions.</summary><p>Le catalogue couvre les villes et les capitales, sans recenser tous les villages. Vous pouvez conserver votre saisie et renseigner les coordonnées si vous les connaissez. La position de votre appareil n’est utile que si vous êtes réellement au lieu que vous souhaitez ajouter.</p></details>
+      <details><summary>À quoi servent l’espace chefferie et l’assistant ?</summary><p>L’espace chefferie permet de documenter des preuves et la transmission institutionnelle selon vos accès. L’assistant propose une exploration des informations disponibles ; ses réponses ne remplacent pas une source ou une validation familiale.</p></details>
+    </section>
+  </div>;
+}

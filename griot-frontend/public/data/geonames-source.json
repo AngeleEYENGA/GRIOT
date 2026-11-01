@@ -1,0 +1,23 @@
+{
+  "source": "GeoNames",
+  "retrieved": "2026-11-01",
+  "license": "CC BY 4.0",
+  "attribution": "https://www.geonames.org/",
+  "columns": [
+    "id",
+    "name",
+    "countryCode",
+    "latitude",
+    "longitude",
+    "region",
+    "population",
+    "asciiName"
+  ],
+  "cities": 34195,
+  "countries": 252,
+  "source_sha256": {
+    "countryInfo.txt": "79f8f59ea01cbb40438bf1856dd6c2ff201f03f8fc72d0530b2646aaf603ef04",
+    "admin1CodesASCII.txt": "42458864faa9887933d75c33408d4a808b765edbcd62a1328fa9e8cfcdfc718e",
+    "cities15000.zip": "1d1a86cc57a641387453beae0a0f89a59cbea636143fccb17368580df23776eb"
+  }
+}
