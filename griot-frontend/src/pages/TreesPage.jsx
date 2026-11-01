@@ -59,6 +59,12 @@ export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
     loadTrees();
   }, []);
 
+  useEffect(() => {
+    if (guidance && trees.length === 1) {
+      onSelectTree(trees[0].id);
+    }
+  }, [activePanel, guidance, onSelectTree, trees]);
+
   const loadTrees = async () => {
     try {
       setLoading(true);
@@ -82,6 +88,7 @@ export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
       setNewTreeName('');
       setNewTreeVisibility('prive');
       setShowCreateForm(false);
+      onSelectTree(response.id);
     } catch (err) {
       setError(err.message);
     } finally {
