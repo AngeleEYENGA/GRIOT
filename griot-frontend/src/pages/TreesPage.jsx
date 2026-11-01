@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
-import { useAuth } from '../contexts/useAuth';
 
-export default function TreesPage({ onSelectTree, onLogout }) {
-  const { user } = useAuth();
+export default function TreesPage({ onSelectTree }) {
   const [trees, setTrees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -48,32 +46,16 @@ export default function TreesPage({ onSelectTree, onLogout }) {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img src="/griot-logo.jpeg" alt="" className="w-14 h-14 object-contain" />
-            <div>
-              <h1 className="text-2xl font-bold text-green-800">GRIOT</h1>
-              <p className="text-sm text-gray-600">{user?.prenom} {user?.nom}</p>
-            </div>
+      <main className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
+          <div>
+            <p className="griot-eyebrow">ESPACE FAMILIAL</p>
+            <h1 className="text-3xl font-bold text-gray-900">Vos arbres généalogiques</h1>
+            <p className="mt-2 text-sm text-gray-600">Choisissez un arbre pour consulter ses personnes, ses récits et ses origines.</p>
           </div>
           <button
-            onClick={onLogout}
-            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-          >
-            Déconnexion
-          </button>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Mes arbres généalogiques</h2>
-          <button
             onClick={() => setShowCreateForm(!showCreateForm)}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+            className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
           >
             {showCreateForm ? 'Annuler' : '+ Nouvel arbre'}
           </button>

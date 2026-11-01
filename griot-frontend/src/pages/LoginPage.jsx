@@ -47,12 +47,10 @@ export default function LoginPage({ onSwitchToRegister, onBackToHome }) {
     <div className="griot-auth-page">
       <div className="griot-auth-card">
         <button className="griot-auth-back" onClick={onBackToHome}>← Retour à l’accueil</button>
-        <h1 className="mb-6">
-          <img
-            src="/griot-logo.jpeg"
-            alt="GRIOT"
-            className="w-40 h-40 object-contain mx-auto"
-          />
+        <h1 className="griot-auth-brand">
+          <img src="/griot-icon.svg" alt="" />
+          <span>GRIOT</span>
+          <small>La mémoire numérique des familles</small>
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">

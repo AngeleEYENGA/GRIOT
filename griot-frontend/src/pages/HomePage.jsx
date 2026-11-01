@@ -27,7 +27,7 @@ export default function HomePage({ onLogin, onRegister }) {
     <div className="griot-home">
       <header className="griot-home-header">
         <a className="griot-home-brand" href="#accueil" aria-label="GRIOT, accueil">
-          <img src="/griot-logo.jpeg" alt="" />
+          <img src="/griot-icon.svg" alt="" />
           <span>GRIOT</span>
         </a>
         <div className="griot-home-actions">

@@ -22,6 +22,7 @@ export default function AppShell({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const active = activePanel === 'accueil' ? 'tableau' : activePanel;
+  const activePage = navigation.find((item) => item.id === active);
   const navigate = (panel) => {
     setMobileMenuOpen(false);
     onNavigate(panel);
@@ -31,7 +32,7 @@ export default function AppShell({
     <div className="griot-shell">
       <aside className="griot-sidebar">
         <button className="griot-brand" onClick={() => navigate('tableau')} aria-label="Accueil GRIOT">
-          <img src="/griot-logo.jpeg" alt="" />
+          <img src="/griot-icon.svg" alt="" />
           <span>
             <strong>GRIOT</strong>
             <small>Mémoire numérique</small>
@@ -63,7 +64,7 @@ export default function AppShell({
         <header className="griot-topbar">
           <div className="griot-topbar-title">
             <span className="griot-mobile-brand">GRIOT</span>
-            <span>{treeName || 'Votre espace familial'}</span>
+            <span>{treeName || activePage?.label || 'Votre espace familial'}</span>
           </div>
           <div className="griot-user-menu">
             <span className="griot-user-name">{user?.prenom} {user?.nom}</span>

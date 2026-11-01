@@ -17,7 +17,6 @@ function AppContent() {
 
   const navigate = (panel) => {
     setActivePanel(panel);
-    if (panel === 'tableau') setSelectedTreeId(null);
   };
   const handleLogout = () => {
     setSelectedTreeId(null);
@@ -29,7 +28,8 @@ function AppContent() {
   if (loading) {
     return (
       <div className="griot-loading">
-        <img src="/griot-logo.jpeg" alt="GRIOT" />
+        <img src="/griot-icon.svg" alt="" />
+        <strong>GRIOT</strong>
         <span>Préparation de votre espace familial…</span>
       </div>
     );
@@ -92,9 +92,7 @@ function AppContent() {
           <TreesPage
             onSelectTree={(treeId) => {
               setSelectedTreeId(treeId);
-              setActivePanel('tableau');
             }}
-            onLogout={handleLogout}
           />
         </>
       )}

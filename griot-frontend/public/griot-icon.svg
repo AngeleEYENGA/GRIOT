@@ -1,0 +1,28 @@
+<svg width="440" height="440" viewBox="0 0 440 440" xmlns="http://www.w3.org/2000/svg" role="img">
+<title>Icône Griot</title>
+<desc>Baobab stylisé dont la cime et les racines symbolisent les liens familiaux entre ancêtres et descendants.</desc>
+<g transform="translate(-120, -29)">
+<line x1="250" y1="250" x2="430" y2="250" stroke="#C9A66B" stroke-width="2" opacity="0.6"/>
+<line x1="340" y1="200" x2="340" y2="300" stroke="#3D2817" stroke-width="10" stroke-linecap="round"/>
+<path d="M340,200 Q280,150 220,115" fill="none" stroke="#3D2817" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,200 Q300,130 280,95" fill="none" stroke="#3D2817" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,200 L340,82" fill="none" stroke="#3D2817" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,200 Q380,130 400,95" fill="none" stroke="#3D2817" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,200 Q400,150 460,115" fill="none" stroke="#3D2817" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,300 Q280,350 220,385" fill="none" stroke="#A8482F" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,300 Q300,370 280,405" fill="none" stroke="#A8482F" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,300 L340,418" fill="none" stroke="#A8482F" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,300 Q380,370 400,405" fill="none" stroke="#A8482F" stroke-width="3" stroke-linecap="round"/>
+<path d="M340,300 Q400,350 460,385" fill="none" stroke="#A8482F" stroke-width="3" stroke-linecap="round"/>
+<circle cx="220" cy="115" r="9" fill="#E8A33D" stroke="#3D2817" stroke-width="1.5"/>
+<circle cx="280" cy="95" r="9" fill="#E8A33D" stroke="#3D2817" stroke-width="1.5"/>
+<circle cx="340" cy="82" r="10" fill="#E8A33D" stroke="#3D2817" stroke-width="1.5"/>
+<circle cx="400" cy="95" r="9" fill="#E8A33D" stroke="#3D2817" stroke-width="1.5"/>
+<circle cx="460" cy="115" r="9" fill="#E8A33D" stroke="#3D2817" stroke-width="1.5"/>
+<circle cx="220" cy="385" r="7" fill="#C1623D" stroke="#A8482F" stroke-width="1.5"/>
+<circle cx="280" cy="405" r="7" fill="#C1623D" stroke="#A8482F" stroke-width="1.5"/>
+<circle cx="340" cy="418" r="8" fill="#C1623D" stroke="#A8482F" stroke-width="1.5"/>
+<circle cx="400" cy="405" r="7" fill="#C1623D" stroke="#A8482F" stroke-width="1.5"/>
+<circle cx="460" cy="385" r="7" fill="#C1623D" stroke="#A8482F" stroke-width="1.5"/>
+</g>
+</svg>

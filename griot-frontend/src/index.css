@@ -51,7 +51,8 @@ a { color: var(--griot-terracotta-deep); }
   gap: 14px;
   color: var(--griot-ink-soft);
 }
-.griot-loading img { width: 106px; height: 106px; object-fit: contain; }
+.griot-loading img { width: 76px; height: 76px; object-fit: contain; }
+.griot-loading strong { font: 700 20px var(--griot-serif); letter-spacing: 2px; }
 
 .griot-shell { min-height: 100vh; display: flex; background: var(--griot-cream); }
 .griot-sidebar {
@@ -77,7 +78,7 @@ a { color: var(--griot-terracotta-deep); }
   text-align: left;
   padding: 2px 6px 24px;
 }
-.griot-brand img { width: 44px; height: 44px; object-fit: contain; border-radius: 50%; }
+.griot-brand img { width: 38px; height: 38px; object-fit: contain; filter: brightness(0) invert(1); }
 .griot-brand span { display: grid; gap: 2px; }
 .griot-brand strong { font: 700 21px var(--griot-serif); letter-spacing: 1.5px; }
 .griot-brand small { font-size: 10px; color: #d7c6a9; letter-spacing: .3px; }
@@ -133,7 +134,7 @@ a { color: var(--griot-terracotta-deep); }
 .griot-home { min-height: 100vh; background: var(--griot-cream); }
 .griot-home-header { height: 78px; display: flex; align-items: center; justify-content: space-between; max-width: 1220px; margin: auto; padding: 0 28px; }
 .griot-home-brand { display: flex; align-items: center; gap: 10px; color: var(--griot-ink); text-decoration: none; font: 700 22px var(--griot-serif); letter-spacing: 2px; }
-.griot-home-brand img { width: 43px; height: 43px; object-fit: contain; border-radius: 50%; }
+.griot-home-brand img { width: 39px; height: 39px; object-fit: contain; }
 .griot-home-actions { display: flex; align-items: center; gap: 8px; }
 .griot-button { border: 0; border-radius: 10px; padding: 11px 16px; font-size: 12px; font-weight: 700; transition: transform .16s ease, background .16s ease; }
 .griot-button:hover:not(:disabled) { transform: translateY(-1px); }
@@ -188,6 +189,11 @@ a { color: var(--griot-terracotta-deep); }
 .griot-home-footer { display: flex; justify-content: space-between; gap: 14px; padding: 20px max(24px, calc((100% - 1140px) / 2)); border-top: 1px solid var(--griot-line); color: var(--griot-ink-soft); font-size: 10px; }
 
 .griot-auth-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at 15% 15%, #e8d5b4 0, transparent 33%), var(--griot-cream); }
+.griot-auth-brand { display: grid; justify-items: center; gap: 5px; margin: 0 0 24px; text-align: center; }
+.griot-auth-brand img { width: 68px; height: 68px; object-fit: contain; }
+.griot-auth-brand span { font: 700 26px var(--griot-serif); letter-spacing: 2px; }
+.griot-auth-brand small { color: var(--griot-ink-soft); font: 500 10px var(--griot-serif); letter-spacing: .3px; }
+.griot-auth-brand-compact { margin-bottom: 12px; }
 .griot-auth-card { width: min(100%, 470px); padding: 34px; border: 1px solid var(--griot-line); border-radius: 17px; background: var(--griot-paper); box-shadow: 0 20px 55px #2b1b1212; }
 .griot-auth-card h1 { margin: 0; }
 .griot-auth-card > h1 img { display: block; width: 110px; height: 110px; margin: 0 auto 15px; object-fit: contain; }
