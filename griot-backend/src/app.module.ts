@@ -9,6 +9,7 @@ import { RelationsFamilialesModule } from './relations-familiales/relations-fami
 import { AppController } from './app.controller';
 import { AiModule } from './ai/ai.module';
 import { SouvenirsModule } from './souvenirs/souvenirs.module';
+import { MediasModule } from './medias/medias.module';
 
 @Module({
   controllers: [AppController],
@@ -22,6 +23,7 @@ import { SouvenirsModule } from './souvenirs/souvenirs.module';
     RelationsFamilialesModule,
     AiModule,
     SouvenirsModule,
+    MediasModule,
   ],
 })
 export class AppModule {}

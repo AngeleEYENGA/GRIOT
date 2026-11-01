@@ -69,7 +69,8 @@ Navigables depuis le rail de gauche du prototype :
 
 - [ ] Moteur de navigation d'arbre pour grandes familles (zoom infini, regroupement, recherche, filtres)
 - [ ] Vraie architecture hors ligne (IndexedDB, Service Worker, sync)
-- [ ] Upload réel de photos et sauvegarde des préférences d'affichage par utilisateur
+- [x] Upload réel de photos privées sur les profils (store Vercel Blob à connecter au backend)
+- [ ] Sauvegarde des préférences d'affichage par utilisateur
 - [x] Système de missions/complétude connecté à de vraies données
 
 ---
@@ -82,6 +83,7 @@ Navigables depuis le rail de gauche du prototype :
 - API du tableau de bord protégée par les droits d'accès à l'arbre et couverte par des tests automatisés
 - Fiches personnes consultables et modifiables selon les rôles, avec biographies, dates, villages d'origine, liens familiaux et souvenirs associés
 - Première vue généalogique interactive : générations, recherche, filtres, zoom et accès direct aux profils
+- Upload de photos JPEG, PNG et WebP dans un store Blob privé, lecture protégée par les droits sur l'arbre et affichage dans les profils (connexion du store Vercel requise avant usage en production)
 
 ### 19 juillet 2026 (v7) — début du développement réel (backend)
 - Démarrage de `griot-backend/` : projet **NestJS + Prisma + PostgreSQL** réel, destiné au déploiement (ce n'est plus une maquette)

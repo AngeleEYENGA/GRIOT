@@ -23,6 +23,10 @@ export default function TreeDetailPage({ treeId, onBack }) {
   const [editingPerson, setEditingPerson] = useState(false);
   const [savingPerson, setSavingPerson] = useState(false);
   const [personError, setPersonError] = useState('');
+  const [personPhotos, setPersonPhotos] = useState([]);
+  const [photosLoading, setPhotosLoading] = useState(false);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photosRefresh, setPhotosRefresh] = useState(0);
   const [savingSouvenir, setSavingSouvenir] = useState(false);
   const [newPerson, setNewPerson] = useState({
     nom: '',
@@ -240,6 +244,59 @@ export default function TreeDetailPage({ treeId, onBack }) {
   const peutAjouterPersonne = ['admin', 'editeur', 'contributeur'].includes(roleCourant);
   const peutGererArbre = ['admin', 'editeur'].includes(roleCourant);
   const peutGererMembres = roleCourant === 'admin';
+  const selectedPersonId = selectedPerson?.id;
+
+  useEffect(() => {
+    if (!selectedPersonId) {
+      setPersonPhotos([]);
+      return undefined;
+    }
+
+    let cancelled = false;
+    const objectUrls = [];
+    const loadPhotos = async () => {
+      setPhotosLoading(true);
+      try {
+        const photos = await api.getPersonPhotos(treeId, selectedPersonId);
+        const loadedPhotos = [];
+        for (const photo of photos) {
+          const blob = await api.getPersonPhotoBlob(treeId, photo.id);
+          if (cancelled) return;
+          const src = URL.createObjectURL(blob);
+          objectUrls.push(src);
+          loadedPhotos.push({ ...photo, src });
+        }
+        if (!cancelled) setPersonPhotos(loadedPhotos);
+      } catch (err) {
+        if (!cancelled) setPersonError(err.message);
+      } finally {
+        if (!cancelled) setPhotosLoading(false);
+      }
+    };
+
+    loadPhotos();
+    return () => {
+      cancelled = true;
+      objectUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedPersonId, treeId, photosRefresh]);
+
+  const handleUploadPhoto = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedPersonId) return;
+
+    try {
+      setUploadingPhoto(true);
+      setPersonError('');
+      await api.uploadPersonPhoto(treeId, selectedPersonId, file);
+      setPhotosRefresh((current) => current + 1);
+    } catch (err) {
+      setPersonError(err.message);
+    } finally {
+      setUploadingPhoto(false);
+      e.target.value = '';
+    }
+  };
 
   if (loading) {
     return (
@@ -964,6 +1021,42 @@ export default function TreeDetailPage({ treeId, onBack }) {
               </form>
             ) : (
               <div className="p-6 space-y-6">
+                <section>
+                  <div className="flex items-center justify-between gap-4">
+                    <h3 className="font-semibold text-gray-900">Photographies privées</h3>
+                    {peutAjouterPersonne && (
+                      <label className="px-3 py-2 text-sm text-white bg-green-700 hover:bg-green-800 rounded-lg cursor-pointer">
+                        {uploadingPhoto ? 'Envoi...' : 'Ajouter une photo'}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="sr-only"
+                          disabled={uploadingPhoto}
+                          onChange={handleUploadPhoto}
+                        />
+                      </label>
+                    )}
+                  </div>
+                  {photosLoading ? (
+                    <p className="mt-2 text-sm text-gray-500">Chargement des photos...</p>
+                  ) : personPhotos.length ? (
+                    <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {personPhotos.map((photo) => (
+                        <img
+                          key={photo.id}
+                          src={photo.src}
+                          alt={`Photo de ${selectedPerson.prenom} ${selectedPerson.nom}`}
+                          className="w-full aspect-square object-cover rounded-lg border border-gray-200"
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-gray-500">Aucune photo pour le moment.</p>
+                  )}
+                  <p className="mt-2 text-xs text-gray-500">
+                    JPEG, PNG ou WebP, 4 Mio maximum. Les photos sont visibles uniquement par les membres de l’arbre.
+                  </p>
+                </section>
                 <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <dt className="text-sm text-gray-500">Naissance</dt>

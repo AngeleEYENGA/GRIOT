@@ -17,6 +17,7 @@ Dans le projet Vercel du backend, configurer :
 - `JWT_EXPIRES_IN` : durée du JWT, par exemple `1d` (défaut : `1d`).
 - `GOOGLE_CLIENT_ID` : identifiant client OAuth Google.
 - `FRONTEND_URL` : origine exacte du frontend Vercel. Plusieurs origines sont séparées par des virgules si nécessaire.
+- `BLOB_STORE_ID` : fourni automatiquement en reliant un store Vercel Blob privé au projet backend.
 
 Dans le projet Vercel du frontend :
 
@@ -24,6 +25,17 @@ Dans le projet Vercel du frontend :
 - `VITE_GOOGLE_CLIENT_ID` : même identifiant client Google (cet identifiant est public).
 
 Ne jamais placer `JWT_SECRET`, un secret OAuth Google ou un mot de passe de base dans une variable `VITE_*` : ces variables sont intégrées au JavaScript public.
+
+## Photos privées (Vercel Blob)
+
+Les photos de profil sont stockées dans un store **privé** rattaché au projet `griot-backend`. Le backend enregistre le chemin interne du Blob, jamais une URL publique. La lecture passe par une route API authentifiée, vérifie l'appartenance à l'arbre et relaie le fichier; le navigateur n'accède donc pas directement au store.
+
+1. Dans Vercel, ouvrir le projet `griot-backend`, puis **Storage** et créer un store Blob privé.
+2. Relier le store au projet `griot-backend` pour les environnements Production et Preview. Vercel fournit alors l'identifiant du store et l'authentification OIDC au runtime; ne pas copier ni partager de jeton.
+3. Redéployer le backend après la liaison. Aucune variable Blob ne doit être ajoutée au frontend.
+4. Les membres admin, éditeur et contributeur peuvent charger des images JPEG, PNG ou WebP de 4 Mio maximum sur les profils. Tous les membres actifs de l'arbre peuvent les consulter.
+
+En local, utilisez un store de développement et les variables `BLOB_STORE_ID` / `BLOB_READ_WRITE_TOKEN` dans le `.env` local du backend. Ne transmettez jamais le jeton dans le dépôt, les journaux ou la conversation.
 
 ## Google OAuth
 

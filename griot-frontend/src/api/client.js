@@ -23,7 +23,7 @@ class GriotAPI {
   async request(endpoint, options = {}) {
     const url = `${API_URL}${endpoint}`;
     const headers = {
-      'Content-Type': 'application/json',
+      ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
       ...options.headers,
     };
 
@@ -42,6 +42,20 @@ class GriotAPI {
     }
 
     return response.json();
+  }
+
+  async requestBlob(endpoint) {
+    const headers = {};
+    if (this.token) {
+      headers.Authorization = `Bearer ${this.token}`;
+    }
+
+    const response = await fetch(`${API_URL}${endpoint}`, { headers });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.message || `API Error: ${response.status}`);
+    }
+    return response.blob();
   }
 
   // 🔐 AUTH
@@ -137,6 +151,23 @@ class GriotAPI {
     return this.request(`/arbres/${arbreId}/personnes/${personneId}`, {
       method: 'DELETE',
     });
+  }
+
+  getPersonPhotos(arbreId, personneId) {
+    return this.request(`/arbres/${arbreId}/personnes/${personneId}/photos`);
+  }
+
+  uploadPersonPhoto(arbreId, personneId, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.request(`/arbres/${arbreId}/personnes/${personneId}/photos`, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  getPersonPhotoBlob(arbreId, mediaId) {
+    return this.requestBlob(`/arbres/${arbreId}/medias/${mediaId}/contenu`);
   }
 
   // 🤝 RELATIONS FAMILIALES (Family Links)
