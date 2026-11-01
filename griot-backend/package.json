@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "prebuild": "node scripts/migrate-on-vercel.js",
-    "build": "nest build",
+    "build": "prisma generate && nest build",
     "build:vercel": "prisma generate && prisma migrate deploy && nest build",
     "start": "cmd /c \"set PORT=3001&& nest.cmd start\"",
     "start:dev": "cmd /c \"set PORT=3001&& nest.cmd start --watch\"",
