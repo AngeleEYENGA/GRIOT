@@ -9,6 +9,12 @@ import {
   StylePanel,
 } from '../components/TreeExtraScreens';
 import SouvenirInteractions from '../components/SouvenirInteractions';
+import {
+  getInverseRelationDescription,
+  getRelationDescription,
+  getRelationLabel,
+  relationGroups,
+} from '../utils/familyRelations';
 
 function TreeMotif({ size = 120 }) {
   const angles = [-58, -30, 0, 30, 58];
@@ -129,6 +135,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
     personneId1: '',
     personneId2: '',
     typeRelation: 'parent',
+    precision: '',
   });
   const [newSouvenir, setNewSouvenir] = useState({
     titre: '',
@@ -270,8 +277,17 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
     try {
       const relation = await api.createRelation(treeId, newRelation);
       setRelations([...relations, relation]);
-      setNewRelation({ personneId1: '', personneId2: '', typeRelation: 'parent' });
+      setNewRelation({ personneId1: '', personneId2: '', typeRelation: 'parent', precision: '' });
       setError('');
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDeleteRelation = async (relationId) => {
+    try {
+      await api.deleteRelation(treeId, relationId);
+      setRelations((current) => current.filter((relation) => relation.id !== relationId));
     } catch (err) {
       setError(err.message);
     }
@@ -884,7 +900,11 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   <select
                     aria-label="Première personne"
                     value={newRelation.personneId1}
-                    onChange={(e) => setNewRelation({ ...newRelation, personneId1: e.target.value })}
+                    onChange={(e) => setNewRelation({
+                      ...newRelation,
+                      personneId1: e.target.value,
+                      personneId2: e.target.value === newRelation.personneId2 ? '' : newRelation.personneId2,
+                    })}
                     className="rounded border border-gray-300 px-3 py-2"
                     required
                   >
@@ -892,14 +912,18 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                     {personnes.map((person) => <option key={person.id} value={person.id}>{person.prenom} {person.nom}</option>)}
                   </select>
                   <select
-                    aria-label="Type de relation"
+                    aria-label="Lien de la première personne vers la deuxième"
                     value={newRelation.typeRelation}
                     onChange={(e) => setNewRelation({ ...newRelation, typeRelation: e.target.value })}
-                    className="rounded border border-gray-300 px-3 py-2"
+                    required
                   >
-                    <option value="parent">Parent (personne 1 → personne 2)</option>
-                    <option value="enfant">Enfant (personne 1 → personne 2)</option>
-                    <option value="conjoint">Conjoint</option>
+                    {relationGroups.map((group) => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.options.map((option) => (
+                          <option key={option.value} value={option.value}>{option.label}</option>
+                        ))}
+                      </optgroup>
+                    ))}
                   </select>
                   <select
                     aria-label="Deuxième personne"
@@ -909,43 +933,71 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                     required
                   >
                     <option value="">Personne 2</option>
-                    {personnes.map((person) => <option key={person.id} value={person.id}>{person.prenom} {person.nom}</option>)}
+                    {personnes.map((person) => (
+                      <option key={person.id} value={person.id} disabled={person.id === newRelation.personneId1}>
+                        {person.prenom} {person.nom}
+                      </option>
+                    ))}
                   </select>
+                  {newRelation.typeRelation === 'autre' && (
+                    <input
+                      type="text"
+                      aria-label="Précisez le lien familial"
+                      value={newRelation.precision}
+                      onChange={(event) => setNewRelation({ ...newRelation, precision: event.target.value })}
+                      placeholder="Précisez le lien familial (ex. arrière-arrière-grand-mère)"
+                      maxLength={100}
+                      required
+                    />
+                  )}
                   <button type="submit" className="griot-button griot-button-primary">
-                    Ajouter le lien
+                    Enregistrer le lien
                   </button>
                 </form>
               )}
             </div>
             {peutGererArbre && (
-              <p className="text-sm text-gray-500 mb-4">
-                Pour « Parent », la première personne est le parent de la seconde ; « Enfant » inverse ce sens.
+              <p className="griot-relation-guidance">
+                Le lien décrit la première personne par rapport à la deuxième. Exemple : « A est le père de B ».
               </p>
             )}
             {relations.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg">
-                <p className="text-gray-600">Aucune relation définie</p>
+              <div className="griot-relations-empty">
+                <span aria-hidden="true">♧</span>
+                <h3>Aucun lien familial enregistré</h3>
+                <p>Reliez deux personnes pour préciser leur place et leur histoire dans la famille.</p>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+              <div className="griot-relations-table-wrap">
+                <table className="griot-relations-table">
+                  <thead>
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-900">Type</th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-900">Personnes</th>
+                      <th>Lien familial</th>
+                      <th>Personnes</th>
+                      {peutGererArbre && <th><span className="sr-only">Actions</span></th>}
                     </tr>
                   </thead>
                   <tbody>
                     {relations.map((rel) => (
-                      <tr key={rel.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-6 py-3 text-sm text-gray-600">
-                          {rel.typeRelation === 'parent' && '👨‍👩‍👧 Parent'}
-                          {rel.typeRelation === 'enfant' && '👶 Enfant'}
-                          {rel.typeRelation === 'conjoint' && '💑 Conjoint'}
+                      <tr key={rel.id}>
+                        <td><span className="griot-relation-pill">{getRelationLabel(rel.typeRelation, rel.precision)}</span></td>
+                        <td>
+                          <strong>{rel.personne1?.prenom} {rel.personne1?.nom}</strong>
+                          <span className="griot-relation-description">{getRelationDescription(rel.typeRelation, rel.precision)}</span>
+                          <strong>{rel.personne2?.prenom} {rel.personne2?.nom}</strong>
                         </td>
-                        <td className="px-6 py-3 text-sm text-gray-900">
-                          {rel.personne1?.prenom} {rel.personne1?.nom} ↔ {rel.personne2?.prenom} {rel.personne2?.nom}
-                        </td>
+                        {peutGererArbre && <td>
+                          <button
+                            type="button"
+                            className="griot-relation-delete"
+                            onClick={() => {
+                              if (window.confirm('Supprimer ce lien familial ?')) handleDeleteRelation(rel.id);
+                            }}
+                            aria-label={`Supprimer le lien entre ${rel.personne1?.prenom} ${rel.personne1?.nom} et ${rel.personne2?.prenom} ${rel.personne2?.nom}`}
+                          >
+                            Supprimer
+                          </button>
+                        </td>}
                       </tr>
                     ))}
                   </tbody>
@@ -1517,16 +1569,12 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                         const isFirstPerson = relation.personneId1 === selectedPerson.id;
                         const otherPersonId = isFirstPerson ? relation.personneId2 : relation.personneId1;
                         const otherPerson = personnes.find((person) => person.id === otherPersonId);
-                        const relationType = isFirstPerson
-                          ? relation.typeRelation
-                          : relation.typeRelation === 'parent'
-                            ? 'enfant'
-                            : relation.typeRelation === 'enfant'
-                              ? 'parent'
-                              : relation.typeRelation;
+                        const relationDescription = isFirstPerson
+                          ? getRelationDescription(relation.typeRelation, relation.precision)
+                          : getInverseRelationDescription(relation.typeRelation, relation.precision);
                         return otherPerson ? (
                           <li key={relation.id} className="text-sm text-gray-700">
-                            <span className="capitalize">{relationType}</span> : {otherPerson.prenom} {otherPerson.nom}
+                            <span>{relationDescription.replace(/^est /, '')}</span> <strong>{otherPerson.prenom} {otherPerson.nom}</strong>
                           </li>
                         ) : null;
                       })}

@@ -111,6 +111,37 @@ enum TypeRelation {
   parent
   enfant
   conjoint
+  pere
+  mere
+  fils
+  fille
+  frere
+  soeur
+  demi_frere
+  demi_soeur
+  grand_pere
+  grand_mere
+  petit_fils
+  petite_fille
+  arriere_grand_pere
+  arriere_grand_mere
+  arriere_petit_fils
+  arriere_petite_fille
+  oncle_maternel
+  oncle_paternel
+  tante_maternelle
+  tante_paternelle
+  neveu
+  niece
+  cousin
+  cousine
+  beau_pere
+  belle_mere
+  beau_fils
+  belle_fille
+  beau_frere
+  belle_soeur
+  autre
 }
 
 enum ThemeVisuel {
@@ -254,6 +285,7 @@ model RelationFamiliale {
   personneId2  String
   personne2    Personne     @relation("personne2", fields: [personneId2], references: [id])
   typeRelation TypeRelation
+  precision    String?
 
   @@map("relations_familiales")
 }

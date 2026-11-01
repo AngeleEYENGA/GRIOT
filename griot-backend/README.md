@@ -95,6 +95,16 @@ Tu y trouveras toutes les routes, groupées par module (auth, arbres, membres-ar
 6. `POST /arbres/{arbreId}/relations` — relier deux personnes entre elles
 7. `POST /arbres/{arbreId}/membres` — inviter un deuxième compte sur l'arbre (il doit déjà exister — crée un second compte via `/auth/register` pour tester)
 
+Pour une relation, `typeRelation` décrit la première personne par rapport à la seconde. Les valeurs couvrent notamment les parents/enfants (`pere`, `mere`, `fils`, `fille`), la fratrie, les grands-parents et arrière-grands-parents, les oncles/tantes, les neveux/nièces, les cousins et les liens par alliance. Pour un lien non répertorié, utiliser `"typeRelation": "autre"` et ajouter `"precision"` (100 caractères maximum).
+
+```json
+{
+  "personneId1": "identifiant-de-la-personne",
+  "personneId2": "identifiant-de-la-personne-liee",
+  "typeRelation": "arriere_grand_mere"
+}
+```
+
 ### 2. Prisma Studio — pour voir/éditer les données directement
 
 ```bash

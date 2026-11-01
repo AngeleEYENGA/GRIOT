@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { getGenealogyEdge, getRelationLabel } from '../utils/familyRelations';
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 106;
@@ -11,19 +12,14 @@ function getGenerations(personnes, relations) {
   const personIds = new Set(personnes.map((person) => person.id));
 
   relations.forEach((relation) => {
-    let parentId;
-    let childId;
-    if (relation.typeRelation === 'parent') {
-      parentId = relation.personneId1;
-      childId = relation.personneId2;
-    } else if (relation.typeRelation === 'enfant') {
-      parentId = relation.personneId2;
-      childId = relation.personneId1;
-    }
+    const edge = getGenealogyEdge(relation.typeRelation, relation.personneId1, relation.personneId2);
+    if (!edge || edge.isSpouse) return;
+    const parentId = edge?.parentId;
+    const childId = edge?.childId;
 
     if (parentId && childId && personIds.has(parentId) && personIds.has(childId)) {
       const children = childrenByParent.get(parentId) || [];
-      children.push(childId);
+      children.push({ childId, generationDistance: edge.generationDistance });
       childrenByParent.set(parentId, children);
       parentIds.add(childId);
     }
@@ -34,10 +30,9 @@ function getGenerations(personnes, relations) {
     const queue = [rootId];
     for (let index = 0; index < queue.length; index += 1) {
       const personId = queue[index];
-      const nextGeneration = generations.get(personId) + 1;
-      (childrenByParent.get(personId) || []).forEach((childId) => {
+      (childrenByParent.get(personId) || []).forEach(({ childId, generationDistance }) => {
         if (!generations.has(childId)) {
-          generations.set(childId, nextGeneration);
+          generations.set(childId, generations.get(personId) + generationDistance);
           queue.push(childId);
         }
       });
@@ -85,16 +80,10 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
     for (let index = 0; index < pending.length; index += 1) {
       const currentId = pending[index];
       relations.forEach((relation) => {
-        const parentId = relation.typeRelation === 'parent'
-          ? relation.personneId1
-          : relation.typeRelation === 'enfant'
-            ? relation.personneId2
-            : null;
-        const childId = relation.typeRelation === 'parent'
-          ? relation.personneId2
-          : relation.typeRelation === 'enfant'
-            ? relation.personneId1
-            : null;
+        const edge = getGenealogyEdge(relation.typeRelation, relation.personneId1, relation.personneId2);
+        if (!edge || edge.isSpouse) return;
+        const parentId = edge?.parentId;
+        const childId = edge?.childId;
         const nextId = filter === 'ancestors' && childId === currentId
           ? parentId
           : filter === 'descendants' && parentId === currentId
@@ -275,15 +264,54 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
                 height={layout.height}
               >
                 {visibleRelations.map((relation) => {
+                  const edge = getGenealogyEdge(relation.typeRelation, relation.personneId1, relation.personneId2);
                   const firstPosition = layout.positions.get(relation.personneId1);
                   const secondPosition = layout.positions.get(relation.personneId2);
                   if (!firstPosition || !secondPosition) return null;
 
-                  const isSpouse = relation.typeRelation === 'conjoint';
+                  if (!edge) {
+                    const sameGeneration = firstPosition.y === secondPosition.y;
+                    const firstIsLeft = firstPosition.x <= secondPosition.x;
+                    const startX = sameGeneration
+                      ? firstPosition.x + (firstIsLeft ? NODE_WIDTH : 0)
+                      : firstPosition.x + NODE_WIDTH / 2;
+                    const startY = sameGeneration
+                      ? firstPosition.y + NODE_HEIGHT / 2
+                      : firstPosition.y + (firstPosition.y < secondPosition.y ? NODE_HEIGHT : 0);
+                    const endX = sameGeneration
+                      ? secondPosition.x + (firstIsLeft ? 0 : NODE_WIDTH)
+                      : secondPosition.x + NODE_WIDTH / 2;
+                    const endY = sameGeneration
+                      ? secondPosition.y + NODE_HEIGHT / 2
+                      : secondPosition.y + (secondPosition.y < firstPosition.y ? NODE_HEIGHT : 0);
+                    const curveY = (startY + endY) / 2;
+                    return (
+                      <g key={relation.id}>
+                        <path
+                          d={`M ${startX} ${startY} Q ${(startX + endX) / 2} ${curveY}, ${endX} ${endY}`}
+                          fill="none"
+                          stroke="var(--griot-terracotta)"
+                          strokeDasharray="5 5"
+                          strokeWidth="1.5"
+                        />
+                        <text
+                          x={(startX + endX) / 2}
+                          y={curveY - 5}
+                          textAnchor="middle"
+                          fill="var(--griot-terracotta-deep)"
+                          fontSize="11"
+                        >
+                          {getRelationLabel(relation.typeRelation, relation.precision)}
+                        </text>
+                      </g>
+                    );
+                  }
+
+                  const isSpouse = edge.isSpouse;
                   const spouseLeft = firstPosition.x <= secondPosition.x ? firstPosition : secondPosition;
                   const spouseRight = firstPosition.x <= secondPosition.x ? secondPosition : firstPosition;
-                  const parentPosition = relation.typeRelation === 'enfant' ? secondPosition : firstPosition;
-                  const childPosition = relation.typeRelation === 'enfant' ? firstPosition : secondPosition;
+                  const parentPosition = layout.positions.get(edge.parentId);
+                  const childPosition = layout.positions.get(edge.childId);
                   const startX = isSpouse ? spouseLeft.x + NODE_WIDTH : parentPosition.x + NODE_WIDTH / 2;
                   const startY = isSpouse
                     ? spouseLeft.y + NODE_HEIGHT / 2
@@ -307,7 +335,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
                         fill="var(--griot-ink-soft)"
                         fontSize="12"
                       >
-                        {relation.typeRelation}
+                        {getRelationLabel(relation.typeRelation, relation.precision)}
                       </text>
                     </g>
                   );

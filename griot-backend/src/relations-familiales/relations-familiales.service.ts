@@ -16,13 +16,16 @@ export class RelationsFamilialesService {
 
   async create(arbreId: string, dto: CreateRelationDto) {
     await this.assertPeopleBelongToTree(arbreId, dto.personneId1, dto.personneId2);
+    const precision = this.getPrecision(dto);
 
     return this.prisma.relationFamiliale.create({
       data: {
         personneId1: dto.personneId1,
         personneId2: dto.personneId2,
         typeRelation: dto.typeRelation,
+        precision,
       },
+      include: { personne1: true, personne2: true },
     });
   }
 
@@ -35,6 +38,7 @@ export class RelationsFamilialesService {
     }
 
     await this.assertPeopleBelongToTree(arbreId, dto.personneId1, dto.personneId2);
+    const precision = this.getPrecision(dto);
 
     return this.prisma.relationFamiliale.update({
       where: { id },
@@ -42,6 +46,7 @@ export class RelationsFamilialesService {
         personneId1: dto.personneId1,
         personneId2: dto.personneId2,
         typeRelation: dto.typeRelation,
+        precision,
       },
       include: { personne1: true, personne2: true },
     });
@@ -59,6 +64,10 @@ export class RelationsFamilialesService {
   }
 
   private async assertPeopleBelongToTree(arbreId: string, personneId1: string, personneId2: string) {
+    if (personneId1 === personneId2) {
+      throw new BadRequestException('Une personne ne peut pas être liée à elle-même.');
+    }
+
     const [p1, p2] = await Promise.all([
       this.prisma.personne.findFirst({ where: { id: personneId1, arbreId } }),
       this.prisma.personne.findFirst({ where: { id: personneId2, arbreId } }),
@@ -66,5 +75,13 @@ export class RelationsFamilialesService {
     if (!p1 || !p2) {
       throw new BadRequestException('Les deux personnes doivent appartenir à cet arbre.');
     }
+  }
+
+  private getPrecision(dto: CreateRelationDto) {
+    const precision = dto.precision?.trim();
+    if (dto.typeRelation === 'autre' && !precision) {
+      throw new BadRequestException('Précisez le lien familial personnalisé.');
+    }
+    return dto.typeRelation === 'autre' ? precision : null;
   }
 }
