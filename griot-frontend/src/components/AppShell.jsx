@@ -13,6 +13,7 @@ const navigation = [
   { id: 'institutions', label: 'Console chefferie' },
   { id: 'assistant', label: 'Demander à GRIOT' },
   { id: 'style', label: 'Charte graphique' },
+  { id: 'compte', label: 'Mon compte' },
 ];
 
 function NavigationIcon({ name }) {
@@ -27,6 +28,7 @@ function NavigationIcon({ name }) {
     institutions: <><path d="m3 9 9-6 9 6M4 20h16M6 9v11m4-11v11m4-11v11m4-11v11M3 9h18" /><path d="M9 5.2h6" /></>,
     assistant: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z" /><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" /></>,
     style: <><circle cx="12" cy="12" r="9" /><path d="M12 3v18a9 9 0 0 0 0-18Z" /></>,
+    compte: <><circle cx="12" cy="8" r="3" /><path d="M5 21v-2a7 7 0 0 1 14 0v2M4 4l2 2m12 0 2-2" /></>,
   };
 
   return (
@@ -93,7 +95,10 @@ export default function AppShell({
           <div className="griot-user-menu">
             <NotificationCenter />
             <InstallAppButton compact />
-            <span className="griot-user-name">{user?.prenom} {user?.nom}</span>
+            <button className="griot-account-trigger" onClick={() => navigate('compte')} aria-label="Ouvrir mon compte" aria-current={active === 'compte' ? 'page' : undefined}>
+              <span className="griot-account-avatar" aria-hidden="true">{user?.prenom?.[0]}{user?.nom?.[0]}</span>
+              <span className="griot-user-name">{user?.prenom} {user?.nom}</span>
+            </button>
             <button className="griot-logout" onClick={onLogout}>Déconnexion</button>
           </div>
         </header>

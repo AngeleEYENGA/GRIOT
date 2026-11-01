@@ -1173,6 +1173,157 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .griot-relation-delete:hover { color: white; background: var(--griot-terracotta-deep); }
 .griot-profile-dialog li strong { margin-left: 4px; }
 
+/* Account and enriched family dashboard */
+.griot-sidebar { overflow-y: auto; }
+.griot-sidebar-footer { flex-shrink: 0; margin-top: auto; padding-top: 20px; }
+.griot-account-trigger { display: flex; align-items: center; gap: 8px; padding: 4px; border: 0; border-radius: 999px; color: var(--griot-ink-soft); background: transparent; text-align: left; }
+.griot-account-trigger:hover { color: var(--griot-terracotta-deep); background: #c9932e12; }
+.griot-account-avatar { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 1px solid #c9932e66; border-radius: 50%; color: var(--griot-paper); background: var(--griot-olive); font-size: 10px; font-weight: 700; text-transform: uppercase; }
+.griot-account-page { width: min(100%, 1160px); margin: auto; padding: 32px 28px 60px; }
+.griot-account-hero { display: flex; align-items: center; gap: 22px; margin: 22px 0 28px; padding: 30px; border: 1px solid var(--griot-line); border-radius: 18px; background: linear-gradient(120deg, var(--griot-paper), #eee2cb); }
+.griot-account-monogram { display: grid; width: 78px; height: 78px; flex: 0 0 78px; place-items: center; border: 5px solid var(--griot-paper); border-radius: 50%; color: var(--griot-paper); background: linear-gradient(135deg, var(--griot-olive), #73835d); box-shadow: 0 5px 20px #4b5d3b22; font: 600 24px var(--griot-serif); text-transform: uppercase; }
+.griot-account-hero h1 { margin: 5px 0 8px; font: 600 clamp(26px, 3vw, 36px) var(--griot-serif); }
+.griot-account-hero p:last-child { margin: 0; color: var(--griot-ink-soft); font-size: 13px; line-height: 1.6; }
+.griot-account-badge { margin-left: auto; padding: 7px 12px; border: 1px solid #4b5d3b33; border-radius: 999px; color: var(--griot-olive); background: #4b5d3b0d; font-size: 11px; white-space: nowrap; }
+.griot-account-layout { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: start; }
+.griot-account-card { min-width: 0; padding: 26px; border: 1px solid var(--griot-line); border-radius: 16px; background: var(--griot-paper); }
+.griot-account-card h2, .griot-account-footer h2 { margin: 8px 0; font: 600 22px var(--griot-serif); }
+.griot-account-card > p:not(.griot-eyebrow), .griot-account-footer p { color: var(--griot-ink-soft); font-size: 12px; line-height: 1.7; }
+.griot-account-form { display: grid; gap: 17px; margin-top: 24px; }
+.griot-account-fieldset { display: grid; min-width: 0; gap: 17px; margin: 0; padding: 0; border: 0; }
+.griot-account-fieldset > button { justify-self: start; }
+.griot-account-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.griot-account-form label { display: flex; min-width: 0; flex-direction: column; gap: 7px; color: var(--griot-ink-soft); font-size: 12px; font-weight: 600; }
+.griot-account-form input { width: 100%; min-width: 0; min-height: 44px; padding: 10px 12px; border: 1px solid var(--griot-line); border-radius: 9px; color: var(--griot-ink); background: #fffdf8; font-size: 13px; }
+.griot-account-form input:read-only { color: var(--griot-ink-soft); background: var(--griot-cream); }
+.griot-account-form small { font-size: 10px; font-weight: 400; line-height: 1.6; }
+.griot-account-form > button { justify-self: start; }
+.griot-account-feedback { margin: 0; border-radius: 8px; padding: 12px; color: #8c2929; background: #b329290d; font-size: 12px; line-height: 1.6; }
+.griot-account-feedback.is-success { color: var(--griot-olive); background: #4b5d3b12; }
+.griot-password-rules { display: grid; gap: 6px; margin: -5px 0 0; padding: 0; list-style: none; color: var(--griot-ink-soft); font-size: 11px; }
+.griot-password-rules .is-valid { color: var(--griot-olive); font-weight: 600; }
+.griot-account-footer { display: flex; align-items: center; justify-content: space-between; gap: 26px; margin-top: 24px; border-top: 1px solid var(--griot-line); padding: 24px 0; }
+.griot-account-footer > div { max-width: 620px; }
+.griot-account-footer small { color: var(--griot-ink-soft); font-size: 11px; }
+.griot-account-footer > button { flex-shrink: 0; }
+
+.griot-overview-hero { position: relative; display: grid; grid-template-columns: 1fr 220px; gap: 28px; overflow: hidden; margin-bottom: 24px; padding: 36px; border-radius: 18px; color: var(--griot-paper); background: radial-gradient(ellipse at 100% 80%, #8f3e2077, transparent 60%), var(--griot-ink); }
+.griot-overview-hero .griot-eyebrow { color: #e9bd6d; }
+.griot-overview-hero h1 { max-width: 620px; margin: 14px 0; font: 500 clamp(26px, 3vw, 37px)/1.2 var(--griot-serif); }
+.griot-overview-hero > div > p:not(.griot-eyebrow) { max-width: 550px; color: #dfd0bc; font-size: 13px; line-height: 1.8; }
+.griot-overview-hero .griot-button { margin-top: 10px; color: var(--griot-ink); background: #e9bd6d; }
+.griot-overview-art { position: relative; display: grid; place-items: center; }
+.griot-overview-art > span { position: absolute; top: 0; right: 5px; color: #e9bd6d; font-size: 44px; animation: griot-star-breathe 5s ease-in-out infinite; }
+.griot-overview-art > i { position: absolute; width: 170px; height: 170px; border: 1px solid #e9bd6d44; border-radius: 50%; }
+.griot-overview-art > i:nth-of-type(2) { transform: translate(18px, 18px); border-color: #e9bd6d22; }
+.griot-overview-art > i:nth-of-type(3) { transform: translate(-18px, -18px); border-style: dashed; border-color: #e9bd6d22; }
+.griot-overview-art > p { z-index: 1; font: 500 24px/1.5 var(--griot-serif); color: #e9bd6d; }
+.griot-overview-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin-bottom: 34px; }
+.griot-overview-stats article { display: grid; gap: 5px; padding: 22px; border: 1px solid var(--griot-line); border-radius: 13px; background: var(--griot-paper); }
+.griot-overview-stats strong { color: var(--griot-olive); font: 600 30px var(--griot-serif); }
+.griot-overview-stats span { font-size: 12px; font-weight: 600; }
+.griot-overview-stats small { color: var(--griot-ink-soft); font-size: 10px; }
+.griot-metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 24px 0; }
+.griot-metric-card { position: relative; display: grid; gap: 6px; padding: 20px; border: 1px solid var(--griot-line); border-radius: 14px; text-align: left; color: var(--griot-ink); background: var(--griot-paper); transition: transform .2s, box-shadow .2s, border-color .2s; }
+.griot-metric-card strong { margin-top: 8px; font: 600 32px var(--griot-serif); }
+.griot-metric-card > span:not(.griot-metric-mark):not(.griot-metric-arrow) { font-size: 12px; font-weight: 600; }
+.griot-metric-card small { color: var(--griot-ink-soft); font-size: 10px; line-height: 1.6; }
+.griot-metric-mark { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; color: var(--griot-terracotta); background: #b5502a0d; font-size: 22px; }
+.griot-metric-card:nth-child(even) .griot-metric-mark { color: var(--griot-olive); background: #4b5d3b12; }
+.griot-metric-arrow { position: absolute; top: 24px; right: 20px; color: var(--griot-ink-soft); }
+.griot-metric-card:hover { transform: translateY(-4px); border-color: #c9932e99; box-shadow: 0 10px 25px #2b1b1210; }
+.griot-dashboard-insights { display: grid; gap: 22px; margin-top: 24px; }
+.griot-insight-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; align-items: stretch; }
+.griot-insight-card { min-width: 0; padding: 24px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); }
+.griot-insight-intro, .griot-insight-empty p { margin: 12px 0 20px; color: var(--griot-ink-soft); font-size: 12px; line-height: 1.7; }
+.griot-insight-symbol { color: var(--griot-gold); font-size: 28px; }
+.griot-insight-empty { padding: 18px; border: 1px dashed var(--griot-line); border-radius: 12px; background: #f6efe166; }
+.griot-insight-empty > strong { font: 500 17px var(--griot-serif); }
+.griot-birthday-list { display: grid; gap: 4px; }
+.griot-birthday-list > button { display: flex; align-items: center; gap: 12px; padding: 11px 0; border: 0; border-bottom: 1px solid #e3d5b866; text-align: left; background: transparent; color: var(--griot-ink); }
+.griot-birthday-list > button:hover { color: var(--griot-terracotta); }
+.griot-birthday-list > button > span:last-child { margin-left: auto; }
+.griot-birthday-date { display: grid; min-width: 46px; justify-items: center; padding: 7px; border-radius: 10px; color: var(--griot-terracotta-deep); background: #c9932e14; }
+.griot-birthday-date strong { font: 600 21px var(--griot-serif); }
+.griot-birthday-date small { font-size: 9px; text-transform: uppercase; }
+.griot-birthday-list > button > span:nth-child(2) { display: grid; gap: 5px; }
+.griot-birthday-list > button > span:nth-child(2) strong { font-size: 12px; }
+.griot-birthday-list > button > span:nth-child(2) small { color: var(--griot-ink-soft); font-size: 10px; }
+.griot-coverage-list { display: grid; gap: 18px; margin: 20px 0; }
+.griot-coverage-list > div > div:first-child { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; font-size: 11px; }
+.griot-coverage-track { height: 7px; overflow: hidden; border-radius: 99px; background: #e9dfcc; }
+.griot-coverage-track > span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--griot-olive), #9baf7d); transition: width .7s ease; }
+.griot-coverage-list small { display: block; margin-top: 7px; color: var(--griot-ink-soft); font-size: 10px; line-height: 1.6; }
+.griot-story-studio { padding: 26px; border: 1px solid #d8c39d; border-radius: 16px; background: linear-gradient(120deg, #ede2cb, #f8f1e4); }
+.griot-story-studio > .griot-dashboard-section-heading > span { font-size: 11px; color: var(--griot-ink-soft); }
+.griot-story-prompts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 22px; }
+.griot-story-prompts article { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; padding: 20px; border: 1px solid #e3d5b8; border-radius: 12px; background: #fffbf3dd; transition: transform .2s, box-shadow .2s; }
+.griot-story-prompts article:hover { transform: translateY(-3px); box-shadow: 0 8px 20px #2b1b120a; }
+.griot-story-number { margin-bottom: 18px; color: #c9932e88; font: 500 30px var(--griot-serif); }
+.griot-story-prompts small { color: var(--griot-terracotta); font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+.griot-story-prompts h4 { margin: 9px 0; font: 600 18px var(--griot-serif); }
+.griot-story-prompts p { flex: 1; margin: 0 0 20px; color: var(--griot-ink-soft); font-size: 12px; line-height: 1.7; }
+.griot-story-prompts button { padding: 0; }
+.griot-activity-list { display: grid; gap: 0; margin: 22px 0 0; padding: 0; list-style: none; }
+.griot-activity-list li { position: relative; display: flex; gap: 15px; padding: 0 0 22px; }
+.griot-activity-list li:not(:last-child)::before { position: absolute; top: 10px; bottom: 0; left: 4px; width: 1px; background: var(--griot-line); content: ''; }
+.griot-activity-dot { z-index: 1; width: 9px; height: 9px; flex: 0 0 9px; margin-top: 4px; border: 2px solid var(--griot-paper); border-radius: 50%; background: var(--griot-gold); box-shadow: 0 0 0 1px var(--griot-gold); }
+.griot-activity-list li > div { display: grid; gap: 6px; }
+.griot-activity-list small, .griot-activity-list time { color: var(--griot-ink-soft); font-size: 10px; }
+.griot-activity-list button { padding: 0; border: 0; color: var(--griot-ink); background: transparent; font-size: 12px; font-weight: 600; text-align: left; }
+.griot-activity-list button:hover { color: var(--griot-terracotta); }
+.griot-roots-card { position: relative; isolation: isolate; overflow: hidden; padding: 30px; border-radius: 14px; color: var(--griot-paper); background: linear-gradient(145deg, #3b4a30, #263220); }
+.griot-roots-card .griot-eyebrow { position: relative; color: #e1c590; }
+.griot-roots-card h3 { position: relative; max-width: 300px; margin: 24px 0; font: 500 30px/1.2 var(--griot-serif); }
+.griot-roots-card > p:not(.griot-eyebrow) { position: relative; color: #d7dfcd; font-size: 12px; line-height: 1.8; }
+.griot-roots-card .griot-button { position: relative; margin-top: 15px; color: #f2e1bf; border-color: #e1c59066; background: transparent; }
+.griot-roots-orbit { position: absolute; top: -70px; right: -30px; z-index: -1; color: #e1c59015; font-size: 300px; line-height: 1; }
+@keyframes griot-soft-entry { from { opacity: 0; } to { opacity: 1; } }
+@keyframes griot-star-breathe { 0%, 100% { opacity: .6; transform: scale(.95) rotate(-8deg); } 50% { opacity: 1; transform: scale(1.08) rotate(8deg); } }
+@keyframes griot-bar-reveal { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
+@media (prefers-reduced-motion: no-preference) {
+  .griot-account-page, .griot-overview-hero, .griot-dashboard-welcome { animation: griot-soft-entry .45s ease-out; }
+  .griot-metric-card { animation: griot-soft-entry .5s var(--entry-delay, 0ms) backwards; }
+  .griot-insight-card, .griot-story-studio, .griot-roots-card, .griot-account-card { animation: griot-soft-entry .65s .1s backwards; }
+  .griot-coverage-track > span, .griot-dashboard-progress > span { animation: griot-bar-reveal .9s ease-out; }
+  .griot-profile-dialog { animation: griot-soft-entry .2s ease-out; }
+}
+@media (max-width: 1080px) {
+  .griot-account-layout, .griot-insight-columns { grid-template-columns: 1fr; }
+  .griot-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .griot-overview-hero { grid-template-columns: 1fr 150px; }
+  .griot-story-studio > .griot-dashboard-section-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+}
+@media (max-width: 720px) {
+  .griot-shell-content { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+  .griot-account-page { padding: 22px 16px 35px; }
+  .griot-account-hero { flex-wrap: wrap; gap: 15px; padding: 20px; }
+  .griot-account-monogram { width: 58px; height: 58px; flex-basis: 58px; font-size: 19px; }
+  .griot-account-hero > div { flex: 1; min-width: 180px; }
+  .griot-account-badge { margin-left: 0; }
+  .griot-account-card { padding: 20px; }
+  .griot-account-footer { align-items: flex-start; flex-direction: column; }
+  .griot-overview-hero { grid-template-columns: 1fr; padding: 26px; }
+  .griot-overview-art { display: none; }
+  .griot-overview-stats { gap: 8px; }
+  .griot-overview-stats article { padding: 14px 10px; }
+  .griot-overview-stats strong { font-size: 25px; }
+  .griot-overview-stats span { font-size: 10px; }
+  .griot-overview-stats small { font-size: 9px; line-height: 1.6; }
+  .griot-story-prompts { grid-template-columns: 1fr; }
+  .griot-story-prompts article { padding: 18px; }
+  .griot-story-number { margin-bottom: 10px; }
+  .griot-metric-card { padding: 16px; }
+  .griot-metric-card strong { font-size: 28px; }
+  .griot-insight-card, .griot-story-studio { padding: 20px; }
+}
+@media (max-width: 380px) {
+  .griot-account-fields { grid-template-columns: 1fr; }
+  .griot-mobile-brand { display: none; }
+  .griot-topbar { padding-inline: 10px; }
+  .griot-topbar-title { font-size: 12px; }
+}
+
 @media (max-width: 920px) {
   .griot-relation-form { width: 100%; }
 }

@@ -93,6 +93,13 @@ class GriotAPI {
     });
   }
 
+  changePassword(currentPassword, newPassword) {
+    return this.request('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  }
+
   // 🌳 ARBRES (Family Trees)
   createArbre(nom, visibilite = 'prive') {
     return this.request('/arbres', {

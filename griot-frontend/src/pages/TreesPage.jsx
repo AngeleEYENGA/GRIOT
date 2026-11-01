@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
+import { useAuth } from '../contexts/useAuth';
 
 const panelGuidance = {
   genealogie: {
@@ -46,6 +47,7 @@ const setupSteps = [
 ];
 
 export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
+  const { user } = useAuth();
   const [trees, setTrees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -99,6 +101,15 @@ export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
   return (
     <div className="griot-trees-page">
       <main className="griot-trees-content">
+        {!guidance && <section className="griot-overview-hero">
+          <div><p className="griot-eyebrow">LE FIL DE VOTRE HISTOIRE</p><h1>Bonjour {user?.prenom || ''},<br />la mémoire se cultive ensemble.</h1><p>Retrouvez vos espaces familiaux, faites grandir vos liens et laissez une trace de ce qui vous rassemble.</p><button className="griot-button griot-button-primary" onClick={() => trees.length ? onSelectTree(trees[0].id) : setShowCreateForm(true)}>{trees.length ? 'Retrouver ma famille →' : 'Commencer mon histoire →'}</button></div>
+          <div className="griot-overview-art" aria-hidden="true"><span>✦</span><i /><i /><i /><p>Préserver.<br />Transmettre.<br />Relier.</p></div>
+        </section>}
+        {!guidance && !loading && <div className="griot-overview-stats">
+          <article><strong>{trees.length}</strong><span>Arbre{trees.length > 1 ? 's' : ''} familial{trees.length > 1 ? 'aux' : ''}</span><small>Vos espaces de transmission</small></article>
+          <article><strong>{new Set(trees.flatMap((tree) => (tree.membres || []).filter((m) => m.statut === 'actif').map((m) => m.utilisateurId))).size}</strong><span>Personnes participantes</span><small>Comptes actifs dans vos arbres</small></article>
+          <article><strong>{trees.filter((tree) => ['prive', 'privee'].includes(tree.visibilite)).length}</strong><span>Arbres privés</span><small>Accessibles aux membres invités</small></article>
+        </div>}
         {guidance ? (
           <section className="griot-select-tree griot-module-empty">
             <div>
@@ -135,7 +146,7 @@ export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
           <div>
             <p className="griot-eyebrow">ESPACE FAMILIAL</p>
             <h1>{guidance ? 'Choisissez un arbre' : 'Vos arbres généalogiques'}</h1>
-            <p>{guidance ? 'Ouvrez un espace familial existant pour consulter cette page.' : 'Choisissez un arbre pour consulter ses personnes, ses récits et ses origines.'}</p>
+            <p>{guidance ? 'Ouvrez un espace familial existant pour consulter cette page.' : 'Ouvrez un arbre pour retrouver son tableau de bord, ses anniversaires et les prochaines étapes de votre histoire.'}</p>
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}

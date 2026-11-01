@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 import FamilyTreeView from '../components/FamilyTreeView';
+import DashboardInsights, { DashboardMetrics } from '../components/DashboardInsights';
 import {
   AssistantPanel,
   GovernancePanel,
@@ -655,6 +656,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             </header>
 
             {dashboardLoading && <p className="griot-muted">Mise à jour de votre espace…</p>}
+            <DashboardMetrics personnes={personnes} relations={relations} souvenirs={souvenirs} membres={membres} onNavigate={setActiveTab} />
             {dashboard && (
               <>
                 <div className="griot-dashboard-layout">
@@ -757,6 +759,17 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 </section>
               </>
             )}
+            <DashboardInsights
+              personnes={personnes}
+              souvenirs={souvenirs}
+              onOpenProfile={openPersonProfile}
+              onNavigate={setActiveTab}
+              canContribute={peutAjouterPersonne}
+              onStartStory={(idea) => {
+                setNewSouvenir((current) => ({ ...current, titre: idea.title, contenu: `${idea.question}\n\n` }));
+                openAddSouvenir();
+              }}
+            />
           </section>
         )}
 

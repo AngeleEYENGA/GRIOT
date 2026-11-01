@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/useAuth';
 import LoginPage from './pages/LoginPage';
@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import AppShell from './components/AppShell';
 import { StylePanel } from './components/TreeExtraScreens';
 import InstitutionSpacePage from './pages/InstitutionSpacePage';
+import AccountPage from './pages/AccountPage';
 import './index.css';
 
 function AppContent() {
@@ -16,6 +17,10 @@ function AppContent() {
   const [authMode, setAuthMode] = useState('home');
   const [selectedTreeId, setSelectedTreeId] = useState(null);
   const [activePanel, setActivePanel] = useState('tableau');
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [activePanel, selectedTreeId]);
 
   const navigate = (panel) => {
     setActivePanel(panel);
@@ -71,7 +76,9 @@ function AppContent() {
       onNavigate={navigate}
       user={user}
     >
-      {activePanel === 'institutions' ? (
+      {activePanel === 'compte' ? (
+        <AccountPage onLogout={handleLogout} onBack={() => setActivePanel('tableau')} />
+      ) : activePanel === 'institutions' ? (
         <InstitutionSpacePage />
       ) : selectedTreeId ? (
         <TreeDetailPage
