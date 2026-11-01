@@ -59,6 +59,7 @@ export default function NotificationCenter() {
         type="button"
         className="griot-notifications-trigger"
         aria-label={`Notifications${unread ? `, ${unread} non lue${unread === 1 ? '' : 's'}` : ''}`}
+        aria-controls="griot-notifications-panel"
         aria-expanded={open}
         onClick={toggle}
       >
@@ -69,11 +70,26 @@ export default function NotificationCenter() {
         {unread > 0 && <span className="griot-notifications-count">{unread > 9 ? '9+' : unread}</span>}
       </button>
       {open && (
-        <section className="griot-notifications-panel" aria-label="Vos notifications">
-          <header><h2>Notifications</h2><button type="button" onClick={() => setOpen(false)} aria-label="Fermer">×</button></header>
+        <section id="griot-notifications-panel" className="griot-notifications-panel" aria-label="Vos notifications">
+          <header className="griot-notifications-heading">
+            <div>
+              <h2>Notifications</h2>
+              <p>{unread ? `${unread} non lue${unread === 1 ? '' : 's'}` : 'Vous êtes à jour'}</p>
+            </div>
+            <button type="button" className="griot-notifications-close" onClick={() => setOpen(false)} aria-label="Fermer les notifications">×</button>
+          </header>
           {error && <p className="griot-inline-error" role="alert">{error}</p>}
           {loading ? <p className="griot-muted">Chargement des notifications…</p> : notifications.length === 0 ? (
-            <p className="griot-muted">Aucune notification pour le moment.</p>
+            <div className="griot-notifications-empty">
+              <span aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9" />
+                  <path d="M10 21h4" />
+                </svg>
+              </span>
+              <strong>Tout est calme pour le moment</strong>
+              <p>Les invitations et nouvelles de votre famille apparaîtront ici.</p>
+            </div>
           ) : (
             <div className="griot-notifications-list">
               {notifications.map((notification) => {
