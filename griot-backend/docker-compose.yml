@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: griot
+      POSTGRES_PASSWORD: griot
+      POSTGRES_DB: griot
+    ports:
+      - "5433:5432"
+    volumes:
+      - griot_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  griot_postgres_data:

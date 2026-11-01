@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GRIOT — Mémoire Numérique Familiale</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" />
+  <style>
+    :root {
+      --cream: #f6efe1;
+      --paper: #fffbf3;
+      --surface: #fffdfa;
+      --ink: #2b1b12;
+      --ink-soft: #5b4636;
+      --gold: #c9932e;
+      --gold-deep: #a9782a;
+      --terracotta: #b5502a;
+      --terracotta-deep: #8f3e20;
+      --olive: #4b5d3b;
+      --line: #e3d5b8;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Work Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    #root {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =========================== ANIMATIONS =========================== */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideInFromLeft {
+      from { opacity: 0; transform: translateX(-24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes slideInFromRight {
+      from { opacity: 0; transform: translateX(24px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    /* =========================== HEADER =========================== */
+    .header {
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .header-logo {
+      font-family: 'Fraunces', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    /* =========================== NAVIGATION =========================== */
+    .nav-rail {
+      background: var(--paper);
+      border-right: 1px solid var(--line);
+      padding: 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 80px;
+      height: calc(100vh - 60px);
+      overflow-y: auto;
+      animation: slideInFromLeft 0.4s ease;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 8px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--ink-soft);
+      text-decoration: none;
+      font-size: 10px;
+      font-weight: 600;
+      min-width: 64px;
+      text-align: center;
+    }
+
+    .nav-item:hover {
+      background: var(--cream);
+      color: var(--ink);
+    }
+
+    .nav-item.active {
+      background: linear-gradient(135deg, rgba(201, 147, 46, 0.15), rgba(181, 80, 42, 0.1));
+      border: 1px solid var(--gold);
+      color: var(--gold-deep);
+    }
+
+    .nav-icon {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* =========================== MAIN CONTENT =========================== */
+    .main-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      background: var(--cream);
+    }
+
+    .content-inner {
+      padding: 24px;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      animation: fadeInUp 0.4s ease;
+    }
+
+    /* =========================== CARDS & CONTAINERS =========================== */
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(43, 27, 18, 0.04);
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      box-shadow: 0 8px 20px rgba(43, 27, 18, 0.08);
+    }
+
+    .card-header {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+
+    /* =========================== GRID LAYOUTS =========================== */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    @media (max-width: 768px) {
+      .grid-2, .grid-3 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* =========================== BUTTONS =========================== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), var(--terracotta));
+      color: white;
+      border: none;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(201, 147, 46, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--cream);
+      color: var(--ink);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover {
+      background: var(--paper);
+    }
+
+    .btn-sm {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    /* =========================== INPUTS =========================== */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-family: 'Work Sans', sans-serif;
+      font-size: 14px;
+      color: var(--ink);
+      background: var(--paper);
+      transition: all 0.2s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 147, 46, 0.1);
+    }
+
+    /* =========================== RESPONSIVE =========================== */
+    @media (max-width: 1024px) {
+      .nav-rail {
+        min-width: 70px;
+      }
+
+      .nav-item {
+        min-width: 58px;
+      }
+
+      .content-inner {
+        padding: 20px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 12px 16px;
+      }
+
+      .header-logo {
+        font-size: 18px;
+      }
+
+      .nav-rail {
+        min-width: 64px;
+        padding: 8px 4px;
+      }
+
+      .nav-item {
+        padding: 10px 6px;
+        min-width: 56px;
+        font-size: 9px;
+      }
+
+      .content-inner {
+        padding: 16px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .card-header {
+        font-size: 16px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .main-container {
+        flex-direction: column;
+      }
+
+      .nav-rail {
+        flex-direction: row;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--line);
+        min-width: unset;
+        overflow-x: auto;
+      }
+
+      .nav-item {
+        flex-shrink: 0;
+      }
+
+      .content-inner {
+        padding: 14px;
+      }
+    }
+
+    /* =========================== ANIMATIONS STAGGER =========================== */
+    .stagger-delay-1 { animation-delay: 0.05s; }
+    .stagger-delay-2 { animation-delay: 0.1s; }
+    .stagger-delay-3 { animation-delay: 0.15s; }
+    .stagger-delay-4 { animation-delay: 0.2s; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@latest"></script>
+
+  <script type="module">
+    const { useState, useEffect, useCallback } = React;
+    const e = React.createElement;
+
+    // ===================== ICONS (lucide) =====================
+    const Icons = {
+      Home: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('path', { d: 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' }),
+        e('polyline', { points: '9 22 9 12 15 12 15 22' })),
+      
+      Plus: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('line', { x1: '12', y1: '5', x2: '12', y2: '19' }),
+        e('line', { x1: '5', y1: '12', x2: '19', y2: '12' })),
+      
+      GitBranch: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('line', { x1: '6', y1: '3', x2: '6', y2: '15' }),
+        e('circle', { cx: '18', cy: '6', r: '3' }),
+        e('circle', { cx: '6', cy: '18', r: '3' }),
+        e('path', { d: 'M18 9a9 9 0 0 1-9 9' })),
+      
+      MapPin: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('path', { d: 'M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z' }),
+        e('circle', { cx: '12', cy: '10', r: '3' })),
+      
+      BookOpen: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('path', { d: 'M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z' }),
+        e('path', { d: 'M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z' })),
+      
+      Users: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('path', { d: 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2' }),
+        e('circle', { cx: '9', cy: '7', r: '4' }),
+        e('path', { d: 'M23 21v-2a4 4 0 0 0-3-3.87' }),
+        e('path', { d: 'M16 3.13a4 4 0 0 1 0 7.75' })),
+      
+      Menu: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('line', { x1: '3', y1: '6', x2: '21', y2: '6' }),
+        e('line', { x1: '3', y1: '12', x2: '21', y2: '12' }),
+        e('line', { x1: '3', y1: '18', x2: '21', y2: '18' })),
+      
+      LogOut: () => e('svg', { width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2 }, 
+        e('path', { d: 'M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4' }),
+        e('polyline', { points: '16 17 21 12 16 7' }),
+        e('line', { x1: '21', y1: '12', x2: '9', y2: '12' })),
+    };
+
+    // ===================== SCREENS =====================
+    function AccueilScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { textAlign: 'center', marginBottom: 40 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 42, fontWeight: 700, marginBottom: 16 } },
+            'Retrouvez vos ancêtres'
+          ),
+          e('p', { style: { fontSize: 18, color: 'var(--ink-soft)', marginBottom: 32, lineHeight: 1.6 } },
+            'Préservez la mémoire de votre famille et transmettez son histoire aux générations futures'
+          ),
+          e('div', { style: { display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' } },
+            e('button', { className: 'btn btn-primary', style: { padding: '14px 28px', fontSize: 16 } },
+              Icons.Plus ? e(Icons.Plus) : null, ' Créer mon arbre'
+            ),
+            e('button', { className: 'btn btn-secondary', style: { padding: '14px 28px', fontSize: 16 } },
+              'En savoir plus'
+            )
+          )
+        ),
+        e('div', { className: 'grid-2', style: { marginTop: 40 } },
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.1s both' } },
+            e('h3', { className: 'card-header' }, '📊 Votre arbre'),
+            e('p', { style: { color: 'var(--ink-soft)', lineHeight: 1.6 } },
+              'Organisez vos ancêtres et descendants sur plusieurs générations'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.2s both' } },
+            e('h3', { className: 'card-header' }, '🎙️ Mémoire familiale'),
+            e('p', { style: { color: 'var(--ink-soft)', lineHeight: 1.6 } },
+              'Enregistrez histoires, traditions et héritages culturels'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.3s both' } },
+            e('h3', { className: 'card-header' }, '🌍 Origines et migrations'),
+            e('p', { style: { color: 'var(--ink-soft)', lineHeight: 1.6 } },
+              'Tracez les routes de votre famille à travers l\'Afrique'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.4s both' } },
+            e('h3', { className: 'card-header' }, '👥 Collaborez'),
+            e('p', { style: { color: 'var(--ink-soft)', lineHeight: 1.6 } },
+              'Invitez famille et historiens pour enrichir vos données'
+            )
+          )
+        )
+      );
+    }
+
+    function DashboardScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { marginBottom: 32 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 8 } },
+            'Tableau de bord'
+          ),
+          e('p', { style: { color: 'var(--ink-soft)' } },
+            'Gérez votre arbre généalogique et sa mémoire familiale'
+          )
+        ),
+        e('div', { className: 'grid-2' },
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease' } },
+            e('h3', { className: 'card-header' }, '🌳 Mon arbre'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 16 } }, 'Accès à votre généalogie'),
+            e('button', { className: 'btn btn-primary btn-sm' },
+              'Voir l\'arbre complet'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.1s both' } },
+            e('h3', { className: 'card-header' }, '📝 Missions de la semaine'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 16 } }, '3 tâches en cours'),
+            e('button', { className: 'btn btn-primary btn-sm' },
+              'Voir les missions'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.2s both' } },
+            e('h3', { className: 'card-header' }, '👥 Collaborateurs'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 16 } }, '5 personnes ont accès'),
+            e('button', { className: 'btn btn-primary btn-sm' },
+              'Gérer l\'équipe'
+            )
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.3s both' } },
+            e('h3', { className: 'card-header' }, '📊 Complétude'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 16 } }, '65% de votre arbre complété'),
+            e('div', { style: { width: '100%', height: 8, background: 'var(--line)', borderRadius: 4, overflow: 'hidden' } },
+              e('div', { style: { width: '65%', height: '100%', background: 'var(--gold)', transition: 'width 0.3s ease' } })
+            )
+          )
+        )
+      );
+    }
+
+    function ArbreScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { marginBottom: 32 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 8 } },
+            'Arbre généalogique'
+          ),
+          e('p', { style: { color: 'var(--ink-soft)' } },
+            'Visualisez votre généalogie familiale'
+          )
+        ),
+        e('div', { className: 'card', style: { minHeight: 400 } },
+          e('div', { style: { textAlign: 'center', paddingTop: 60, color: 'var(--ink-soft)' } },
+            'Visualiseur d\'arbre généalogique',
+            e('p', { style: { fontSize: 12, marginTop: 8 } }, 'Fonctionnalité en développement')
+          )
+        )
+      );
+    }
+
+    function MemoireScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { marginBottom: 32 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 8 } },
+            'Mémoire familiale'
+          ),
+          e('p', { style: { color: 'var(--ink-soft)' } },
+            'Histoires, traditions et héritages culturels'
+          )
+        ),
+        e('div', { className: 'grid-2' },
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease' } },
+            e('h3', { className: 'card-header' }, '🎙️ Histoires orales'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 12 } }, 'Enregistrements et récits'),
+            e('button', { className: 'btn btn-primary btn-sm' }, 'Ajouter une histoire')
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.1s both' } },
+            e('h3', { className: 'card-header' }, '🍽️ Traditions culinaires'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 12 } }, 'Recettes et préparations'),
+            e('button', { className: 'btn btn-primary btn-sm' }, 'Documenter une recette')
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.2s both' } },
+            e('h3', { className: 'card-header' }, '💃 Dances et musiques'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 12 } }, 'Patrimoine artistique'),
+            e('button', { className: 'btn btn-primary btn-sm' }, 'Ajouter un média')
+          ),
+          e('div', { className: 'card', style: { animation: 'fadeInUp 0.4s ease 0.3s both' } },
+            e('h3', { className: 'card-header' }, '📿 Rituels et cérémonies'),
+            e('p', { style: { color: 'var(--ink-soft)', marginBottom: 12 } }, 'Pratiques importantes'),
+            e('button', { className: 'btn btn-primary btn-sm' }, 'Documenter')
+          )
+        )
+      );
+    }
+
+    function CarteScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { marginBottom: 32 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 8 } },
+            'Carte des origines'
+          ),
+          e('p', { style: { color: 'var(--ink-soft)' } },
+            'Migrations et lieux d\'origine de votre famille'
+          )
+        ),
+        e('div', { className: 'card', style: { minHeight: 400 } },
+          e('div', { style: { textAlign: 'center', paddingTop: 60, color: 'var(--ink-soft)' } },
+            'Cartographie des migrations',
+            e('p', { style: { fontSize: 12, marginTop: 8 } }, 'Fonctionnalité en développement')
+          )
+        )
+      );
+    }
+
+    function CollaborateursScreen() {
+      return e('div', { className: 'content-inner' },
+        e('div', { style: { marginBottom: 32 } },
+          e('h1', { style: { fontFamily: "'Fraunces', serif", fontSize: 28, fontWeight: 600, marginBottom: 8 } },
+            'Gérer les collaborateurs'
+          ),
+          e('p', { style: { color: 'var(--ink-soft)' } },
+            'Invitez des membres de votre famille ou des historiens'
+          )
+        ),
+        e('div', { className: 'card', style: { marginBottom: 24 } },
+          e('h3', { className: 'card-header' }, '➕ Ajouter un collaborateur'),
+          e('div', { className: 'input-group' },
+            e('label', { className: 'input-label' }, 'Email'),
+            e('input', { className: 'input-field', type: 'email', placeholder: 'collaborateur@email.com' })
+          ),
+          e('div', { className: 'input-group' },
+            e('label', { className: 'input-label' }, 'Rôle'),
+            e('select', { className: 'input-field', style: { cursor: 'pointer' } },
+              e('option', null, 'Lecteur'),
+              e('option', null, 'Contributeur'),
+              e('option', null, 'Éditeur'),
+              e('option', null, 'Administrateur')
+            )
+          ),
+          e('button', { className: 'btn btn-primary' }, 'Envoyer une invitation')
+        ),
+        e('div', { className: 'card' },
+          e('h3', { className: 'card-header' }, '👥 Collaborateurs actuels'),
+          e('p', { style: { color: 'var(--ink-soft)', marginBottom: 16 } }, 'Aucun collaborateur pour le moment')
+        )
+      );
+    }
+
+    // ===================== MAIN APP =====================
+    function App() {
+      const [currentScreen, setCurrentScreen] = useState('accueil');
+      const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+      useEffect(() => {
+        const handleOnline = () => setIsOnline(true);
+        const handleOffline = () => setIsOnline(false);
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+        return () => {
+          window.removeEventListener('online', handleOnline);
+          window.removeEventListener('offline', handleOffline);
+        };
+      }, []);
+
+      const screens = [
+        { id: 'accueil', label: 'Accueil', icon: 'Home', component: AccueilScreen },
+        { id: 'dashboard', label: 'Tableau de bord', icon: 'Menu', component: DashboardScreen },
+        { id: 'arbre', label: 'Arbre', icon: 'GitBranch', component: ArbreScreen },
+        { id: 'memoire', label: 'Mémoire', icon: 'BookOpen', component: MemoireScreen },
+        { id: 'carte', label: 'Carte', icon: 'MapPin', component: CarteScreen },
+        { id: 'collab', label: 'Équipe', icon: 'Users', component: CollaborateursScreen },
+      ];
+
+      const CurrentComponent = screens.find(s => s.id === currentScreen)?.component || AccueilScreen;
+
+      return e('div', null,
+        e('header', { className: 'header' },
+          e('a', { className: 'header-logo', style: { cursor: 'pointer' }, onClick: () => setCurrentScreen('accueil') }, 'GRIOT'),
+          e('div', { className: 'header-actions' },
+            e('span', { style: { fontSize: 12, color: 'var(--ink-soft)' } }, isOnline ? '✓ En ligne' : '⚠️ Hors ligne')
+          )
+        ),
+        e('div', { className: 'main-container' },
+          e('nav', { className: 'nav-rail' },
+            screens.map((screen, idx) => 
+              e('button', {
+                key: screen.id,
+                className: `nav-item ${currentScreen === screen.id ? 'active' : ''}`,
+                onClick: () => setCurrentScreen(screen.id),
+                title: screen.label,
+                style: { animation: `fadeInUp 0.4s ease ${idx * 0.05}s both` }
+              },
+                Icons[screen.icon] ? e(Icons[screen.icon]) : e('span', null, screen.label?.[0]),
+                e('span', null, screen.label)
+              )
+            )
+          ),
+          e('main', { className: 'content' },
+            e(CurrentComponent)
+          )
+        )
+      );
+    }
+
+    // ===================== MOUNT =====================
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(e(App));
+  </script>
+</body>
+</html>

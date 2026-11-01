@@ -1,0 +1,452 @@
+// GRIOT — Schéma de base de données (PostgreSQL via Prisma)
+// Traduction directe du MCD défini dans GRIOT-Conception-SI.md
+// Toutes les entités du dossier de conception sont représentées ici,
+// même celles dont l'API n'est pas encore implémentée en Lot 1
+// (cf. README.md pour la portée exacte du Lot 1).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------
+// ENUMS
+// ---------------------------------------------------------
+
+enum RoleArbre {
+  admin
+  editeur
+  contributeur
+  lecteur
+}
+
+enum StatutMembre {
+  actif
+  invite
+  en_attente
+}
+
+enum StatutUtilisateur {
+  actif
+  suspendu
+  supprime
+}
+
+enum AvatarType {
+  photo
+  avatar_personnalise
+  avatar_auto
+  initiales
+}
+
+enum StatutVerification {
+  non_verifie
+  verifie_famille
+  verifie_chefferie
+}
+
+enum CategorieSouvenir {
+  histoire
+  cuisine
+  danse
+  musique
+  proverbe
+  mariage
+  funerailles
+  naissance
+  vetements
+  rituel
+}
+
+enum TypeMedia {
+  photo
+  audio
+  video
+  document
+}
+
+enum TypeSource {
+  acte_civil
+  archive_nationale
+  chefferie
+  temoignage
+  livre
+  journal
+  universite
+  photo
+  video
+  entretien
+}
+
+enum FiabiliteSource {
+  officielle
+  institutionnelle
+  familiale
+  non_verifiee
+}
+
+enum StatutPreuve {
+  en_attente
+  validee
+  rejetee
+}
+
+enum TypeRelation {
+  parent
+  enfant
+  conjoint
+}
+
+enum ThemeVisuel {
+  moderne
+  traditionnel_africain
+  aquarelle
+  minimaliste
+  archives_anciennes
+  royal
+}
+
+enum ActionSync {
+  creation
+  modification
+  suppression
+}
+
+enum StatutSync {
+  en_attente
+  synchronise
+  conflit
+}
+
+// ---------------------------------------------------------
+// IDENTITY & TRUST (portée V1 — cf. §14 du dossier de conception)
+// ---------------------------------------------------------
+
+model Utilisateur {
+  id                String            @id @default(uuid())
+  nom               String
+  prenom            String
+  email             String            @unique
+  telephone         String?           @unique
+  motDePasseHash    String?
+  langue            String            @default("fr")
+  statut            StatutUtilisateur @default(actif)
+  emailVerifie      Boolean           @default(false)
+  telephoneVerifie  Boolean           @default(false)
+  mfaActive         Boolean           @default(false)
+  dateCreation      DateTime          @default(now())
+
+  arbresPossedes    Arbre[]              @relation("proprietaire")
+  membresArbre      MembreArbre[]
+  souvenirsCrees    Souvenir[]           @relation("auteur")
+  preuvesCreees     Preuve[]             @relation("auteurPreuve")
+  notifications     Notification[]
+  syncQueue         SyncQueue[]
+  preferences       PreferenceAffichage[]
+  identitesModifiees IdentiteFamiliale[] @relation("modifiePar")
+  identitesOAuth     IdentiteOAuth[]
+
+  @@map("utilisateurs")
+}
+
+model IdentiteOAuth {
+  id            String      @id @default(uuid())
+  utilisateurId String
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  fournisseur   String
+  sujet         String
+  dateCreation  DateTime    @default(now())
+
+  @@unique([fournisseur, sujet])
+  @@unique([utilisateurId, fournisseur])
+  @@map("identites_oauth")
+}
+
+// ---------------------------------------------------------
+// FAMILY MANAGEMENT
+// ---------------------------------------------------------
+
+model Arbre {
+  id             String   @id @default(uuid())
+  nom            String
+  proprietaireId String
+  proprietaire   Utilisateur @relation("proprietaire", fields: [proprietaireId], references: [id])
+  visibilite     String   @default("prive")
+  dateCreation   DateTime @default(now())
+
+  membres              MembreArbre[]
+  personnes            Personne[]
+  souvenirs            Souvenir[]
+  evenementsHistoriques EvenementHistorique[]
+  missions             Mission[]
+  institution          Institution?
+  identiteFamiliale    IdentiteFamiliale?
+  preferences          PreferenceAffichage[]
+
+  @@map("arbres")
+}
+
+model MembreArbre {
+  id             String       @id @default(uuid())
+  utilisateurId  String
+  utilisateur    Utilisateur  @relation(fields: [utilisateurId], references: [id])
+  arbreId        String
+  arbre          Arbre        @relation(fields: [arbreId], references: [id])
+  role           RoleArbre    @default(lecteur)
+  statut         StatutMembre @default(invite)
+  dateInvitation DateTime     @default(now())
+
+  @@unique([utilisateurId, arbreId])
+  @@map("membres_arbre")
+}
+
+// ---------------------------------------------------------
+// GENEALOGY ENGINE
+// ---------------------------------------------------------
+
+model Personne {
+  id              String     @id @default(uuid())
+  arbreId         String
+  arbre           Arbre      @relation(fields: [arbreId], references: [id])
+  nom             String
+  prenom          String
+  dateNaissance   DateTime?
+  dateDeces       DateTime?
+  villageOrigine  String?
+  avatarType      AvatarType @default(initiales)
+  avatarCategorie String?
+  avatarValeur    String?
+  biographie      String?
+  statutVerification StatutVerification @default(non_verifie)
+
+  relationsSujet1 RelationFamiliale[] @relation("personne1")
+  relationsSujet2 RelationFamiliale[] @relation("personne2")
+  souvenirs       Souvenir[]
+  medias          Media[]
+  migrations      Migration[]
+  preuves         Preuve[]
+
+  @@map("personnes")
+}
+
+model RelationFamiliale {
+  id           String       @id @default(uuid())
+  personneId1  String
+  personne1    Personne     @relation("personne1", fields: [personneId1], references: [id])
+  personneId2  String
+  personne2    Personne     @relation("personne2", fields: [personneId2], references: [id])
+  typeRelation TypeRelation
+
+  @@map("relations_familiales")
+}
+
+// ---------------------------------------------------------
+// HERITAGE MANAGEMENT
+// ---------------------------------------------------------
+
+model Souvenir {
+  id                 String            @id @default(uuid())
+  arbreId            String
+  arbre              Arbre             @relation(fields: [arbreId], references: [id])
+  personneId         String?
+  personne           Personne?         @relation(fields: [personneId], references: [id])
+  auteurId           String
+  auteur             Utilisateur       @relation("auteur", fields: [auteurId], references: [id])
+  categorie          CategorieSouvenir
+  titre              String
+  contenu            String?
+  statutVerification StatutVerification @default(non_verifie)
+  dateCreation       DateTime          @default(now())
+
+  medias  Media[]
+  preuves Preuve[]
+
+  @@map("souvenirs")
+}
+
+model EvenementHistorique {
+  id          String @id @default(uuid())
+  arbreId     String
+  arbre       Arbre  @relation(fields: [arbreId], references: [id])
+  annee       String
+  titre       String
+  description String?
+
+  @@map("evenements_historiques")
+}
+
+model Source {
+  id         String          @id @default(uuid())
+  type       TypeSource
+  nom        String
+  reference  String?
+  fiabilite  FiabiliteSource @default(non_verifiee)
+
+  preuves Preuve[]
+
+  @@map("sources")
+}
+
+model Preuve {
+  id               String       @id @default(uuid())
+  sourceId         String?
+  source           Source?      @relation(fields: [sourceId], references: [id])
+  personneId       String?
+  personne         Personne?    @relation(fields: [personneId], references: [id])
+  souvenirId       String?
+  souvenir         Souvenir?    @relation(fields: [souvenirId], references: [id])
+  type             String
+  urlDocument      String?
+  datePreuve       DateTime?
+  auteurId         String
+  auteur           Utilisateur  @relation("auteurPreuve", fields: [auteurId], references: [id])
+  statutValidation StatutPreuve @default(en_attente)
+
+  @@map("preuves")
+}
+
+// ---------------------------------------------------------
+// MEDIA MANAGEMENT
+// ---------------------------------------------------------
+
+model Media {
+  id          String    @id @default(uuid())
+  souvenirId  String?
+  souvenir    Souvenir? @relation(fields: [souvenirId], references: [id])
+  personneId  String?
+  personne    Personne? @relation(fields: [personneId], references: [id])
+  type        TypeMedia
+  url         String
+  tailleOctets Int?
+  dateUpload  DateTime  @default(now())
+
+  @@map("medias")
+}
+
+// ---------------------------------------------------------
+// GEOLOCALISATION / MIGRATIONS
+// ---------------------------------------------------------
+
+model Lieu {
+  id        String  @id @default(uuid())
+  nom       String
+  pays      String?
+  latitude  Float?
+  longitude Float?
+
+  migrations Migration[]
+
+  @@map("lieux")
+}
+
+model Migration {
+  id            String    @id @default(uuid())
+  personneId    String
+  personne      Personne  @relation(fields: [personneId], references: [id])
+  lieuId        String
+  lieu          Lieu      @relation(fields: [lieuId], references: [id])
+  dateEvenement DateTime?
+  ordre         Int       @default(0)
+
+  @@map("migrations")
+}
+
+// ---------------------------------------------------------
+// ENGAGEMENT (missions, notifications)
+// ---------------------------------------------------------
+
+model Mission {
+  id             String    @id @default(uuid())
+  arbreId        String
+  arbre          Arbre     @relation(fields: [arbreId], references: [id])
+  libelle        String
+  complete       Boolean   @default(false)
+  dateCompletion DateTime?
+
+  @@map("missions")
+}
+
+model Notification {
+  id            String   @id @default(uuid())
+  utilisateurId String
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  type          String
+  contenu       String
+  lue           Boolean  @default(false)
+  dateCreation  DateTime @default(now())
+
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------
+// OFFLINE & SYNCHRONIZATION
+// ---------------------------------------------------------
+
+model SyncQueue {
+  id            String     @id @default(uuid())
+  utilisateurId String
+  utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
+  actionType    ActionSync
+  payload       Json
+  statut        StatutSync @default(en_attente)
+  dateCreation  DateTime   @default(now())
+  dateSync      DateTime?
+
+  @@map("sync_queue")
+}
+
+// ---------------------------------------------------------
+// VISUALIZATION ENGINE (personnalisation)
+// ---------------------------------------------------------
+
+model PreferenceAffichage {
+  id                  String      @id @default(uuid())
+  utilisateurId       String
+  utilisateur         Utilisateur @relation(fields: [utilisateurId], references: [id])
+  arbreId             String
+  arbre               Arbre       @relation(fields: [arbreId], references: [id])
+  themeVisuel         ThemeVisuel?
+  avatarsActives      Boolean     @default(true)
+  modeAvatarPrefere   String?
+  densiteAffichage    String      @default("confortable")
+  informationsVisibles Json?
+
+  @@unique([utilisateurId, arbreId])
+  @@map("preferences_affichage")
+}
+
+model IdentiteFamiliale {
+  id                 String      @id @default(uuid())
+  arbreId            String      @unique
+  arbre              Arbre       @relation(fields: [arbreId], references: [id])
+  blasonUrl          String?
+  banniereUrl        String?
+  devise             String?
+  themeOfficiel      ThemeVisuel @default(moderne)
+  paletteCouleurs    String?
+  styleAvatarDefaut  String?
+  modifieParId       String
+  modifiePar         Utilisateur @relation("modifiePar", fields: [modifieParId], references: [id])
+  dateModification   DateTime    @updatedAt
+
+  @@map("identites_familiales")
+}
+
+// ---------------------------------------------------------
+// GOVERNANCE — Institution (chefferie)
+// ---------------------------------------------------------
+
+model Institution {
+  id                 String @id @default(uuid())
+  arbreId            String @unique
+  arbre              Arbre  @relation(fields: [arbreId], references: [id])
+  nom                String
+  type               String
+  statutVerification StatutVerification @default(non_verifie)
+
+  @@map("institutions")
+}

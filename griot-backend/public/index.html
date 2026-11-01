@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GRIOT — Démo</title>
+    <style>
+      :root {
+        --cream: #f6efe1;
+        --paper: #fffbf3;
+        --ink: #2b1b12;
+        --ink-soft: #5b4636;
+        --gold: #c9932e;
+        --terracotta: #b5502a;
+        --olive: #4b5d3b;
+        --line: #e3d5b8;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, var(--cream), #efe4c7);
+        color: var(--ink);
+      }
+
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 18px 60px;
+      }
+
+      .hero {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: 0 12px 30px rgba(43, 27, 18, 0.08);
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0 0 8px;
+        font-size: 2rem;
+        color: var(--ink);
+      }
+
+      .muted { color: var(--ink-soft); margin: 0; line-height: 1.5; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 18px;
+        box-shadow: 0 10px 24px rgba(43, 27, 18, 0.06);
+      }
+
+      form { display: grid; gap: 10px; }
+      label { font-weight: 600; font-size: 0.95rem; }
+      input, button {
+        font: inherit;
+        padding: 11px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+      }
+
+      input:focus { outline: 2px solid rgba(201, 147, 46, 0.24); border-color: var(--gold); }
+      button {
+        cursor: pointer;
+        background: var(--gold);
+        color: white;
+        border: none;
+        font-weight: 700;
+      }
+
+      button.secondary {
+        background: var(--terracotta);
+      }
+
+      .message {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #f4efe4;
+        border: 1px solid var(--line);
+        font-size: 0.95rem;
+      }
+
+      .message.success { background: #eef7eb; border-color: #bdd9b4; }
+      .message.error { background: #fdebec; border-color: #e7b2b8; }
+
+      .state {
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fcf7eb;
+        border: 1px solid var(--line);
+      }
+
+      .pill {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(75, 93, 59, 0.12);
+        color: var(--olive);
+        font-weight: 600;
+        font-size: 0.85rem;
+      }
+
+      .small { font-size: 0.9rem; color: var(--ink-soft); }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <h1>GRIOT — Démo interactive</h1>
+        <p class="muted">
+          Cette page permet de tester rapidement l’inscription, la connexion et la création d’un arbre généalogique avec l’API backend.
+        </p>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Créer un compte</h2>
+          <form id="registerForm">
+            <label>Nom</label>
+            <input name="nom" required />
+            <label>Prénom</label>
+            <input name="prenom" required />
+            <label>Email</label>
+            <input name="email" type="email" required />
+            <label>Mot de passe</label>
+            <input name="motDePasse" type="password" required />
+            <button type="submit">S’inscrire</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Connexion</h2>
+          <form id="loginForm">
+            <label>Email</label>
+            <input name="email" type="email" required />
+            <label>Mot de passe</label>
+            <input name="motDePasse" type="password" required />
+            <button type="submit">Se connecter</button>
+          </form>
+        </section>
+
+        <section class="card">
+          <h2>Créer un arbre</h2>
+          <form id="treeForm">
+            <label>Nom de l’arbre</label>
+            <input name="nom" value="Arbre Demo" required />
+            <button type="submit">Créer l’arbre</button>
+            <button type="button" class="secondary" id="logoutBtn">Se déconnecter</button>
+          </form>
+        </section>
+      </div>
+
+      <div id="message" class="message">Prêt à tester. Connectez-vous pour créer un arbre.</div>
+      <div id="state" class="state">
+        <strong>État actuel :</strong> aucune connexion active.
+      </div>
+    </div>
+
+    <script>
+      const messageBox = document.getElementById('message');
+      const stateBox = document.getElementById('state');
+      const registerForm = document.getElementById('registerForm');
+      const loginForm = document.getElementById('loginForm');
+      const treeForm = document.getElementById('treeForm');
+      const logoutBtn = document.getElementById('logoutBtn');
+
+      function setMessage(text, kind = 'info') {
+        messageBox.className = `message ${kind}`.trim();
+        messageBox.textContent = text;
+      }
+
+      function updateState(token) {
+        const user = JSON.parse(localStorage.getItem('griotUser') || 'null');
+        if (token) {
+          stateBox.innerHTML = `
+            <strong>État actuel :</strong> connecté.<br />
+            <span class="pill">Token stocké localement</span><br />
+            <span class="small">Utilisateur : ${user ? `${user.prenom} ${user.nom}` : 'connecté'}</span>
+          `;
+        } else {
+          stateBox.innerHTML = '<strong>État actuel :</strong> aucune connexion active.';
+        }
+      }
+
+      function readForm(form) {
+        const data = Object.fromEntries(new FormData(form).entries());
+        return data;
+      }
+
+      registerForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = readForm(registerForm);
+        try {
+          const response = await fetch('/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message || 'Échec de l’inscription');
+          setMessage(`Compte créé pour ${payload.prenom} ${payload.nom}.`, 'success');
+        } catch (error) {
+          setMessage(error.message, 'error');
+        }
+      });
+
+      loginForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const payload = readForm(loginForm);
+        try {
+          const response = await fetch('/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message || 'Échec de la connexion');
+          localStorage.setItem('griotToken', result.accessToken);
+          localStorage.setItem('griotUser', JSON.stringify({ email: payload.email }));
+          updateState(result.accessToken);
+          setMessage(`Connexion réussie. Vous pouvez créer un arbre.`, 'success');
+        } catch (error) {
+          setMessage(error.message, 'error');
+        }
+      });
+
+      treeForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const token = localStorage.getItem('griotToken');
+        if (!token) {
+          setMessage('Vous devez d’abord vous connecter.', 'error');
+          return;
+        }
+
+        const payload = readForm(treeForm);
+        try {
+          const response = await fetch('/arbres', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          if (!response.ok) throw new Error(result.message || 'Échec de la création d’arbre');
+          setMessage(`Arbre créé : ${result.nom}`, 'success');
+        } catch (error) {
+          setMessage(error.message, 'error');
+        }
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('griotToken');
+        localStorage.removeItem('griotUser');
+        updateState(null);
+        setMessage('Déconnecté.', 'info');
+      });
+
+      updateState(localStorage.getItem('griotToken'));
+    </script>
+  </body>
+</html>

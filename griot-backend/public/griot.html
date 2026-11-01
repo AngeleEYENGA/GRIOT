@@ -1,0 +1,4527 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GRIOT</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" />
+    <style>
+      :root {
+        --cream: #f6efe1;
+        --paper: #fffbf3;
+        --surface: #fffdfa;
+        --ink: #2b1b12;
+        --ink-soft: #5b4636;
+        --gold: #c9932e;
+        --gold-deep: #a9782a;
+        --terracotta: #b5502a;
+        --terracotta-deep: #8f3e20;
+        --olive: #4b5d3b;
+        --line: #e3d5b8;
+      }
+
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Work Sans", "Segoe UI", sans-serif;
+        background: #ede3cc;
+      }
+
+      .app {
+        min-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+      }
+
+      .site-footer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 8px;
+        text-align: center;
+        font-size: 0.74rem;
+        color: rgba(43, 27, 18, 0.66);
+        pointer-events: none;
+        z-index: 20;
+      }
+
+      .page {
+        display: none;
+        width: min(100%, 1220px);
+      }
+
+      .page.active { display: block; }
+
+      .card {
+        background: rgba(255, 250, 241, 0.96);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 18px 48px rgba(43, 27, 18, 0.12);
+      }
+
+      .auth-page {
+        width: min(100%, 560px);
+      }
+
+      .auth-shell {
+        background: var(--cream);
+      }
+
+      .home-screen {
+        display: grid;
+        gap: 14px;
+        position: relative;
+      }
+
+      .home-intro {
+        position: absolute;
+        inset: 0;
+        border-radius: 20px;
+        background: var(--ink);
+        color: var(--paper);
+        z-index: 5;
+        overflow: hidden;
+      }
+
+      .home-intro-step {
+        position: absolute;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        text-align: center;
+      }
+
+      .home-intro-step.active {
+        display: flex;
+        animation: fadeIn 0.35s ease;
+      }
+
+      .intro-blackout {
+        background: radial-gradient(circle at 50% 35%, rgba(43, 27, 18, 0.3), rgba(16, 10, 7, 0.98));
+      }
+
+      .intro-blackout-glow {
+        width: 220px;
+        height: 220px;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(201, 147, 46, 0.18), rgba(201, 147, 46, 0));
+        animation: pulseGlow 1.4s ease-in-out infinite;
+      }
+
+      .intro-copy {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.55rem;
+        line-height: 1.35;
+        color: var(--gold);
+        animation: fadeInUp 0.9s ease;
+      }
+
+      .intro-subcopy {
+        margin-top: 12px;
+        color: rgba(246, 239, 225, 0.72);
+        font-size: 0.86rem;
+        animation: fadeInUp 1.05s ease;
+      }
+
+      .intro-orbit {
+        position: relative;
+        width: 270px;
+        height: 270px;
+      }
+
+      .intro-map-wrap {
+        width: min(280px, 88%);
+        display: grid;
+        gap: 10px;
+        justify-items: center;
+      }
+
+      .intro-map-title {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.95rem;
+        color: var(--gold);
+        animation: fadeInUp 0.8s ease;
+      }
+
+      .intro-map {
+        width: 100%;
+        height: 170px;
+        border-radius: 14px;
+        border: 1px solid rgba(201, 147, 46, 0.34);
+        background: radial-gradient(circle at 40% 45%, rgba(74, 52, 34, 0.95), rgba(23, 15, 10, 0.98));
+        animation: fadeIn 0.9s ease;
+      }
+
+      .intro-map-land {
+        fill: rgba(246, 239, 225, 0.12);
+        stroke: rgba(246, 239, 225, 0.2);
+        stroke-width: 1.2;
+      }
+
+      .intro-map-path {
+        fill: none;
+        stroke: rgba(201, 147, 46, 0.86);
+        stroke-width: 2;
+        stroke-dasharray: 5 5;
+        animation: dashFlow 1.2s linear infinite;
+      }
+
+      .intro-map-node {
+        fill: var(--gold);
+        stroke: #f6efe1;
+        stroke-width: 1.5;
+        animation: pulseNode 1.25s ease-in-out infinite;
+      }
+
+      .intro-ring {
+        position: absolute;
+        border-radius: 999px;
+        border: 1px solid rgba(201, 147, 46, 0.28);
+        animation: pulseGlow 2.4s infinite;
+      }
+
+      .intro-ring.r1 {
+        width: 180px;
+        height: 180px;
+        left: 45px;
+        top: 45px;
+      }
+
+      .intro-ring.r2 {
+        width: 250px;
+        height: 250px;
+        left: 10px;
+        top: 10px;
+      }
+
+      .intro-ancestor {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        font-size: 0.66rem;
+        color: var(--gold);
+        font-weight: 600;
+        white-space: nowrap;
+        animation: ancestorAppear 0.55s ease both;
+      }
+
+      .intro-ancestor::before {
+        content: '';
+        display: block;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--gold);
+        margin: 0 auto 6px;
+        box-shadow: 0 0 10px rgba(201, 147, 46, 0.85);
+      }
+
+      .intro-tree-wrap {
+        display: grid;
+        gap: 12px;
+        justify-items: center;
+      }
+
+      .intro-tree-wrap .home-tree-mark {
+        animation: zoomIn 1.3s ease;
+      }
+
+      .intro-tree-note {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1rem;
+        color: var(--gold);
+        animation: fadeInUp 1s ease;
+      }
+
+      .intro-skip {
+        position: absolute;
+        right: 16px;
+        bottom: 14px;
+        border: 0;
+        background: transparent;
+        color: rgba(246, 239, 225, 0.62);
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+
+      .home-search {
+        position: relative;
+      }
+
+      .home-animate .home-search {
+        animation: fadeInUp 0.55s ease 0.06s both;
+      }
+
+      .home-search input {
+        width: 100%;
+        padding: 11px 12px 11px 38px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        font-size: 0.9rem;
+      }
+
+      .home-search svg {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ink-soft);
+      }
+
+      .home-search .search-icon {
+        left: 12px;
+      }
+
+      .home-search .globe-icon {
+        right: 12px;
+      }
+
+      .home-hero {
+        display: grid;
+        justify-items: center;
+        text-align: center;
+        gap: 8px;
+      }
+
+      .home-hero .home-tree-mark {
+        transform-origin: center bottom;
+      }
+
+      .home-animate .home-hero .home-tree-mark {
+        animation: zoomIn 0.85s ease 0.2s both, floatPulse 4s ease-in-out 1.1s infinite;
+      }
+
+      .home-title {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        margin: 0;
+      }
+
+      .home-animate .home-title {
+        animation: fadeInUp 0.65s ease 0.24s both;
+      }
+
+      .home-subtitle {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.98rem;
+        font-style: italic;
+        color: var(--terracotta-deep);
+        line-height: 1.45;
+        margin: 0;
+      }
+
+      .home-animate .home-subtitle {
+        animation: fadeInUp 0.75s ease 0.36s both;
+      }
+
+      .home-caption {
+        color: var(--ink-soft);
+        font-size: 0.8rem;
+        line-height: 1.4;
+        max-width: 280px;
+        margin: 0;
+      }
+
+      .home-animate .home-caption {
+        animation: fadeInUp 0.75s ease 0.45s both;
+      }
+
+      .home-stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .home-stat {
+        text-align: center;
+        padding: 10px 8px;
+        border-radius: 10px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+      }
+
+      .home-animate .home-stat {
+        animation: countUp 0.52s ease both;
+      }
+
+      .home-animate .home-stat:nth-child(1) {
+        animation-delay: 0.54s;
+      }
+
+      .home-animate .home-stat:nth-child(2) {
+        animation-delay: 0.64s;
+      }
+
+      .home-stat-value {
+        font-family: "Fraunces", Georgia, serif;
+        color: var(--terracotta-deep);
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .home-stat-label {
+        color: var(--ink-soft);
+        font-size: 0.68rem;
+        font-weight: 600;
+      }
+
+      .home-cta {
+        display: grid;
+        gap: 9px;
+      }
+
+      .home-primary {
+        width: 100%;
+        border: 0;
+        border-radius: 12px;
+        padding: 14px 0;
+        background: var(--ink);
+        color: var(--paper);
+        font-family: "Work Sans", "Segoe UI", sans-serif;
+        font-size: 0.96rem;
+        font-weight: 700;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .home-primary::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(110deg, transparent 35%, rgba(246, 239, 225, 0.2) 50%, transparent 65%);
+        background-size: 230% 100%;
+        opacity: 0;
+      }
+
+      .home-animate .home-primary::after {
+        opacity: 1;
+        animation: shimmer 1.6s linear 0.95s;
+      }
+
+      .home-outline {
+        width: 100%;
+        border: 1.5px solid var(--ink);
+        border-radius: 12px;
+        padding: 13px 0;
+        background: transparent;
+        color: var(--ink);
+        font-family: "Work Sans", "Segoe UI", sans-serif;
+        font-size: 0.92rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .home-text {
+        border: 0;
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .griot-ai {
+        justify-self: center;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1.5px solid var(--gold);
+        border-radius: 999px;
+        padding: 8px 14px;
+        background: linear-gradient(135deg, rgba(201, 147, 46, 0.13), rgba(181, 80, 42, 0.09));
+        color: var(--gold-deep);
+        font-size: 0.76rem;
+        font-weight: 700;
+        font-family: "Work Sans", "Segoe UI", sans-serif;
+      }
+
+      .home-animate .home-cta > * {
+        animation: fadeInUp 0.58s ease both;
+      }
+
+      .home-animate .home-cta > :nth-child(1) { animation-delay: 0.72s; }
+      .home-animate .home-cta > :nth-child(2) { animation-delay: 0.8s; }
+      .home-animate .home-cta > :nth-child(3) { animation-delay: 0.88s; }
+      .home-animate .home-cta > :nth-child(4) { animation-delay: 0.96s; }
+
+      .griot-ai svg {
+        color: var(--gold);
+      }
+
+      .home-tree-mark {
+        width: 136px;
+        height: 174px;
+      }
+
+      h1, h2, h3, p { margin-top: 0; }
+      h1 { font-size: 1.8rem; margin-bottom: 8px; }
+      h3 { margin-bottom: 14px; }
+
+      .copy { color: var(--ink-soft); line-height: 1.5; margin-bottom: 20px; }
+      .badge {
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(201, 147, 46, 0.12);
+        color: #5c4210;
+        font-weight: 700;
+        font-size: 0.92rem;
+      }
+
+        border: 1.5px solid var(--gold);
+        cursor: pointer;
+      .field { display: grid; gap: 8px; margin-bottom: 12px; }
+      label { font-size: 0.95rem; font-weight: 700; }
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid var(--line);
+
+      .ai-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(43, 27, 18, 0.58);
+        z-index: 40;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+      }
+
+      .ai-panel {
+        width: min(100%, 560px);
+        max-height: min(86vh, 760px);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 12px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        padding: 14px;
+        box-shadow: 0 18px 46px rgba(43, 27, 18, 0.24);
+      }
+
+      .ai-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .ai-title {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.04rem;
+        font-weight: 700;
+      }
+
+      .ai-close {
+        border: 0;
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 1.2rem;
+        line-height: 1;
+        cursor: pointer;
+      }
+
+      .ai-feed {
+        overflow: auto;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        padding-right: 2px;
+      }
+
+      .ai-msg {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        background: #fffefb;
+      }
+
+      .ai-msg.user {
+        justify-self: end;
+        max-width: 88%;
+        background: rgba(201, 147, 46, 0.14);
+        border-color: rgba(201, 147, 46, 0.4);
+      }
+
+      .ai-msg.bot {
+        justify-self: start;
+        max-width: 94%;
+      }
+
+      .ai-msg.loading {
+        color: var(--ink-soft);
+        font-style: italic;
+      }
+
+      .ai-suggestions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .ai-chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--cream);
+        color: var(--ink);
+        font-size: 0.76rem;
+        font-weight: 600;
+        padding: 6px 10px;
+        cursor: pointer;
+      }
+
+      .ai-composer {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+
+      .ai-composer input {
+        border-radius: 10px;
+      }
+
+      .ai-send {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: var(--ink);
+        color: var(--paper);
+        font-weight: 700;
+        cursor: pointer;
+      }
+        border-radius: 14px;
+        padding: 12px 14px;
+        font: inherit;
+        background: var(--surface);
+      }
+      textarea { min-height: 100px; resize: vertical; }
+      input:focus, select:focus, textarea:focus {
+        outline: 2px solid rgba(201, 147, 46, 0.22);
+        border-color: var(--gold);
+      }
+
+      .btn {
+        border: 0;
+        border-radius: 999px;
+        padding: 12px 16px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .btn-primary { background: var(--gold); color: white; }
+      .btn-secondary { background: var(--terracotta); color: white; }
+      .btn-muted { background: rgba(75, 93, 59, 0.12); color: var(--olive); }
+      .btn-ghost {
+        background: transparent;
+        color: var(--gold);
+        padding: 0;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .btn-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+      .message {
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        padding: 12px 14px;
+        background: #fcf7eb;
+        color: var(--ink);
+        margin-bottom: 16px;
+      }
+      .message.success { background: #eff8e9; border-color: #b8d9a9; }
+      .message.error { background: #fdebed; border-color: #e8b9bf; }
+
+      .password-rules {
+        color: var(--ink-soft);
+        font-size: 0.88rem;
+        line-height: 1.45;
+      }
+
+      .strength { min-height: 48px; }
+      .links { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 8px; }
+      .hidden { display: none !important; }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+
+      .section-nav {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+
+      .role-summary {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+
+      .role-chip {
+        display: inline-flex;
+        align-items: center;
+        padding: 7px 12px;
+        border-radius: 999px;
+        background: rgba(75, 93, 59, 0.12);
+        color: var(--olive);
+        font-weight: 700;
+      }
+
+      .permissions-note {
+        color: var(--ink-soft);
+        font-size: 0.92rem;
+      }
+
+      .section-link.active {
+        background: var(--terracotta);
+        color: white;
+      }
+
+      .kpis {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 18px;
+      }
+
+      .kpi {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 16px;
+        background: var(--surface);
+      }
+
+      .kpi strong {
+        display: block;
+        font-size: 1.35rem;
+        margin-top: 8px;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      .proto-dashboard-card {
+        width: 100%;
+        margin-inline: auto;
+        background: var(--cream);
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        padding: 0;
+        box-shadow: 0 18px 48px rgba(43, 27, 18, 0.12);
+        overflow: hidden;
+      }
+
+      .proto-dash-shell {
+        min-height: 72vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--cream);
+      }
+
+      .proto-dash-top {
+        padding: 16px 20px 6px;
+      }
+
+      .proto-search {
+        position: relative;
+      }
+
+      .proto-search input {
+        width: 100%;
+        padding: 11px 12px 11px 38px;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        font-size: 0.9rem;
+      }
+
+      .proto-search svg {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ink-soft);
+      }
+
+      .proto-search .search-icon {
+        left: 12px;
+      }
+
+      .proto-search .globe-icon {
+        right: 12px;
+      }
+
+      .proto-welcome {
+        padding: 8px 20px 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+      }
+
+      .proto-welcome-quote {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.95rem;
+        font-style: italic;
+        color: var(--terracotta-deep);
+        margin-bottom: 2px;
+      }
+
+      .proto-welcome-muted {
+        font-size: 0.8rem;
+        color: var(--ink-soft);
+      }
+
+      .proto-welcome-name {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .proto-dash-scroll {
+        flex: 1;
+        overflow: auto;
+        padding: 8px 20px 0;
+      }
+
+      .proto-collab-block {
+        margin-bottom: 14px;
+      }
+
+      .proto-tree-card {
+        background: linear-gradient(135deg, var(--ink), #40291b);
+        border-radius: 16px;
+        padding: 18px;
+        color: var(--paper);
+        cursor: pointer;
+        margin-bottom: 14px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .proto-tree-kicker {
+        font-size: 0.72rem;
+        opacity: 0.75;
+        margin-bottom: 4px;
+      }
+
+      .proto-tree-count {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .proto-verified {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 0.64rem;
+        font-weight: 700;
+        color: var(--olive);
+        background: rgba(75, 93, 59, 0.16);
+        border-radius: 999px;
+        padding: 4px 8px;
+      }
+
+      .proto-tree-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gold);
+        margin-top: 10px;
+      }
+
+      .proto-mini-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .proto-mini-card {
+        flex: 1;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+
+      .proto-mini-label {
+        font-size: 0.68rem;
+        color: var(--ink-soft);
+        margin-bottom: 3px;
+      }
+
+      .proto-mini-value {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .proto-collab-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+
+      .proto-collab-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        letter-spacing: 0.4px;
+      }
+
+      .proto-collab-invite {
+        border: 0;
+        background: transparent;
+        color: var(--terracotta);
+        font-size: 0.7rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .proto-collab-list {
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+        padding-bottom: 4px;
+      }
+
+      .proto-collab-item {
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 10px 12px;
+        min-width: 72px;
+      }
+
+      .proto-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--paper);
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 0.74rem;
+        font-weight: 700;
+      }
+
+      .proto-collab-name {
+        font-size: 0.6rem;
+        font-weight: 600;
+        text-align: center;
+        line-height: 1.2;
+      }
+
+      .proto-collab-role {
+        font-size: 0.54rem;
+        color: var(--ink-soft);
+      }
+
+      .proto-collab-chip {
+        font-size: 0.5rem;
+        font-weight: 700;
+        color: var(--gold);
+        background: rgba(201, 147, 46, 0.16);
+        border-radius: 999px;
+        padding: 2px 6px;
+      }
+
+      .proto-ai-wrap {
+        display: flex;
+        justify-content: center;
+        margin: 14px 0;
+      }
+
+      .proto-ai-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border: 1.5px solid var(--gold);
+        border-radius: 999px;
+        padding: 9px 16px;
+        background: linear-gradient(135deg, rgba(201, 147, 46, 0.13), rgba(181, 80, 42, 0.09));
+        color: var(--gold-deep);
+        font-size: 0.78rem;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .proto-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+        margin-bottom: 18px;
+      }
+
+      .proto-action {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--paper);
+        padding: 12px 6px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.66rem;
+        font-weight: 600;
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .proto-activity-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        letter-spacing: 0.4px;
+        margin-bottom: 8px;
+      }
+
+      .proto-activity-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-bottom: 10px;
+      }
+
+      .proto-activity-pane {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px;
+      }
+
+      .proto-activity-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .proto-activity-main {
+        font-size: 0.8rem;
+      }
+
+      .proto-activity-meta {
+        font-size: 0.68rem;
+        color: var(--ink-soft);
+      }
+
+      .proto-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 6px 14px;
+        border-top: 1px solid var(--line);
+        background: var(--paper);
+      }
+
+      .proto-nav-item {
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        color: var(--ink-soft);
+        font-size: 0.62rem;
+        font-weight: 500;
+      }
+
+      .proto-nav-item.active {
+        color: var(--terracotta);
+        font-weight: 700;
+      }
+
+      .legacy-dashboard {
+        display: block;
+        margin-top: 18px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+      }
+
+      .legacy-dashboard .dashboard-header {
+        margin-bottom: 14px;
+      }
+
+      .legacy-dashboard .kpis {
+        margin-bottom: 14px;
+      }
+
+      .legacy-dashboard .panel {
+        border-radius: 16px;
+        transition: box-shadow 0.2s ease, transform 0.2s ease;
+      }
+
+      .legacy-dashboard .panel:hover {
+        box-shadow: 0 10px 26px rgba(43, 27, 18, 0.08);
+      }
+
+      .legacy-dashboard .section-nav {
+        gap: 8px;
+      }
+
+      .legacy-dashboard .section-link {
+        border-radius: 10px;
+        padding: 10px 12px;
+      }
+
+      .legacy-dashboard .section-link:hover {
+        background: rgba(181, 80, 42, 0.12);
+        color: var(--terracotta-deep);
+      }
+
+      .legacy-dashboard .message {
+        margin-bottom: 12px;
+      }
+
+      .legacy-dashboard .item {
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .legacy-dashboard .item:hover {
+        border-color: rgba(201, 147, 46, 0.42);
+        box-shadow: 0 8px 18px rgba(43, 27, 18, 0.06);
+      }
+
+      .legacy-dashboard input,
+      .legacy-dashboard select,
+      .legacy-dashboard textarea {
+        background: #fffefb;
+      }
+
+      .legacy-dashboard .btn:disabled,
+      .proto-ai-send:disabled,
+      .ai-send:disabled {
+        opacity: 0.62;
+        cursor: not-allowed;
+      }
+
+      .legacy-dashboard .inline-actions .btn,
+      .legacy-dashboard .inline-actions select {
+        min-height: 36px;
+      }
+
+      .legacy-dashboard .kpi {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .legacy-dashboard .kpi:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(43, 27, 18, 0.08);
+      }
+
+      .proto-nav-item {
+        transition: color 0.2s ease;
+      }
+
+      .toast-stack {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 120;
+        display: grid;
+        gap: 8px;
+        pointer-events: none;
+        width: min(92vw, 360px);
+      }
+
+      .toast {
+        pointer-events: auto;
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--ink);
+        border-radius: 12px;
+        padding: 10px 12px;
+        background: #fffefb;
+        color: var(--ink);
+        box-shadow: 0 12px 28px rgba(43, 27, 18, 0.14);
+        font-size: 0.84rem;
+        line-height: 1.4;
+        animation: toastIn 0.25s ease;
+      }
+
+      .toast-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .toast-text {
+        min-width: 0;
+        word-break: break-word;
+      }
+
+      .toast-count {
+        display: none;
+        flex-shrink: 0;
+        border: 1px solid rgba(43, 27, 18, 0.16);
+        border-radius: 999px;
+        padding: 2px 7px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        color: var(--ink-soft);
+        background: rgba(43, 27, 18, 0.06);
+      }
+
+      .toast-count.visible {
+        display: inline-flex;
+      }
+
+      .toast.success {
+        border-left-color: var(--olive);
+        background: #f4faef;
+      }
+
+      .toast.success .toast-count {
+        border-color: rgba(75, 93, 59, 0.26);
+        color: var(--olive);
+        background: rgba(75, 93, 59, 0.1);
+      }
+
+      .toast.error {
+        border-left-color: var(--terracotta);
+        background: #fff2f3;
+      }
+
+      .toast.error .toast-count {
+        border-color: rgba(181, 80, 42, 0.26);
+        color: var(--terracotta-deep);
+        background: rgba(181, 80, 42, 0.1);
+      }
+
+      .toast.info {
+        border-left-color: var(--gold);
+        background: #fffaef;
+      }
+
+      .toast.info .toast-count {
+        border-color: rgba(201, 147, 46, 0.3);
+        color: var(--gold-deep);
+        background: rgba(201, 147, 46, 0.12);
+      }
+
+      .toast.hide {
+        animation: toastOut 0.22s ease forwards;
+      }
+
+      .proto-ai-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(43, 27, 18, 0.58);
+        z-index: 60;
+        display: grid;
+        place-items: center;
+        padding: 18px;
+      }
+
+      .proto-ai-panel {
+        width: min(100%, 560px);
+        max-height: min(86vh, 760px);
+        display: grid;
+        grid-template-rows: auto 1fr auto;
+        gap: 12px;
+        border-radius: 18px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        padding: 14px;
+        box-shadow: 0 18px 46px rgba(43, 27, 18, 0.24);
+      }
+
+      .proto-ai-feed {
+        overflow: auto;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+        padding-right: 2px;
+      }
+
+      .proto-ai-msg {
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+        font-size: 0.88rem;
+        line-height: 1.5;
+        background: #fffefb;
+      }
+
+      .proto-ai-msg.user {
+        justify-self: end;
+        max-width: 88%;
+        background: rgba(201, 147, 46, 0.14);
+        border-color: rgba(201, 147, 46, 0.4);
+      }
+
+      .proto-ai-msg.bot {
+        justify-self: start;
+        max-width: 94%;
+      }
+
+      .proto-ai-msg.loading {
+        color: var(--ink-soft);
+        font-style: italic;
+      }
+
+      .proto-ai-composer {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+
+      .proto-ai-send {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        background: var(--ink);
+        color: var(--paper);
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .proto-tree-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 80;
+        background: rgba(43, 27, 18, 0.45);
+        display: grid;
+        place-items: center;
+        padding: 16px;
+      }
+
+      .proto-tree-shell {
+        width: min(100%, 980px);
+        max-height: min(92vh, 980px);
+        background: var(--cream);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        box-shadow: 0 18px 46px rgba(43, 27, 18, 0.2);
+        display: grid;
+        grid-template-rows: auto auto auto 1fr auto;
+        overflow: hidden;
+      }
+
+      .proto-tree-head {
+        padding: 16px 18px 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .proto-tree-back {
+        border: 0;
+        background: transparent;
+        color: var(--ink);
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
+
+      .proto-tree-title {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 1.18rem;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .proto-tree-subtitle {
+        font-size: 0.78rem;
+        color: var(--ink-soft);
+      }
+
+      .proto-tree-ai {
+        padding: 0 18px 8px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .proto-tree-filters {
+        padding: 0 18px 10px;
+        display: flex;
+        gap: 8px;
+        overflow: auto;
+      }
+
+      .proto-tree-pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: transparent;
+        color: var(--ink-soft);
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+        padding: 7px 14px;
+        cursor: pointer;
+      }
+
+      .proto-tree-pill.active {
+        border-color: var(--ink);
+        background: var(--ink);
+        color: var(--paper);
+      }
+
+      .proto-tree-canvas {
+        position: relative;
+        margin: 0 18px 14px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: auto;
+        background: radial-gradient(circle at 50% 45%, var(--paper), var(--cream));
+      }
+
+      .proto-tree-canvas svg {
+        display: block;
+        width: 100%;
+        min-width: 360px;
+        height: 560px;
+      }
+
+      .proto-tree-zoom {
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .proto-tree-zoom button {
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: var(--paper);
+        border: 1px solid var(--line);
+        cursor: pointer;
+        color: var(--ink);
+        box-shadow: 0 2px 6px rgba(43, 27, 18, 0.12);
+      }
+
+      .proto-tree-bottom-nav {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+        padding: 10px 8px 14px;
+        border-top: 1px solid var(--line);
+        background: var(--paper);
+      }
+
+      .proto-tree-bottom-nav .proto-nav-item {
+        font-size: 0.64rem;
+      }
+
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 18px;
+        background: var(--surface);
+      }
+
+      .person-graph {
+        display: grid;
+        gap: 12px;
+        margin-top: 12px;
+      }
+
+      .graph-center {
+        display: flex;
+        justify-content: center;
+      }
+
+      .graph-node {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 12px 14px;
+        background: #fffefb;
+        min-width: 180px;
+        text-align: center;
+      }
+
+      .graph-node.clickable {
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+
+      .graph-node.clickable:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 20px rgba(43, 27, 18, 0.08);
+      }
+
+      .graph-node.center {
+        background: rgba(201, 147, 46, 0.12);
+        border-color: rgba(201, 147, 46, 0.4);
+      }
+
+      .graph-links {
+        display: grid;
+        gap: 10px;
+      }
+
+      .graph-edge {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 10px;
+        align-items: center;
+      }
+
+      .edge-label {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(75, 93, 59, 0.12);
+        color: var(--olive);
+        font-size: 0.85rem;
+        font-weight: 700;
+        text-align: center;
+      }
+
+      .list { display: grid; gap: 10px; }
+      .item {
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 12px 14px;
+        background: #fffefb;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .meta { color: var(--ink-soft); font-size: 0.92rem; }
+      .stack { display: grid; gap: 16px; }
+      .inline-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+      .form-grid .field { margin-bottom: 0; }
+      .form-grid .field-wide,
+      .form-grid .btn-row,
+      .form-grid .btn-full {
+        grid-column: 1 / -1;
+      }
+      .tab-panel {
+        display: none;
+        gap: 16px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-content: start;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.24s ease, transform 0.24s ease;
+      }
+      .tab-panel.active {
+        display: grid;
+        grid-column: 1 / -1;
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .panel.panel-wide { grid-column: 1 / -1; }
+
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes zoomIn {
+        from {
+          opacity: 0;
+          transform: scale(0.35);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      @keyframes pulseGlow {
+        0%, 100% { opacity: 0.35; }
+        50% { opacity: 1; }
+      }
+
+      @keyframes ancestorAppear {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -50%) scale(0.4);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
+        }
+      }
+
+      @keyframes countUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes shimmer {
+        from { background-position: -180% 0; }
+        to { background-position: 180% 0; }
+      }
+
+      @keyframes floatPulse {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-3px); }
+      }
+
+      @keyframes dashFlow {
+        from { stroke-dashoffset: 20; }
+        to { stroke-dashoffset: 0; }
+      }
+
+      @keyframes pulseNode {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.25); opacity: 0.75; }
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(-8px) scale(0.98);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes toastOut {
+        from {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-6px) scale(0.98);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .home-animate * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+
+      @media (max-width: 960px) {
+        .dashboard-grid,
+        .kpis {
+          grid-template-columns: 1fr;
+        }
+        .tab-panel {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (min-width: 900px) {
+        .proto-dashboard-card {
+          border-radius: 28px;
+        }
+
+        .proto-dash-shell {
+          min-height: 80vh;
+        }
+
+        .proto-dash-top {
+          padding: 22px 26px 10px;
+        }
+
+        .proto-welcome {
+          padding: 10px 26px 12px;
+        }
+
+        .proto-welcome-quote {
+          font-size: 1.02rem;
+        }
+
+        .proto-welcome-muted {
+          font-size: 0.86rem;
+        }
+
+        .proto-welcome-name {
+          font-size: 1.82rem;
+        }
+
+        .proto-dash-scroll {
+          padding: 8px 26px 20px;
+          display: grid;
+          grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+          gap: 16px;
+          align-content: start;
+          overflow: visible;
+        }
+
+        .proto-tree-card,
+        .proto-mini-grid,
+        .proto-ai-wrap,
+        .proto-actions,
+        #protoDashboardNotice {
+          grid-column: 1;
+        }
+
+        .proto-collab-block,
+        .proto-activity-title,
+        .proto-activity-pane {
+          grid-column: 2;
+        }
+
+        .proto-activity-title {
+          margin: 0;
+          align-self: end;
+          font-size: 0.78rem;
+        }
+
+        .proto-mini-value {
+          font-size: 1.08rem;
+        }
+
+        .proto-mini-label {
+          font-size: 0.72rem;
+        }
+
+        .proto-activity-pane {
+          padding: 14px;
+        }
+
+        .proto-collab-list {
+          flex-wrap: wrap;
+          overflow: visible;
+        }
+
+        .proto-collab-item {
+          min-width: 104px;
+        }
+
+        .proto-collab-name {
+          font-size: 0.68rem;
+        }
+
+        .proto-collab-role {
+          font-size: 0.6rem;
+        }
+
+        .proto-tree-kicker {
+          font-size: 0.74rem;
+        }
+
+        .proto-tree-count {
+          font-size: 1.32rem;
+        }
+
+        .proto-verified {
+          font-size: 0.68rem;
+        }
+
+        .proto-tree-link {
+          font-size: 0.84rem;
+        }
+
+        .proto-action {
+          font-size: 0.76rem;
+          min-height: 100px;
+          padding: 14px 8px;
+        }
+
+        .proto-activity-main {
+          font-size: 0.88rem;
+        }
+
+        .proto-activity-meta {
+          font-size: 0.72rem;
+        }
+
+        #protoDashboardNotice {
+          margin-top: 2px;
+        }
+
+        .proto-bottom-nav {
+          display: none;
+        }
+
+        .proto-tree-shell {
+          width: min(100%, 1040px);
+        }
+
+        .proto-tree-title {
+          font-size: 1.3rem;
+        }
+
+        .proto-tree-subtitle {
+          font-size: 0.84rem;
+        }
+
+        .proto-tree-bottom-nav {
+          display: none;
+        }
+
+        .legacy-dashboard {
+          margin-top: 20px;
+          padding-top: 20px;
+        }
+
+        .legacy-dashboard .kpis {
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .legacy-dashboard .dashboard-grid {
+          gap: 14px;
+        }
+
+        .legacy-dashboard .tab-panel {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+      }
+
+      @media (min-width: 1280px) {
+        .page {
+          width: min(100%, 1320px);
+        }
+
+        .proto-dash-scroll {
+          grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+          gap: 20px;
+        }
+
+        .proto-tree-count {
+          font-size: 1.42rem;
+        }
+
+        .proto-collab-item {
+          min-width: 112px;
+        }
+
+        .proto-mini-grid {
+          gap: 12px;
+        }
+
+        .proto-actions {
+          gap: 10px;
+        }
+
+        .legacy-dashboard .tab-panel {
+          gap: 16px;
+        }
+
+        .legacy-dashboard .panel {
+          padding: 20px;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .app { padding: 16px; }
+        .card { padding: 22px; border-radius: 22px; }
+        .home-title { font-size: 2rem; }
+        .proto-dashboard-card {
+          border-radius: 20px;
+        }
+        .proto-dash-shell {
+          min-height: 74vh;
+        }
+        .proto-dash-top,
+        .proto-welcome,
+        .proto-dash-scroll {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+        .legacy-dashboard {
+          margin-top: 14px;
+          padding-top: 14px;
+        }
+        .legacy-dashboard .kpis {
+          grid-template-columns: 1fr;
+        }
+        .legacy-dashboard .tab-panel {
+          grid-template-columns: 1fr;
+        }
+        .proto-tree-overlay {
+          padding: 10px;
+        }
+        .proto-tree-shell {
+          border-radius: 16px;
+        }
+        .proto-tree-head,
+        .proto-tree-ai,
+        .proto-tree-filters {
+          padding-left: 12px;
+          padding-right: 12px;
+        }
+        .proto-tree-canvas {
+          margin-left: 12px;
+          margin-right: 12px;
+          margin-bottom: 10px;
+        }
+        .toast-stack {
+          left: 12px;
+          right: 12px;
+          top: 12px;
+          width: auto;
+        }
+        .site-footer {
+          font-size: 0.68rem;
+          bottom: 6px;
+        }
+      }
+      /* MVP local : l'ancien tableau de bord visuel affichait des données
+         fictives. Seuls les panneaux réellement reliés à l'API sont montrés. */
+      .proto-dashboard-card,
+      .proto-ai-overlay,
+      .proto-tree-overlay {
+        display: none !important;
+      }
+
+      .legacy-dashboard {
+        margin-top: 0;
+        padding-top: 0;
+        border-top: 0;
+      }
+
+      .legacy-dashboard .dashboard-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 18px;
+        padding-bottom: 18px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .legacy-dashboard .dashboard-header h1 {
+        font-size: clamp(1.65rem, 4vw, 2.4rem);
+      }
+
+      .legacy-dashboard .section-nav {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        padding: 6px;
+        background: #f7f0e4;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+      }
+
+      .legacy-dashboard .section-link {
+        min-height: 44px;
+        white-space: normal;
+      }
+
+      .legacy-dashboard .section-link.active {
+        background: var(--terracotta);
+        color: #fff;
+        border-color: var(--terracotta);
+      }
+
+      .legacy-dashboard .dashboard-grid {
+        min-height: 420px;
+      }
+
+      @media (max-width: 720px) {
+        .legacy-dashboard .dashboard-header {
+          flex-direction: column;
+        }
+
+        .legacy-dashboard .dashboard-header .btn-row {
+          width: 100%;
+        }
+
+        .legacy-dashboard .dashboard-header .btn-row .btn {
+          flex: 1;
+        }
+
+        .legacy-dashboard .section-nav {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+
+      /* Une application, pas une application dans un cadre : on retire les
+         grandes cartes décoratives et on garde une hiérarchie très légère. */
+      .app {
+        align-items: stretch;
+        padding: 0;
+      }
+
+      .page {
+        width: min(100%, 1280px);
+        margin: 0 auto;
+      }
+
+      .card,
+      .auth-shell,
+      .legacy-dashboard {
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+      }
+
+      .card {
+        padding: clamp(20px, 4vw, 48px);
+      }
+
+      .legacy-dashboard .section-nav {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        padding: 0;
+        background: transparent;
+        border: 0;
+        border-radius: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .legacy-dashboard .section-link,
+      .legacy-dashboard .section-link.active {
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        color: var(--ink-soft);
+      }
+
+      .legacy-dashboard .section-link.active {
+        color: var(--terracotta-deep);
+        box-shadow: inset 0 -3px 0 var(--terracotta);
+      }
+
+      .legacy-dashboard .panel {
+        padding: 20px 0;
+        border: 0;
+        border-radius: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+      }
+
+      .legacy-dashboard .panel:hover,
+      .legacy-dashboard .kpi:hover {
+        box-shadow: none;
+        transform: none;
+      }
+
+      .legacy-dashboard .kpi {
+        border: 0;
+        border-left: 2px solid var(--line);
+        border-radius: 0;
+        padding: 10px 14px;
+        background: transparent;
+      }
+
+      .legacy-dashboard .kpi:first-child { border-left: 0; }
+
+      .legacy-dashboard .item {
+        border: 0;
+        border-left: 3px solid var(--line);
+        border-radius: 0;
+        background: transparent;
+      }
+
+      .legacy-dashboard .item:hover {
+        border-color: var(--gold);
+        box-shadow: none;
+      }
+
+      @media (max-width: 720px) {
+        .legacy-dashboard .section-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .legacy-dashboard .kpi:nth-child(odd) { border-left: 0; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <section class="page auth-page active" id="authScreen">
+        <div class="card auth-shell">
+          <div id="authHome" class="home-screen home-animate">
+            <div id="homeIntro" class="home-intro hidden">
+              <div id="introBlackStep" class="home-intro-step intro-blackout active">
+                <div class="intro-blackout-glow"></div>
+              </div>
+
+              <div id="introTextStep" class="home-intro-step">
+                <div>
+                  <div class="intro-copy">Retrouvez vos ancêtres.<br>Préservez leur mémoire.<br>Transmettez-la à vos enfants.</div>
+                  <div class="intro-subcopy">La mémoire numérique des peuples africains</div>
+                </div>
+              </div>
+
+              <div id="introMapStep" class="home-intro-step">
+                <div class="intro-map-wrap">
+                  <div class="intro-map-title">Vos racines traversent les terres</div>
+                  <svg class="intro-map" viewBox="0 0 300 170" aria-hidden="true">
+                    <path class="intro-map-land" d="M136 18C171 13 203 25 225 46C247 66 257 90 250 111C243 132 219 148 186 153C149 158 117 150 94 133C71 115 63 92 70 70C78 46 102 25 136 18Z"></path>
+                    <path class="intro-map-path" d="M94 126C123 97 151 79 187 54"></path>
+                    <path class="intro-map-path" d="M111 136C149 106 188 90 224 76"></path>
+                    <circle class="intro-map-node" cx="94" cy="126" r="5"></circle>
+                    <circle class="intro-map-node" cx="187" cy="54" r="5"></circle>
+                    <circle class="intro-map-node" cx="224" cy="76" r="4.5"></circle>
+                  </svg>
+                </div>
+              </div>
+
+              <div id="introAncestorsStep" class="home-intro-step">
+                <div class="intro-orbit">
+                  <div class="intro-ring r1"></div>
+                  <div class="intro-ring r2"></div>
+                  <div id="introAncestorsLayer"></div>
+                </div>
+              </div>
+
+              <div id="introTreeStep" class="home-intro-step">
+                <div class="intro-tree-wrap">
+                  <svg class="home-tree-mark" viewBox="0 0 100 130" aria-hidden="true">
+                    <line x1="50" y1="38" x2="50" y2="92" stroke="#f6efe1" stroke-width="3"></line>
+                    <line x1="50" y1="38" x2="22" y2="22" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="38" x2="35" y2="11" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="38" x2="50" y2="8" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="38" x2="65" y2="11" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="38" x2="78" y2="22" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <circle cx="22" cy="22" r="6.5" fill="#c9932e" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="35" cy="11" r="6.5" fill="#c9932e" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="50" cy="8" r="8" fill="#c9932e" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="65" cy="11" r="6.5" fill="#c9932e" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="78" cy="22" r="6.5" fill="#c9932e" stroke="#f6efe1" stroke-width="2"></circle>
+                    <line x1="50" y1="92" x2="22" y2="108" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="92" x2="35" y2="119" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="92" x2="50" y2="122" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="92" x2="65" y2="119" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <line x1="50" y1="92" x2="78" y2="108" stroke="#f6efe1" stroke-width="2.5"></line>
+                    <circle cx="22" cy="108" r="6.5" fill="#b5502a" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="35" cy="119" r="6.5" fill="#b5502a" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="50" cy="122" r="8" fill="#b5502a" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="65" cy="119" r="6.5" fill="#b5502a" stroke="#f6efe1" stroke-width="2"></circle>
+                    <circle cx="78" cy="108" r="6.5" fill="#b5502a" stroke="#f6efe1" stroke-width="2"></circle>
+                  </svg>
+                  <div class="intro-tree-note">Votre arbre prend vie</div>
+                </div>
+              </div>
+
+              <button id="introSkipBtn" class="intro-skip" type="button">Passer →</button>
+            </div>
+
+            <div class="home-search">
+              <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+              <input id="homeSearchInput" type="text" placeholder="Mvondo, un village, une ethnie..." />
+              <svg class="globe-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+            </div>
+
+            <div class="home-hero">
+              <svg class="home-tree-mark" viewBox="0 0 100 130" aria-hidden="true">
+                <line x1="50" y1="38" x2="50" y2="92" stroke="#2b1b12" stroke-width="3"></line>
+                <line x1="50" y1="38" x2="22" y2="22" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="38" x2="35" y2="11" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="38" x2="50" y2="8" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="38" x2="65" y2="11" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="38" x2="78" y2="22" stroke="#2b1b12" stroke-width="2.5"></line>
+                <circle cx="22" cy="22" r="6.5" fill="#c9932e" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="35" cy="11" r="6.5" fill="#c9932e" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="50" cy="8" r="8" fill="#c9932e" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="65" cy="11" r="6.5" fill="#c9932e" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="78" cy="22" r="6.5" fill="#c9932e" stroke="#2b1b12" stroke-width="2"></circle>
+                <line x1="50" y1="92" x2="22" y2="108" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="92" x2="35" y2="119" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="92" x2="50" y2="122" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="92" x2="65" y2="119" stroke="#2b1b12" stroke-width="2.5"></line>
+                <line x1="50" y1="92" x2="78" y2="108" stroke="#2b1b12" stroke-width="2.5"></line>
+                <circle cx="22" cy="108" r="6.5" fill="#b5502a" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="35" cy="119" r="6.5" fill="#b5502a" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="50" cy="122" r="8" fill="#b5502a" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="65" cy="119" r="6.5" fill="#b5502a" stroke="#2b1b12" stroke-width="2"></circle>
+                <circle cx="78" cy="108" r="6.5" fill="#b5502a" stroke="#2b1b12" stroke-width="2"></circle>
+              </svg>
+              <h1 class="home-title">GRIOT</h1>
+              <p class="home-subtitle">La mémoire numérique<br>des peuples africains</p>
+              <p class="home-caption">Une ambition : préserver ce qui ne s'écrit pas toujours.</p>
+            </div>
+
+            <div class="home-stats">
+              <div class="home-stat">
+                <div class="home-stat-value">🌱</div>
+                <div class="home-stat-label">Rejoignez les familles fondatrices</div>
+              </div>
+              <div class="home-stat">
+                <div class="home-stat-value">🌍</div>
+                <div class="home-stat-label">Déjà présent au Cameroun, Gabon, Congo</div>
+              </div>
+            </div>
+
+            <div class="home-cta">
+              <button id="homeCreateBtn" class="home-primary" type="button">Créer mon arbre</button>
+              <button id="homeExploreBtn" class="home-outline" type="button">Explorer les histoires</button>
+              <button id="homeLoginBtn" class="home-text" type="button">Se connecter</button>
+              <button id="homeAiBtn" class="griot-ai" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                Demander à GRIOT
+              </button>
+            </div>
+
+            <div id="aiOverlay" class="ai-overlay hidden" role="dialog" aria-modal="true" aria-label="Assistant GRIOT">
+              <div class="ai-panel" id="aiPanel">
+                <div class="ai-head">
+                  <div class="ai-title">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                    Assistant GRIOT
+                  </div>
+                  <button id="aiCloseBtn" class="ai-close" type="button" aria-label="Fermer">×</button>
+                </div>
+
+                <div id="aiFeed" class="ai-feed">
+                  <div class="ai-msg bot">Posez une question sur vos ancêtres, migrations, liens familiaux ou traditions.</div>
+                </div>
+
+                <div>
+                  <div class="ai-suggestions" id="aiSuggestions">
+                    <button class="ai-chip" type="button" data-ai-prompt="Qui était mon arrière-grand-père ?">Qui était mon arrière-grand-père ?</button>
+                    <button class="ai-chip" type="button" data-ai-prompt="Résume ma branche familiale">Résume ma branche familiale</button>
+                    <button class="ai-chip" type="button" data-ai-prompt="Quelles infos me manquent pour compléter mon arbre ?">Quelles infos me manquent ?</button>
+                  </div>
+                  <div class="ai-composer" style="margin-top: 10px;">
+                    <input id="aiInput" type="text" placeholder="Posez votre question à GRIOT..." />
+                    <button id="aiSendBtn" class="ai-send" type="button">Envoyer</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="authFlow" class="hidden">
+            <div class="badge" style="margin-bottom: 14px;">GRIOT • Accès sécurisé</div>
+            <h1 id="authHeading">Connexion</h1>
+            <p class="copy" id="authCopy">Connectez-vous pour accéder à votre dashboard et à vos arbres familiaux.</p>
+            <div class="message" id="messageBox">Bienvenue dans GRIOT.</div>
+
+            <form id="authForm">
+            <div id="registerFields" class="hidden">
+              <div class="field">
+                <label for="nom">Nom</label>
+                <input id="nom" name="nom" autocomplete="family-name" />
+              </div>
+              <div class="field">
+                <label for="prenom">Prénom</label>
+                <input id="prenom" name="prenom" autocomplete="given-name" />
+              </div>
+            </div>
+
+            <div class="field" id="emailField">
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required />
+            </div>
+
+            <div class="field" id="passwordField">
+              <label for="motDePasse">Mot de passe</label>
+              <input id="motDePasse" name="motDePasse" type="password" autocomplete="current-password" required />
+              <div class="password-rules">Min. 8 caractères, avec au moins 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.</div>
+            </div>
+
+            <div id="resetFields" class="hidden">
+              <div class="field">
+                <label for="resetToken">Token de réinitialisation</label>
+                <input id="resetToken" name="resetToken" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="newPassword">Nouveau mot de passe</label>
+                <input id="newPassword" name="newPassword" type="password" autocomplete="new-password" />
+                <div class="password-rules">Min. 8 caractères, avec au moins 1 majuscule, 1 minuscule, 1 chiffre et 1 caractère spécial.</div>
+              </div>
+              <div class="field">
+                <label for="confirmResetPassword">Confirmer le mot de passe</label>
+                <input id="confirmResetPassword" name="confirmResetPassword" type="password" autocomplete="new-password" />
+              </div>
+            </div>
+
+            <div id="passwordStrength" class="message strength"></div>
+
+            <div class="links">
+              <button class="btn btn-ghost" id="toggleAuthBtn" type="button">Créer un compte</button>
+              <button class="btn btn-ghost" id="forgotPasswordBtn" type="button">Mot de passe oublié ?</button>
+            </div>
+
+            <button class="btn btn-primary" id="authSubmitBtn" type="submit" style="width:100%; margin-top: 14px;">Valider</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="dashboardScreen">
+        <div class="proto-dashboard-card">
+          <div class="proto-dash-shell">
+            <div class="proto-dash-top">
+              <div class="proto-search">
+                <svg class="search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+                <input id="protoDashboardSearch" type="text" placeholder="Rechercher une famille, un nom, un village..." />
+                <svg class="globe-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"></path><path d="M2 12h20"></path></svg>
+              </div>
+            </div>
+
+            <div class="proto-welcome">
+              <div>
+                <div class="proto-welcome-quote">Votre histoire continue.</div>
+                <div class="proto-welcome-muted">Bienvenue chez vous,</div>
+                <div class="proto-welcome-name" id="protoWelcomeName">Jean</div>
+              </div>
+              <button id="protoRefreshBtn" class="btn btn-muted" type="button" style="padding:8px 10px;">Actualiser</button>
+            </div>
+
+            <div class="proto-dash-scroll">
+              <div class="proto-tree-card" id="protoOpenArbreBtn">
+                <div class="proto-tree-kicker">VOTRE ARBRE</div>
+                <div class="proto-tree-count"><span id="protoTreeCount">0</span> personnes</div>
+                <span class="proto-verified">Vérifié par la famille</span>
+                <div class="proto-tree-link">Voir mon arbre →</div>
+              </div>
+
+              <div class="proto-mini-grid">
+                <div class="proto-mini-card">
+                  <div class="proto-mini-label">ORIGINES</div>
+                  <div class="proto-mini-value" id="protoOrigins">Cameroun</div>
+                  <div class="proto-activity-meta">Région du Mbam</div>
+                </div>
+                <div class="proto-mini-card">
+                  <div class="proto-mini-label">COLLABORATION</div>
+                  <div class="proto-mini-value"><span id="protoCollaboratorCount">0</span> contributeurs</div>
+                  <div class="proto-activity-meta"><span id="protoPendingCount">0</span> en attente</div>
+                </div>
+              </div>
+
+              <div class="proto-collab-block">
+                <div class="proto-collab-head">
+                  <div class="proto-collab-title">COLLABORATEURS</div>
+                  <button class="proto-collab-invite" id="protoInviteBtn" type="button">+ Inviter</button>
+                </div>
+                <div class="proto-collab-list" id="protoCollaboratorsList"></div>
+              </div>
+
+              <div class="proto-ai-wrap">
+                <button id="protoAiBtn" class="proto-ai-btn" type="button">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                  Demander à GRIOT
+                </button>
+              </div>
+
+              <div class="proto-actions">
+                <button id="protoQuickAddPersonBtn" class="proto-action" type="button">
+                  <span>➕</span>
+                  <span>Ajouter une personne</span>
+                </button>
+                <button id="protoQuickStoryBtn" class="proto-action" type="button">
+                  <span>🎙️</span>
+                  <span>Raconter une histoire</span>
+                </button>
+                <button id="protoQuickDocBtn" class="proto-action" type="button">
+                  <span>📄</span>
+                  <span>Ajouter un document</span>
+                </button>
+              </div>
+
+              <div class="proto-activity-title">ACTIVITÉS RÉCENTES</div>
+              <div class="proto-activity-pane">
+                <div class="proto-activity-list" id="protoActivityList"></div>
+              </div>
+              <div id="protoDashboardNotice" class="message">Chargement des données...</div>
+            </div>
+
+            <div class="proto-bottom-nav">
+              <button id="protoNavDashboard" class="proto-nav-item active" type="button"><span>⌂</span><span>Accueil</span></button>
+              <button id="protoNavArbre" class="proto-nav-item" type="button"><span>⎇</span><span>Arbre</span></button>
+              <button id="protoNavCarte" class="proto-nav-item" type="button"><span>◉</span><span>Carte</span></button>
+              <button id="protoNavMemoire" class="proto-nav-item" type="button"><span>☰</span><span>Mémoire</span></button>
+              <button id="protoLogoutBtn" class="proto-nav-item" type="button"><span>↦</span><span>Quitter</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="protoAiOverlay" class="proto-ai-overlay hidden" role="dialog" aria-modal="true" aria-label="Assistant GRIOT">
+          <div id="protoAiPanel" class="proto-ai-panel">
+            <div class="ai-head">
+              <div class="ai-title">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                Assistant GRIOT
+              </div>
+              <button id="protoAiCloseBtn" class="ai-close" type="button" aria-label="Fermer">×</button>
+            </div>
+
+            <div id="protoAiFeed" class="proto-ai-feed">
+              <div class="proto-ai-msg bot">Posez une question sur vos ancêtres, migrations, liens familiaux ou traditions.</div>
+            </div>
+
+            <div>
+              <div class="ai-suggestions" id="protoAiSuggestions">
+                <button class="ai-chip" type="button" data-ai-prompt="Qui était mon arrière-grand-père ?">Qui était mon arrière-grand-père ?</button>
+                <button class="ai-chip" type="button" data-ai-prompt="Résume ma branche familiale">Résume ma branche familiale</button>
+                <button class="ai-chip" type="button" data-ai-prompt="Quelles infos me manquent pour compléter mon arbre ?">Quelles infos me manquent ?</button>
+              </div>
+              <div class="proto-ai-composer" style="margin-top: 10px;">
+                <input id="protoAiInput" type="text" placeholder="Posez votre question à GRIOT..." />
+                <button id="protoAiSendBtn" class="proto-ai-send" type="button">Envoyer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="protoTreeOverlay" class="proto-tree-overlay hidden" role="dialog" aria-modal="true" aria-label="Arbre généalogique">
+          <div class="proto-tree-shell">
+            <div class="proto-tree-head">
+              <button id="protoTreeBackBtn" class="proto-tree-back" type="button">← Retour</button>
+              <div>
+                <div class="proto-tree-title">Arbre généalogique</div>
+                <div class="proto-tree-subtitle">128 personnes · 4 générations</div>
+              </div>
+              <div style="width:70px;"></div>
+            </div>
+
+            <div class="proto-tree-ai">
+              <button id="protoTreeAiBtn" class="proto-ai-btn" type="button" style="padding:6px 12px;font-size:0.72rem;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg>
+                Demander à GRIOT
+              </button>
+            </div>
+
+            <div class="proto-tree-filters">
+              <button class="proto-tree-pill active" type="button" data-tree-filter="branche">Branche familiale</button>
+              <button class="proto-tree-pill" type="button" data-tree-filter="ascendants">Ascendants</button>
+              <button class="proto-tree-pill" type="button" data-tree-filter="descendants">Descendants</button>
+            </div>
+
+            <div class="proto-tree-canvas">
+              <svg id="protoTreeSvg" viewBox="0 0 360 560" aria-label="Visualisation de l'arbre généalogique"></svg>
+              <div class="proto-tree-zoom">
+                <button type="button" aria-label="Zoom avant">+</button>
+                <button type="button" aria-label="Zoom arrière">−</button>
+              </div>
+            </div>
+
+            <div class="proto-tree-bottom-nav">
+              <button id="protoTreeNavDashboard" class="proto-nav-item" type="button"><span>⌂</span><span>Accueil</span></button>
+              <button class="proto-nav-item active" type="button"><span>⎇</span><span>Arbre</span></button>
+              <button id="protoTreeNavCarte" class="proto-nav-item" type="button"><span>◉</span><span>Carte</span></button>
+              <button id="protoTreeNavMemoire" class="proto-nav-item" type="button"><span>☰</span><span>Mémoire</span></button>
+            </div>
+          </div>
+        </div>
+
+        <div id="legacyDashboard" class="card legacy-dashboard">
+          <div class="dashboard-header">
+            <div>
+              <div class="badge" style="margin-bottom: 14px;">GRIOT • Espace famille</div>
+              <h1 id="dashboardCopy">Mon espace famille</h1>
+              <p class="copy" id="dashboardMessage">Créez votre arbre, ajoutez vos proches et reliez leurs histoires.</p>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="refreshBtn" type="button">Actualiser</button>
+              <button class="btn btn-secondary" id="logoutBtn" type="button">Déconnexion</button>
+            </div>
+          </div>
+
+          <div class="kpis">
+            <div class="kpi">
+              Profil
+              <strong id="profileName">-</strong>
+              <div class="meta" id="profileEmail">-</div>
+            </div>
+            <div class="kpi">
+              Arbres
+              <strong id="treeCount">0</strong>
+              <div class="meta">Arbres accessibles</div>
+            </div>
+            <div class="kpi">
+              Personnes
+              <strong id="peopleCount">0</strong>
+              <div class="meta" id="currentTreeLabel">Aucun arbre sélectionné</div>
+            </div>
+            <div class="kpi">
+              Relations
+              <strong id="relationCount">0</strong>
+              <div class="meta">Liens familiaux documentés</div>
+            </div>
+          </div>
+
+          <div class="message" id="dashboardNotice">Chargement des données...</div>
+
+          <div class="role-summary">
+            <span class="role-chip" id="roleChip">Rôle : non défini</span>
+            <span class="permissions-note" id="permissionsNote">Sélectionnez un arbre pour afficher vos permissions.</span>
+          </div>
+
+          <div class="section-nav" id="sectionNav">
+            <button class="btn btn-muted section-link active" type="button" data-target="profilePanel">Mon arbre</button>
+            <button class="btn btn-muted section-link" type="button" data-target="peoplePanel">Personnes</button>
+            <button class="btn btn-muted section-link" type="button" data-target="membersPanel">Membres</button>
+            <button class="btn btn-muted section-link" type="button" data-target="relationsPanel">Relations</button>
+            <button class="btn btn-muted section-link" type="button" data-target="memoriesPanel">Mémoire</button>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="stack tab-panel active" id="profilePanel">
+              <section class="panel">
+                <h3>Profil</h3>
+                <form id="profileForm" class="form-grid">
+                  <div class="field">
+                    <label for="profileNom">Nom</label>
+                    <input id="profileNom" name="nom" />
+                  </div>
+                  <div class="field">
+                    <label for="profilePrenom">Prénom</label>
+                    <input id="profilePrenom" name="prenom" />
+                  </div>
+                  <div class="field">
+                    <label for="profileTelephone">Téléphone</label>
+                    <input id="profileTelephone" name="telephone" />
+                  </div>
+                  <div class="field">
+                    <label for="profileLangue">Langue</label>
+                    <input id="profileLangue" name="langue" value="fr" />
+                  </div>
+                  <button class="btn btn-primary btn-full" type="submit" style="width:100%;">Mettre à jour le profil</button>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Créer un arbre</h3>
+                <form id="treeForm" class="form-grid">
+                  <div class="field">
+                    <label for="treeName">Nom de l'arbre</label>
+                    <input id="treeName" name="nom" required />
+                  </div>
+                  <div class="field">
+                    <label for="treeVisibility">Visibilité</label>
+                    <select id="treeVisibility" name="visibilite">
+                      <option value="prive">Privé</option>
+                      <option value="public">Public</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary btn-full" type="submit" style="width:100%;">Créer l'arbre</button>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Mes arbres</h3>
+                <div id="treesList" class="list"></div>
+              </section>
+
+              <section class="panel">
+                <h3>Détail de l'arbre</h3>
+                <div id="treeDetail" class="list">
+                  <div class="message">Sélectionnez un arbre pour afficher ses informations clés.</div>
+                </div>
+              </section>
+            </div>
+
+            <div class="stack tab-panel" id="peoplePanel">
+              <section class="panel">
+                <h3 id="personFormTitle">Ajouter une personne</h3>
+                <form id="personForm" class="form-grid">
+                  <div class="field">
+                    <label for="personNom">Nom</label>
+                    <input id="personNom" name="nom" required />
+                  </div>
+                  <div class="field">
+                    <label for="personPrenom">Prénom</label>
+                    <input id="personPrenom" name="prenom" required />
+                  </div>
+                  <div class="field">
+                    <label for="personBirth">Date de naissance</label>
+                    <input id="personBirth" name="dateNaissance" type="date" />
+                  </div>
+                  <div class="field">
+                    <label for="personVillage">Village d'origine</label>
+                    <input id="personVillage" name="villageOrigine" />
+                  </div>
+                  <div class="field field-wide">
+                    <label for="personBio">Biographie</label>
+                    <textarea id="personBio" name="biographie"></textarea>
+                  </div>
+                  <div class="btn-row">
+                    <button class="btn btn-primary" type="submit" style="flex:1;">Ajouter la personne</button>
+                    <button class="btn btn-muted hidden" id="personCancelBtn" type="button">Annuler</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Personnes de l'arbre</h3>
+                <div id="peopleList" class="list"></div>
+              </section>
+
+              <section class="panel panel-wide">
+                <h3>Détail de la personne</h3>
+                <div id="personDetail" class="list">
+                  <div class="message">Sélectionnez une personne pour afficher ses informations et ses relations.</div>
+                </div>
+              </section>
+            </div>
+
+            <div class="stack tab-panel" id="membersPanel">
+              <section class="panel">
+                <h3>Inviter un membre</h3>
+                <form id="memberInviteForm" class="form-grid">
+                  <div class="field">
+                    <label for="memberEmail">Email</label>
+                    <input id="memberEmail" name="email" type="email" required />
+                  </div>
+                  <div class="field">
+                    <label for="memberRole">Rôle</label>
+                    <select id="memberRole" name="role">
+                      <option value="admin">Admin</option>
+                      <option value="editeur">Editeur</option>
+                      <option value="contributeur">Contributeur</option>
+                      <option value="lecteur">Lecteur</option>
+                    </select>
+                  </div>
+                  <button class="btn btn-primary btn-full" type="submit" style="width:100%;">Inviter</button>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Membres et rôles</h3>
+                <div id="membersList" class="list"></div>
+              </section>
+            </div>
+
+            <div class="stack tab-panel" id="relationsPanel">
+              <section class="panel">
+                <h3 id="relationFormTitle">Créer une relation familiale</h3>
+                <form id="relationForm" class="form-grid">
+                  <div class="field">
+                    <label for="relationPerson1">Personne 1</label>
+                    <select id="relationPerson1" name="personneId1"></select>
+                  </div>
+                  <div class="field">
+                    <label for="relationPerson2">Personne 2</label>
+                    <select id="relationPerson2" name="personneId2"></select>
+                  </div>
+                  <div class="field">
+                    <label for="relationType">Type de relation</label>
+                    <select id="relationType" name="typeRelation">
+                      <option value="parent">Parent</option>
+                      <option value="enfant">Enfant</option>
+                      <option value="conjoint">Conjoint</option>
+                    </select>
+                  </div>
+                  <div class="btn-row">
+                    <button class="btn btn-primary" type="submit" style="flex:1;">Créer la relation</button>
+                    <button class="btn btn-muted hidden" id="relationCancelBtn" type="button">Annuler</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="panel">
+                <h3>Relations familiales</h3>
+                <div id="relationsList" class="list"></div>
+              </section>
+            </div>
+
+            <div class="stack tab-panel" id="memoriesPanel">
+              <section class="panel">
+                <h3>Ajouter un souvenir</h3>
+                <form id="memoryForm" class="form-grid">
+                  <div class="field"><label for="memoryTitle">Titre</label><input id="memoryTitle" name="titre" required /></div>
+                  <div class="field"><label for="memoryCategory">Catégorie</label><select id="memoryCategory" name="categorie"><option value="histoire">Histoire</option><option value="cuisine">Cuisine</option><option value="danse">Danse</option><option value="musique">Musique & chant</option><option value="proverbe">Proverbe</option><option value="mariage">Mariage</option><option value="funerailles">Funérailles</option><option value="naissance">Naissance</option><option value="vetements">Vêtements & parures</option><option value="rituel">Rituel</option></select></div>
+                  <div class="field"><label for="memoryPerson">Personne liée (facultatif)</label><select id="memoryPerson" name="personneId"><option value="">Aucune</option></select></div>
+                  <div class="field field-wide"><label for="memoryContent">Récit</label><textarea id="memoryContent" name="contenu" placeholder="Écrivez ce que votre famille souhaite transmettre…"></textarea></div>
+                  <button class="btn btn-primary btn-full" type="submit" style="width:100%;">Enregistrer le souvenir</button>
+                </form>
+              </section>
+              <section class="panel panel-wide"><h3>Souvenirs de la famille</h3><div id="memoriesList" class="list"></div></section>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="site-footer">© GAM Labs — Tous droits réservés</footer>
+  <div id="toastStack" class="toast-stack" aria-live="polite" aria-atomic="true"></div>
+
+    <script>
+      const state = {
+        mode: 'landing',
+        introSeen: false,
+        pendingDashboardAfterIntro: false,
+        token: localStorage.getItem('griotToken') || '',
+        user: JSON.parse(localStorage.getItem('griotUser') || 'null'),
+        resetToken: '',
+        currentTreeId: '',
+        currentRole: '',
+        editingPersonId: '',
+        editingRelationId: '',
+        selectedPersonId: '',
+        trees: [],
+        people: [],
+        members: [],
+        relations: [],
+        souvenirs: [],
+      };
+
+      const authScreen = document.getElementById('authScreen');
+      const dashboardScreen = document.getElementById('dashboardScreen');
+      const authHome = document.getElementById('authHome');
+      const authFlow = document.getElementById('authFlow');
+      const homeIntro = document.getElementById('homeIntro');
+      const introBlackStep = document.getElementById('introBlackStep');
+      const introTextStep = document.getElementById('introTextStep');
+      const introMapStep = document.getElementById('introMapStep');
+      const introAncestorsStep = document.getElementById('introAncestorsStep');
+      const introTreeStep = document.getElementById('introTreeStep');
+      const introAncestorsLayer = document.getElementById('introAncestorsLayer');
+      const introSkipBtn = document.getElementById('introSkipBtn');
+      const homeCreateBtn = document.getElementById('homeCreateBtn');
+      const homeExploreBtn = document.getElementById('homeExploreBtn');
+      const homeLoginBtn = document.getElementById('homeLoginBtn');
+      const homeAiBtn = document.getElementById('homeAiBtn');
+      const aiOverlay = document.getElementById('aiOverlay');
+      const aiPanel = document.getElementById('aiPanel');
+      const aiCloseBtn = document.getElementById('aiCloseBtn');
+      const aiFeed = document.getElementById('aiFeed');
+      const aiInput = document.getElementById('aiInput');
+      const aiSendBtn = document.getElementById('aiSendBtn');
+      const aiSuggestions = document.getElementById('aiSuggestions');
+      const authForm = document.getElementById('authForm');
+      const authHeading = document.getElementById('authHeading');
+      const authCopy = document.getElementById('authCopy');
+      const registerFields = document.getElementById('registerFields');
+      const emailField = document.getElementById('emailField');
+      const passwordField = document.getElementById('passwordField');
+      const resetFields = document.getElementById('resetFields');
+      const passwordStrength = document.getElementById('passwordStrength');
+      const messageBox = document.getElementById('messageBox');
+      const authSubmitBtn = document.getElementById('authSubmitBtn');
+      const toggleAuthBtn = document.getElementById('toggleAuthBtn');
+      const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+      const dashboardCopy = document.getElementById('dashboardCopy');
+      const dashboardMessage = document.getElementById('dashboardMessage');
+      const dashboardNotice = document.getElementById('dashboardNotice');
+      const profileName = document.getElementById('profileName');
+      const profileEmail = document.getElementById('profileEmail');
+      const treeCount = document.getElementById('treeCount');
+      const peopleCount = document.getElementById('peopleCount');
+      const relationCount = document.getElementById('relationCount');
+      const currentTreeLabel = document.getElementById('currentTreeLabel');
+      const profileForm = document.getElementById('profileForm');
+      const treeForm = document.getElementById('treeForm');
+      const personForm = document.getElementById('personForm');
+      const memberInviteForm = document.getElementById('memberInviteForm');
+      const relationForm = document.getElementById('relationForm');
+      const memoryForm = document.getElementById('memoryForm');
+      const memoriesList = document.getElementById('memoriesList');
+      const memoryPerson = document.getElementById('memoryPerson');
+      const treesList = document.getElementById('treesList');
+      const treeDetail = document.getElementById('treeDetail');
+      const peopleList = document.getElementById('peopleList');
+      const personDetail = document.getElementById('personDetail');
+      const membersList = document.getElementById('membersList');
+      const relationsList = document.getElementById('relationsList');
+      const relationPerson1 = document.getElementById('relationPerson1');
+      const relationPerson2 = document.getElementById('relationPerson2');
+      const sectionNav = document.getElementById('sectionNav');
+      const roleChip = document.getElementById('roleChip');
+      const permissionsNote = document.getElementById('permissionsNote');
+      const motDePasseInput = document.getElementById('motDePasse');
+      const logoutBtn = document.getElementById('logoutBtn');
+      const refreshBtn = document.getElementById('refreshBtn');
+      const legacyDashboard = document.getElementById('legacyDashboard');
+      const toastStack = document.getElementById('toastStack');
+      const protoWelcomeName = document.getElementById('protoWelcomeName');
+      const protoTreeCount = document.getElementById('protoTreeCount');
+      const protoOrigins = document.getElementById('protoOrigins');
+      const protoCollaboratorCount = document.getElementById('protoCollaboratorCount');
+      const protoPendingCount = document.getElementById('protoPendingCount');
+      const protoCollaboratorsList = document.getElementById('protoCollaboratorsList');
+      const protoActivityList = document.getElementById('protoActivityList');
+      const protoDashboardNotice = document.getElementById('protoDashboardNotice');
+      const protoRefreshBtn = document.getElementById('protoRefreshBtn');
+      const protoLogoutBtn = document.getElementById('protoLogoutBtn');
+      const protoOpenArbreBtn = document.getElementById('protoOpenArbreBtn');
+      const protoInviteBtn = document.getElementById('protoInviteBtn');
+      const protoQuickAddPersonBtn = document.getElementById('protoQuickAddPersonBtn');
+      const protoQuickStoryBtn = document.getElementById('protoQuickStoryBtn');
+      const protoQuickDocBtn = document.getElementById('protoQuickDocBtn');
+      const protoNavDashboard = document.getElementById('protoNavDashboard');
+      const protoNavArbre = document.getElementById('protoNavArbre');
+      const protoNavCarte = document.getElementById('protoNavCarte');
+      const protoNavMemoire = document.getElementById('protoNavMemoire');
+      const protoAiBtn = document.getElementById('protoAiBtn');
+      const protoAiOverlay = document.getElementById('protoAiOverlay');
+      const protoAiPanel = document.getElementById('protoAiPanel');
+      const protoAiCloseBtn = document.getElementById('protoAiCloseBtn');
+      const protoAiFeed = document.getElementById('protoAiFeed');
+      const protoAiInput = document.getElementById('protoAiInput');
+      const protoAiSendBtn = document.getElementById('protoAiSendBtn');
+      const protoAiSuggestions = document.getElementById('protoAiSuggestions');
+      const protoTreeOverlay = document.getElementById('protoTreeOverlay');
+      const protoTreeBackBtn = document.getElementById('protoTreeBackBtn');
+      const protoTreeAiBtn = document.getElementById('protoTreeAiBtn');
+      const protoTreeSvg = document.getElementById('protoTreeSvg');
+      const protoTreeFilterButtons = document.querySelectorAll('[data-tree-filter]');
+      const protoTreeNavDashboard = document.getElementById('protoTreeNavDashboard');
+      const protoTreeNavCarte = document.getElementById('protoTreeNavCarte');
+      const protoTreeNavMemoire = document.getElementById('protoTreeNavMemoire');
+      const toastRegistry = new Map();
+      let protoTreeFilter = 'branche';
+      let introTimers = [];
+
+      const protoTreeData = {
+        root: { name: 'Jean Mvondo', years: '1945 – 2020' },
+        parents: [
+          { id: 'p1', name: 'Paul Mvondo' },
+          { id: 'p2', name: 'Marie Ateba' },
+        ],
+        grandparents: [
+          { id: 'g1' },
+          { id: 'g2' },
+          { id: 'g3' },
+          { id: 'g4' },
+          { id: 'g5' },
+        ],
+        children: [
+          { id: 'c1', name: 'Marie' },
+          { id: 'c2', name: 'Paul' },
+          { id: 'c3', name: 'Sylvie' },
+          { id: 'c4', name: 'André' },
+          { id: 'c5', name: 'Christine' },
+        ],
+      };
+
+      const introAncestorNames = ['Amos Mvondo', 'Elise Owona', 'Etienne Ateba', 'Ngo Bella', 'Joseph Ateba', 'Paul Mvondo', 'Marie Ateba'];
+      const introAncestorAngles = [-58, -30, 0, 30, 58, 146, -146];
+      const introTiming = {
+        black: 620,
+        text: 2200,
+        map: 1800,
+        ancestorsLead: 380,
+        ancestorStep: 320,
+        tree: 2300,
+      };
+
+      function clearIntroTimers() {
+        introTimers.forEach((timer) => clearTimeout(timer));
+        introTimers = [];
+      }
+
+      function showIntroStep(step) {
+        introBlackStep.classList.toggle('active', step === 'black');
+        introTextStep.classList.toggle('active', step === 'text');
+        introMapStep.classList.toggle('active', step === 'map');
+        introAncestorsStep.classList.toggle('active', step === 'ancestors');
+        introTreeStep.classList.toggle('active', step === 'tree');
+      }
+
+      function replayLandingAnimations() {
+        authHome.classList.remove('home-animate');
+        void authHome.offsetWidth;
+        authHome.classList.add('home-animate');
+      }
+
+      function completeIntro() {
+        clearIntroTimers();
+        state.introSeen = true;
+        homeIntro.classList.add('hidden');
+        replayLandingAnimations();
+
+        if (state.pendingDashboardAfterIntro && state.token) {
+          state.pendingDashboardAfterIntro = false;
+          setActivePage('dashboardScreen');
+          activateSection(getSectionFromHash(), false);
+          loadDashboardData();
+        }
+      }
+
+      function renderIntroAncestors() {
+        introAncestorsLayer.innerHTML = '';
+        introAncestorNames.forEach((name, index) => {
+          const angle = (introAncestorAngles[index] || 0) * Math.PI / 180;
+          const radius = 72 + (index % 3) * 24;
+          const x = 135 + Math.sin(angle) * radius;
+          const y = 135 - Math.cos(angle) * radius;
+          const node = document.createElement('div');
+          node.className = 'intro-ancestor';
+          node.style.left = `${x}px`;
+          node.style.top = `${y}px`;
+          node.style.animationDelay = `${index * 0.14}s`;
+          node.textContent = name;
+          introAncestorsLayer.appendChild(node);
+        });
+      }
+
+      function startIntroSequence() {
+        clearIntroTimers();
+        homeIntro.classList.remove('hidden');
+        showIntroStep('black');
+
+        const textAt = introTiming.black;
+        const mapAt = textAt + introTiming.text;
+        const ancestorsAt = mapAt + introTiming.map;
+        const treeAt = ancestorsAt + introTiming.ancestorsLead + (introAncestorNames.length * introTiming.ancestorStep);
+        const doneAt = treeAt + introTiming.tree;
+
+        introTimers.push(setTimeout(() => {
+          showIntroStep('text');
+        }, textAt));
+
+        introTimers.push(setTimeout(() => {
+          showIntroStep('map');
+        }, mapAt));
+
+        introTimers.push(setTimeout(() => {
+          showIntroStep('ancestors');
+          renderIntroAncestors();
+        }, ancestorsAt));
+
+        introTimers.push(setTimeout(() => {
+          showIntroStep('tree');
+        }, treeAt));
+
+        introTimers.push(setTimeout(() => {
+          completeIntro();
+        }, doneAt));
+      }
+
+      function setMessage(text, kind = '') {
+        messageBox.className = kind ? `message ${kind}` : 'message';
+        messageBox.textContent = text;
+        if (kind) showToast(text, kind);
+      }
+
+      function setDashboardNotice(text, kind = '') {
+        dashboardNotice.className = kind ? `message ${kind}` : 'message';
+        dashboardNotice.textContent = text;
+        if (protoDashboardNotice) {
+          protoDashboardNotice.className = kind ? `message ${kind}` : 'message';
+          protoDashboardNotice.textContent = text;
+        }
+        if (kind) showToast(text, kind);
+      }
+
+      function showToast(text, kind = 'info', duration = 3400) {
+        if (!toastStack || !text) return;
+
+        const normalizedKind = ['success', 'error', 'info'].includes(kind) ? kind : 'info';
+        const normalizedText = String(text).trim();
+        const key = `${normalizedKind}:${normalizedText}`;
+        const now = Date.now();
+
+        const existing = toastRegistry.get(key);
+        if (existing && existing.toast?.isConnected) {
+          existing.count += 1;
+          existing.lastSeen = now;
+          existing.countEl.textContent = `x${existing.count}`;
+          existing.countEl.classList.add('visible');
+          existing.toast.classList.remove('hide');
+
+          clearTimeout(existing.hideTimer);
+          existing.hideTimer = setTimeout(() => {
+            existing.toast.classList.add('hide');
+            setTimeout(() => {
+              if (existing.toast.parentElement) existing.toast.remove();
+              const current = toastRegistry.get(key);
+              if (current === existing) {
+                toastRegistry.delete(key);
+              }
+            }, 220);
+          }, duration);
+          return;
+        }
+
+        const toast = document.createElement('div');
+        toast.className = `toast ${normalizedKind}`;
+
+  const content = document.createElement('div');
+  content.className = 'toast-content';
+
+  const textEl = document.createElement('span');
+  textEl.className = 'toast-text';
+  textEl.textContent = normalizedText;
+
+  const countEl = document.createElement('span');
+  countEl.className = 'toast-count';
+  countEl.textContent = 'x1';
+
+  content.appendChild(textEl);
+  content.appendChild(countEl);
+  toast.appendChild(content);
+        toastStack.appendChild(toast);
+
+        while (toastStack.children.length > 4) {
+          toastStack.removeChild(toastStack.firstElementChild);
+        }
+
+        const entry = {
+          count: 1,
+          lastSeen: now,
+          toast,
+          textEl,
+          countEl,
+          hideTimer: null,
+        };
+
+        const hideToast = () => {
+          toast.classList.add('hide');
+          setTimeout(() => {
+            if (toast.parentElement) toast.remove();
+            const current = toastRegistry.get(key);
+            if (current === entry) {
+              toastRegistry.delete(key);
+            }
+          }, 220);
+        };
+
+        entry.hideTimer = setTimeout(hideToast, duration);
+        toastRegistry.set(key, entry);
+
+        // Trim stale entries that are no longer mounted.
+        for (const [entryKey, item] of toastRegistry.entries()) {
+          if (!item.toast?.isConnected && now - item.lastSeen > 12000) {
+            toastRegistry.delete(entryKey);
+          }
+        }
+
+        toast.addEventListener('click', () => {
+          clearTimeout(entry.hideTimer);
+          hideToast();
+        });
+      }
+
+      function openAdvancedSection(sectionId) {
+        closeProtoTreeTab(true);
+        activateSection(sectionId);
+        legacyDashboard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function syncProtoNavState(targetId) {
+        const map = {
+          profilePanel: protoNavDashboard,
+          peoplePanel: protoNavArbre,
+          relationsPanel: protoNavCarte,
+          membersPanel: protoNavMemoire,
+        };
+
+        [protoNavDashboard, protoNavArbre, protoNavCarte, protoNavMemoire].forEach((button) => {
+          button.classList.remove('active');
+        });
+
+        (map[targetId] || protoNavDashboard).classList.add('active');
+      }
+
+      function renderProtoTreeSvg() {
+        const showAsc = protoTreeFilter !== 'descendants';
+        const showDesc = protoTreeFilter !== 'ascendants';
+        const xs = [40, 110, 180, 250, 320];
+
+        let svg = '';
+
+        svg += `<line x1="180" y1="${showAsc ? 175 : 260}" x2="180" y2="${showDesc ? 385 : 300}" stroke="#2b1b12" stroke-width="2.5" />`;
+
+        if (showAsc) {
+          protoTreeData.grandparents.forEach((g, i) => {
+            const x = xs[i];
+            const y = 60;
+            svg += `
+              <g>
+                <line x1="180" y1="175" x2="${x}" y2="${y + 14}" stroke="#e3d5b8" stroke-width="1.8" />
+                <circle cx="${x}" cy="${y}" r="14" fill="#c9932e" stroke="#2b1b12" stroke-width="1.5" />
+              </g>
+            `;
+          });
+
+          protoTreeData.parents.forEach((parent, i) => {
+            const x = i === 0 ? 120 : 240;
+            const y = 175;
+            svg += `
+              <g>
+                <line x1="180" y1="220" x2="${x}" y2="${y + 18}" stroke="#e3d5b8" stroke-width="2" />
+                <circle cx="${x}" cy="${y}" r="20" fill="#c9932e" stroke="#2b1b12" stroke-width="2" />
+                <text x="${x}" y="${y + 34}" text-anchor="middle" style="font-family:'Work Sans',sans-serif;font-size:9px;fill:#5b4636;">${parent.name.split(' ')[0]}</text>
+              </g>
+            `;
+          });
+        }
+
+        svg += `
+          <g>
+            <circle cx="180" cy="260" r="28" fill="#b5502a" stroke="#2b1b12" stroke-width="2.5" />
+            <text x="180" y="264" text-anchor="middle" style="font-family:'Fraunces',Georgia,serif;font-size:12px;font-weight:700;fill:#fffbf3;">JM</text>
+            <text x="180" y="300" text-anchor="middle" style="font-family:'Work Sans',sans-serif;font-size:11px;font-weight:700;fill:#2b1b12;">${protoTreeData.root.name}</text>
+            <text x="180" y="313" text-anchor="middle" style="font-family:'Work Sans',sans-serif;font-size:9.5px;fill:#5b4636;">${protoTreeData.root.years}</text>
+          </g>
+        `;
+
+        if (showDesc) {
+          protoTreeData.children.forEach((child, i) => {
+            const x = xs[i];
+            const y = 470;
+            svg += `
+              <g>
+                <line x1="180" y1="385" x2="${x}" y2="${y - 16}" stroke="#e3d5b8" stroke-width="1.8" />
+                <circle cx="${x}" cy="${y}" r="16" fill="#b5502a" stroke="#2b1b12" stroke-width="1.6" />
+                <text x="${x}" y="${y + 30}" text-anchor="middle" style="font-family:'Work Sans',sans-serif;font-size:9px;fill:#5b4636;">${child.name}</text>
+              </g>
+            `;
+          });
+        }
+
+        protoTreeSvg.innerHTML = svg;
+      }
+
+      function setProtoTreeFilter(filter) {
+        protoTreeFilter = filter;
+        protoTreeFilterButtons.forEach((button) => {
+          button.classList.toggle('active', button.getAttribute('data-tree-filter') === filter);
+        });
+        renderProtoTreeSvg();
+      }
+
+      function openProtoTreeTab() {
+        protoTreeOverlay.classList.remove('hidden');
+        protoNavDashboard.classList.remove('active');
+        protoNavArbre.classList.add('active');
+        protoNavCarte.classList.remove('active');
+        protoNavMemoire.classList.remove('active');
+        setProtoTreeFilter(protoTreeFilter || 'branche');
+      }
+
+      function closeProtoTreeTab(silent = false) {
+        protoTreeOverlay.classList.add('hidden');
+        if (!silent) {
+          protoNavDashboard.classList.add('active');
+          protoNavArbre.classList.remove('active');
+          protoNavCarte.classList.remove('active');
+          protoNavMemoire.classList.remove('active');
+        }
+      }
+
+      function syncPrototypeDashboard() {
+        if (!protoWelcomeName) return;
+
+        const displayName = getDisplayName(state.user);
+        const firstName = displayName.split(' ')[0] || displayName;
+        protoWelcomeName.textContent = `${firstName} 👋`;
+        protoTreeCount.textContent = String(state.people.length || 0);
+
+        const knownVillage = state.people.find((person) => person.villageOrigine)?.villageOrigine;
+        protoOrigins.textContent = knownVillage || 'Cameroun';
+
+        const collaborators = state.members || [];
+        const pending = collaborators.filter((member) => member.statut === 'invite').length;
+        protoCollaboratorCount.textContent = String(collaborators.length);
+        protoPendingCount.textContent = String(pending);
+
+        if (!collaborators.length) {
+          protoCollaboratorsList.innerHTML = `
+            <div class="proto-collab-item">
+              <div class="proto-avatar" style="background:linear-gradient(155deg, var(--gold), var(--terracotta-deep));">?</div>
+              <div class="proto-collab-name">Aucun</div>
+              <div class="proto-collab-role">Membre</div>
+            </div>
+          `;
+        } else {
+          protoCollaboratorsList.innerHTML = collaborators.slice(0, 8).map((member) => {
+            const first = member.utilisateur?.prenom || member.utilisateur?.nom || member.utilisateur?.email || 'Membre';
+            const role = member.role || 'lecteur';
+            const initial = first.charAt(0).toUpperCase();
+            const tone = member.statut === 'actif' ? 'var(--olive)' : 'var(--gold)';
+            const chip = member.statut === 'invite' ? '<span class="proto-collab-chip">En attente</span>' : '';
+            return `
+              <div class="proto-collab-item">
+                <div class="proto-avatar" style="background:linear-gradient(155deg, ${tone}, var(--terracotta-deep));">${initial}</div>
+                <div class="proto-collab-name">${first}</div>
+                <div class="proto-collab-role">${role}</div>
+                ${chip}
+              </div>
+            `;
+          }).join('');
+        }
+
+        protoActivityList.innerHTML = [
+          { who: 'Marie', what: 'a ajouté une photo', when: 'il y a 2 h' },
+          { who: 'Paul', what: 'a complété une naissance', when: 'hier' },
+          { who: 'Sylvie', what: 'a raconté un souvenir', when: 'il y a 3 jours' },
+          { who: 'Dr. Njoya', what: 'a rejoint l\'arbre', when: 'il y a 5 jours' },
+        ].map((item, index) => `
+          <div class="proto-activity-item">
+            <div class="proto-avatar" style="background:linear-gradient(155deg, ${index % 2 ? 'var(--olive)' : 'var(--gold)'}, var(--terracotta-deep));">${item.who.charAt(0)}</div>
+            <div>
+              <div class="proto-activity-main"><b>${item.who}</b> ${item.what}</div>
+              <div class="proto-activity-meta">${item.when}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      function appendProtoAiMessage(text, role, extraClass = '') {
+        const message = document.createElement('div');
+        message.className = `proto-ai-msg ${role}${extraClass ? ` ${extraClass}` : ''}`;
+        message.textContent = text;
+        protoAiFeed.appendChild(message);
+        protoAiFeed.scrollTop = protoAiFeed.scrollHeight;
+        return message;
+      }
+
+      function openProtoAiPanel() {
+        protoAiOverlay.classList.remove('hidden');
+        protoAiInput.focus();
+      }
+
+      function closeProtoAiPanel() {
+        protoAiOverlay.classList.add('hidden');
+      }
+
+      async function askGriotProto(prompt) {
+        const question = (prompt || '').trim();
+        if (!question) return;
+
+        appendProtoAiMessage(question, 'user');
+        protoAiInput.value = '';
+
+        const loading = appendProtoAiMessage('GRIOT réfléchit...', 'bot', 'loading');
+        protoAiSendBtn.disabled = true;
+
+        try {
+          const headers = { 'Content-Type': 'application/json' };
+          if (state.token) headers.Authorization = `Bearer ${state.token}`;
+
+          const response = await fetch('/ai/ask', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ query: question, arbreId: state.currentTreeId || undefined }),
+          });
+
+          const result = await response.json().catch(() => ({}));
+          loading.remove();
+
+          if (!response.ok) {
+            appendProtoAiMessage(result?.message || 'Je ne peux pas répondre pour le moment.', 'bot');
+            return;
+          }
+
+          appendProtoAiMessage(result.answer || 'Je n\'ai pas encore de réponse utile.', 'bot');
+        } catch (error) {
+          loading.remove();
+          appendProtoAiMessage('Service IA temporairement indisponible. Réessayez dans un instant.', 'bot');
+        } finally {
+          protoAiSendBtn.disabled = false;
+          protoAiInput.focus();
+        }
+      }
+
+      function appendAiMessage(text, role, extraClass = '') {
+        const message = document.createElement('div');
+        message.className = `ai-msg ${role}${extraClass ? ` ${extraClass}` : ''}`;
+        message.textContent = text;
+        aiFeed.appendChild(message);
+        aiFeed.scrollTop = aiFeed.scrollHeight;
+        return message;
+      }
+
+      function openAiPanel() {
+        aiOverlay.classList.remove('hidden');
+        aiInput.focus();
+      }
+
+      function closeAiPanel() {
+        aiOverlay.classList.add('hidden');
+      }
+
+      async function askGriot(prompt) {
+        const question = (prompt || '').trim();
+        if (!question) return;
+
+        appendAiMessage(question, 'user');
+        aiInput.value = '';
+
+        const loading = appendAiMessage('GRIOT réfléchit...', 'bot', 'loading');
+        aiSendBtn.disabled = true;
+
+        try {
+          const headers = { 'Content-Type': 'application/json' };
+          if (state.token) {
+            headers.Authorization = `Bearer ${state.token}`;
+          }
+          const response = await fetch('/ai/ask', {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ query: question, arbreId: state.currentTreeId || undefined }),
+          });
+          const result = await response.json().catch(() => ({}));
+
+          loading.remove();
+          if (!response.ok) {
+            appendAiMessage(result?.message || 'Je ne peux pas répondre pour le moment.', 'bot');
+            return;
+          }
+
+          appendAiMessage(result.answer || 'Je n\'ai pas encore de réponse utile.', 'bot');
+        } catch (error) {
+          loading.remove();
+          appendAiMessage('Service IA temporairement indisponible. Réessayez dans un instant.', 'bot');
+        } finally {
+          aiSendBtn.disabled = false;
+          aiInput.focus();
+        }
+      }
+
+      function getDisplayName(user) {
+        if (!user) return 'utilisateur';
+        const parts = [user.prenom, user.nom].filter(Boolean);
+        if (parts.length) return parts.join(' ');
+        if (user.email) return user.email.split('@')[0];
+        return 'utilisateur';
+      }
+
+      function checkPasswordStrength(value) {
+        const score = [/.{8,}/, /[A-Z]/, /[a-z]/, /[0-9]/, /[^A-Za-z0-9]/].filter((pattern) => pattern.test(value)).length;
+        if (!value) return { text: 'Entrez un mot de passe', color: '#6c5644' };
+        if (score < 3) return { text: 'Faible', color: '#b5502a' };
+        if (score < 4) return { text: 'Moyen', color: '#c9932e' };
+        return { text: 'Fort', color: '#4b5d3b' };
+      }
+
+      function authHeaders(includeJson = false) {
+        const headers = { Authorization: `Bearer ${state.token}` };
+        if (includeJson) headers['Content-Type'] = 'application/json';
+        return headers;
+      }
+
+      function canManagePeople() {
+        return ['admin', 'editeur', 'contributeur'].includes(state.currentRole);
+      }
+
+      function canEditPeople() {
+        return ['admin', 'editeur'].includes(state.currentRole);
+      }
+
+      function canManageRelations() {
+        return ['admin', 'editeur'].includes(state.currentRole);
+      }
+
+      function canManageMembers() {
+        return state.currentRole === 'admin';
+      }
+
+      function updateRoleScopedUI() {
+        const personSubmitBtn = personForm.querySelector('button[type="submit"]');
+        const personCancelBtn = document.getElementById('personCancelBtn');
+        const personFormTitle = document.getElementById('personFormTitle');
+        const memberSubmitBtn = memberInviteForm.querySelector('button[type="submit"]');
+        const relationSubmitBtn = relationForm.querySelector('button[type="submit"]');
+        const relationCancelBtn = document.getElementById('relationCancelBtn');
+        const relationFormTitle = document.getElementById('relationFormTitle');
+
+        const canPeople = canManagePeople();
+        const canMembers = canManageMembers();
+        const canRelations = canManageRelations();
+
+        personForm.classList.toggle('hidden', Boolean(state.currentTreeId) && !canPeople);
+        memberInviteForm.classList.toggle('hidden', Boolean(state.currentTreeId) && !canMembers);
+        relationForm.classList.toggle('hidden', Boolean(state.currentTreeId) && !canRelations);
+
+        if (personSubmitBtn) personSubmitBtn.disabled = !canPeople && Boolean(state.currentTreeId);
+        if (personSubmitBtn) personSubmitBtn.textContent = state.editingPersonId ? 'Enregistrer les modifications' : 'Ajouter la personne';
+        if (personCancelBtn) personCancelBtn.classList.toggle('hidden', !state.editingPersonId);
+        if (personFormTitle) personFormTitle.textContent = state.editingPersonId ? 'Modifier une personne' : 'Ajouter une personne';
+        if (memberSubmitBtn) memberSubmitBtn.disabled = !canMembers && Boolean(state.currentTreeId);
+        if (relationSubmitBtn) relationSubmitBtn.disabled = !canRelations && Boolean(state.currentTreeId);
+        if (relationSubmitBtn) relationSubmitBtn.textContent = state.editingRelationId ? 'Enregistrer la relation' : 'Créer la relation';
+        if (relationCancelBtn) relationCancelBtn.classList.toggle('hidden', !state.editingRelationId);
+        if (relationFormTitle) relationFormTitle.textContent = state.editingRelationId ? 'Modifier une relation familiale' : 'Créer une relation familiale';
+
+        const roleLabel = state.currentRole || 'non défini';
+        roleChip.textContent = `Rôle : ${roleLabel}`;
+        if (!state.currentTreeId) {
+          permissionsNote.textContent = 'Sélectionnez un arbre pour afficher vos permissions.';
+        } else if (state.currentRole === 'admin') {
+          permissionsNote.textContent = 'Permissions : gérer les membres, modifier les rôles, créer des personnes et des relations.';
+        } else if (state.currentRole === 'editeur') {
+          permissionsNote.textContent = 'Permissions : créer des personnes et gérer les relations familiales.';
+        } else if (state.currentRole === 'contributeur') {
+          permissionsNote.textContent = 'Permissions : ajouter des personnes à l’arbre sélectionné.';
+        } else if (state.currentRole === 'lecteur') {
+          permissionsNote.textContent = 'Permissions : consultation uniquement sur l’arbre sélectionné.';
+        } else {
+          permissionsNote.textContent = 'Aucune permission spécifique détectée pour cet arbre.';
+        }
+      }
+
+      function extractApiMessage(response, result, fallback) {
+        const message = Array.isArray(result?.message) ? result.message.join(', ') : result?.message;
+        if (response.status === 401) return 'Session expirée ou invalide. Reconnectez-vous.';
+        if (response.status === 403) return 'Action non autorisée pour votre rôle sur cet arbre.';
+        return message || fallback;
+      }
+
+      async function apiRequest(url, options, fallback) {
+        const response = await fetch(url, options);
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(extractApiMessage(response, result, fallback));
+        }
+        return result;
+      }
+
+      function getSectionFromHash() {
+        const targetId = window.location.hash.replace('#', '');
+        if (!targetId) return 'profilePanel';
+        return document.getElementById(targetId) ? targetId : 'profilePanel';
+      }
+
+      function activateSection(targetId, syncHash = true) {
+        sectionNav.querySelectorAll('.section-link').forEach((button) => {
+          button.classList.toggle('active', button.getAttribute('data-target') === targetId);
+        });
+        document.querySelectorAll('.tab-panel').forEach((panel) => {
+          panel.classList.toggle('active', panel.id === targetId);
+        });
+        syncProtoNavState(targetId);
+        if (syncHash) {
+          window.location.hash = targetId;
+        }
+      }
+
+      function renderAuthMode() {
+        const isLanding = state.mode === 'landing';
+        const isRegister = state.mode === 'register';
+        const isForgot = state.mode === 'forgot';
+        const isReset = state.mode === 'reset';
+
+        authHome.classList.toggle('hidden', !isLanding);
+        authFlow.classList.toggle('hidden', isLanding);
+
+        if (isLanding) {
+          if (state.introSeen) {
+            homeIntro.classList.add('hidden');
+            replayLandingAnimations();
+          } else {
+            startIntroSequence();
+          }
+          return;
+        }
+
+        clearIntroTimers();
+        homeIntro.classList.add('hidden');
+
+        authHeading.textContent = isReset
+          ? 'Nouveau mot de passe'
+          : (isForgot ? 'Mot de passe oublié' : (isRegister ? 'Créer un compte' : 'Connexion'));
+        authCopy.textContent = isReset
+          ? 'Définissez un nouveau mot de passe pour finaliser la réinitialisation.'
+          : (isForgot
+            ? 'Entrez votre email pour recevoir la suite de la procédure.'
+            : (isRegister
+              ? 'Créez votre compte pour accéder à votre dashboard et à vos arbres familiaux.'
+              : 'Connectez-vous pour accéder à votre dashboard et à vos arbres familiaux.'));
+
+        registerFields.classList.toggle('hidden', !isRegister);
+        emailField.classList.toggle('hidden', isReset);
+        passwordField.classList.toggle('hidden', isForgot || isReset);
+        resetFields.classList.toggle('hidden', !isReset);
+        passwordStrength.classList.toggle('hidden', isForgot || isReset);
+        passwordStrength.textContent = '';
+
+        toggleAuthBtn.textContent = isRegister ? 'Se connecter' : 'Créer un compte';
+        forgotPasswordBtn.textContent = isForgot || isReset ? 'Retour à la connexion' : 'Mot de passe oublié ?';
+        authSubmitBtn.textContent = isReset ? 'Réinitialiser le mot de passe' : (isForgot ? 'Envoyer le lien' : 'Valider');
+        authSubmitBtn.classList.toggle('btn-secondary', isForgot || isReset);
+
+        if (isReset) {
+          document.getElementById('resetToken').value = state.resetToken || '';
+        }
+      }
+
+      function setActivePage(pageId) {
+        authScreen.classList.toggle('active', pageId === 'authScreen');
+        dashboardScreen.classList.toggle('active', pageId === 'dashboardScreen');
+      }
+
+      function fillProfileForm() {
+        profileName.textContent = getDisplayName(state.user);
+        profileEmail.textContent = state.user?.email || '-';
+        profileForm.nom.value = state.user?.nom || '';
+        profileForm.prenom.value = state.user?.prenom || '';
+        profileForm.telephone.value = state.user?.telephone || '';
+        profileForm.langue.value = state.user?.langue || 'fr';
+      }
+
+      function renderTreeDetail() {
+        if (!state.currentTreeId) {
+          treeDetail.innerHTML = '<div class="message">Sélectionnez un arbre pour afficher ses informations clés.</div>';
+          return;
+        }
+
+        const tree = state.trees.find((item) => item.id === state.currentTreeId);
+        if (!tree) {
+          treeDetail.innerHTML = '<div class="message">L\'arbre sélectionné n\'est plus disponible.</div>';
+          return;
+        }
+
+        const activeMembers = state.members.filter((member) => member.statut === 'actif');
+        const invitedMembers = state.members.filter((member) => member.statut === 'invite');
+        const memberNames = activeMembers.length
+          ? activeMembers.map((member) => `${member.utilisateur?.prenom || ''} ${member.utilisateur?.nom || ''}`.trim()).join(', ')
+          : 'Aucun membre actif chargé';
+
+        treeDetail.innerHTML = `
+          <div class="item">
+            <div>
+              <strong>${tree.nom}</strong>
+              <div class="meta">Visibilité : ${tree.visibilite || 'prive'}</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Votre rôle</strong>
+              <div class="meta">${state.currentRole || 'non défini'}</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Membres</strong>
+              <div class="meta">${activeMembers.length} actif(s) • ${invitedMembers.length} invitation(s)</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Contenu</strong>
+              <div class="meta">${state.people.length} personne(s) • ${state.relations.length} relation(s)</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Membres actifs</strong>
+              <div class="meta">${memberNames}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderTrees() {
+        treeCount.textContent = String(state.trees.length);
+        if (!state.trees.length) {
+          treesList.innerHTML = '<div class="message">Aucun arbre pour le moment.</div>';
+          currentTreeLabel.textContent = 'Aucun arbre sélectionné';
+          state.currentRole = '';
+          updateRoleScopedUI();
+          renderTreeDetail();
+          return;
+        }
+
+        const currentTree = state.trees.find((tree) => tree.id === state.currentTreeId) || state.trees[0];
+        state.currentTreeId = currentTree.id;
+        const currentMember = currentTree.membres?.find((member) => member.utilisateurId === state.user?.id);
+        state.currentRole = currentMember?.role || '';
+        currentTreeLabel.textContent = state.currentRole ? `${currentTree.nom} • rôle : ${state.currentRole}` : currentTree.nom;
+        updateRoleScopedUI();
+        renderTreeDetail();
+
+        treesList.innerHTML = state.trees.map((tree) => `
+          <div class="item">
+            <div>
+              <strong>${tree.nom}</strong>
+              <div class="meta">Visibilité : ${tree.visibilite || 'prive'} • ${tree.membres?.length || 0} membre(s)</div>
+            </div>
+            <button class="btn ${tree.id === state.currentTreeId ? 'btn-secondary' : 'btn-primary'}" type="button" data-tree-id="${tree.id}">
+              ${tree.id === state.currentTreeId ? 'Sélectionné' : 'Ouvrir'}
+            </button>
+          </div>
+        `).join('');
+
+        treesList.querySelectorAll('[data-tree-id]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            state.currentTreeId = button.getAttribute('data-tree-id');
+            renderTrees();
+            await loadTreeScopedData();
+          });
+        });
+
+        syncPrototypeDashboard();
+      }
+
+      function updateRelationPersonOptions() {
+        const options = state.people.length
+          ? state.people.map((person) => `<option value="${person.id}">${person.prenom} ${person.nom}</option>`).join('')
+          : '<option value="">Aucune personne</option>';
+        relationPerson1.innerHTML = options;
+        relationPerson2.innerHTML = options;
+      }
+
+      function renderPersonDetail() {
+        if (!state.selectedPersonId) {
+          personDetail.innerHTML = '<div class="message">Sélectionnez une personne pour afficher ses informations et ses relations.</div>';
+          return;
+        }
+
+        const person = state.people.find((item) => item.id === state.selectedPersonId);
+        if (!person) {
+          personDetail.innerHTML = '<div class="message">La personne sélectionnée n\'est plus disponible dans cet arbre.</div>';
+          return;
+        }
+
+        const linkedRelations = state.relations.filter((relation) => relation.personneId1 === person.id || relation.personneId2 === person.id);
+        const relationMarkup = linkedRelations.length
+          ? linkedRelations.map((relation) => {
+              const other = relation.personneId1 === person.id ? relation.personne2 : relation.personne1;
+              return `<div class="item"><div><strong>${relation.typeRelation}</strong><div class="meta">${other?.prenom || ''} ${other?.nom || ''}</div></div></div>`;
+            }).join('')
+          : '<div class="message">Aucune relation familiale enregistrée pour cette personne.</div>';
+        const graphMarkup = linkedRelations.length
+          ? linkedRelations.map((relation) => {
+              const other = relation.personneId1 === person.id ? relation.personne2 : relation.personne1;
+              return `
+                <div class="graph-edge">
+                  <button class="graph-node clickable" type="button" data-graph-person="${other?.id || ''}">
+                    <strong>${other?.prenom || ''} ${other?.nom || ''}</strong>
+                    <div class="meta">${other?.villageOrigine || 'Village non renseigné'}</div>
+                  </button>
+                  <div class="edge-label">${relation.typeRelation}</div>
+                  <div class="graph-node center">
+                    <strong>${person.prenom} ${person.nom}</strong>
+                    <div class="meta">${person.villageOrigine || 'Village non renseigné'}</div>
+                  </div>
+                </div>
+              `;
+            }).join('')
+          : '<div class="message">Aucune visualisation disponible sans relation familiale.</div>';
+
+        personDetail.innerHTML = `
+          <div class="item">
+            <div>
+              <strong>${person.prenom} ${person.nom}</strong>
+              <div class="meta">${person.villageOrigine || 'Village non renseigné'} • ${person.statutVerification || 'non_verifie'}</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Date de naissance</strong>
+              <div class="meta">${person.dateNaissance ? String(person.dateNaissance).slice(0, 10) : 'Non renseignée'}</div>
+            </div>
+          </div>
+          <div class="item">
+            <div>
+              <strong>Biographie</strong>
+              <div class="meta">${person.biographie || 'Aucune biographie renseignée.'}</div>
+            </div>
+          </div>
+          <div>
+            <strong>Relations</strong>
+            <div class="list" style="margin-top:10px;">${relationMarkup}</div>
+          </div>
+          <div>
+            <strong>Vue graphe</strong>
+            <div class="person-graph">
+              <div class="graph-center">
+                <div class="graph-node center">
+                  <strong>${person.prenom} ${person.nom}</strong>
+                  <div class="meta">${person.villageOrigine || 'Village non renseigné'}</div>
+                </div>
+              </div>
+              <div class="graph-links">${graphMarkup}</div>
+            </div>
+          </div>
+        `;
+
+        personDetail.querySelectorAll('[data-graph-person]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const personId = button.getAttribute('data-graph-person');
+            if (!personId) return;
+            state.selectedPersonId = personId;
+            activateSection('peoplePanel');
+            renderPeople();
+          });
+        });
+      }
+
+      function renderPeople() {
+        peopleCount.textContent = String(state.people.length);
+        updateRelationPersonOptions();
+        if (!state.currentTreeId) {
+          peopleList.innerHTML = '<div class="message">Créez ou sélectionnez un arbre d\'abord.</div>';
+          state.selectedPersonId = '';
+          renderPersonDetail();
+          return;
+        }
+        if (!state.people.length) {
+          peopleList.innerHTML = '<div class="message">Aucune personne dans cet arbre.</div>';
+          state.selectedPersonId = '';
+          renderPersonDetail();
+          return;
+        }
+
+        if (!state.selectedPersonId || !state.people.some((item) => item.id === state.selectedPersonId)) {
+          state.selectedPersonId = state.people[0].id;
+        }
+
+        peopleList.innerHTML = state.people.map((person) => `
+          <div class="item">
+            <div>
+              <strong>${person.prenom} ${person.nom}</strong>
+              <div class="meta">${person.villageOrigine || 'Village non renseigné'} • ${person.statutVerification || 'non_verifie'}</div>
+            </div>
+            <div class="inline-actions">
+              <button class="btn ${person.id === state.selectedPersonId ? 'btn-secondary' : 'btn-primary'}" type="button" data-person-view="${person.id}">${person.id === state.selectedPersonId ? 'Sélectionnée' : 'Voir'}</button>
+              ${canEditPeople() ? `<button class="btn btn-muted" type="button" data-person-edit="${person.id}">Modifier</button>` : ''}
+              ${canEditPeople() ? `<button class="btn btn-secondary" type="button" data-person-delete="${person.id}">Supprimer</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        peopleList.querySelectorAll('[data-person-view]').forEach((button) => {
+          button.addEventListener('click', () => {
+            state.selectedPersonId = button.getAttribute('data-person-view');
+            renderPeople();
+          });
+        });
+
+        peopleList.querySelectorAll('[data-person-edit]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const person = state.people.find((item) => item.id === button.getAttribute('data-person-edit'));
+            if (!person) return;
+            state.editingPersonId = person.id;
+            state.selectedPersonId = person.id;
+            personForm.nom.value = person.nom || '';
+            personForm.prenom.value = person.prenom || '';
+            personForm.dateNaissance.value = person.dateNaissance ? String(person.dateNaissance).slice(0, 10) : '';
+            personForm.villageOrigine.value = person.villageOrigine || '';
+            personForm.biographie.value = person.biographie || '';
+            updateRoleScopedUI();
+            activateSection('peoplePanel');
+            renderPersonDetail();
+          });
+        });
+
+        peopleList.querySelectorAll('[data-person-delete]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            await deletePerson(button.getAttribute('data-person-delete'));
+          });
+        });
+
+        renderPersonDetail();
+        syncPrototypeDashboard();
+      }
+
+      function renderMembers() {
+        if (!state.currentTreeId) {
+          membersList.innerHTML = '<div class="message">Sélectionnez un arbre pour voir ses membres.</div>';
+          return;
+        }
+        if (!state.members.length) {
+          membersList.innerHTML = '<div class="message">Aucun membre à afficher.</div>';
+          return;
+        }
+
+        membersList.innerHTML = state.members.map((member) => `
+          <div class="item">
+            <div>
+              <strong>${member.utilisateur?.prenom || ''} ${member.utilisateur?.nom || ''}</strong>
+              <div class="meta">${member.utilisateur?.email || '-'} • rôle : ${member.role} • statut : ${member.statut}</div>
+            </div>
+            <div class="inline-actions">
+              <select data-role-select="${member.id}" ${canManageMembers() ? '' : 'disabled'}>
+                <option value="admin" ${member.role === 'admin' ? 'selected' : ''}>Admin</option>
+                <option value="editeur" ${member.role === 'editeur' ? 'selected' : ''}>Editeur</option>
+                <option value="contributeur" ${member.role === 'contributeur' ? 'selected' : ''}>Contributeur</option>
+                <option value="lecteur" ${member.role === 'lecteur' ? 'selected' : ''}>Lecteur</option>
+              </select>
+              ${canManageMembers() ? `<button class="btn btn-muted" type="button" data-role-button="${member.id}">Mettre à jour</button>` : ''}
+              ${member.statut === 'invite' && member.utilisateur?.id === state.user?.id ? `<button class="btn btn-primary" type="button" data-accept-button="${member.id}">Accepter</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        membersList.querySelectorAll('[data-role-button]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            const memberId = button.getAttribute('data-role-button');
+            const select = membersList.querySelector(`[data-role-select="${memberId}"]`);
+            await updateMemberRole(memberId, select.value);
+          });
+        });
+
+        membersList.querySelectorAll('[data-accept-button]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            await acceptInvitation(button.getAttribute('data-accept-button'));
+          });
+        });
+
+        syncPrototypeDashboard();
+      }
+
+      function renderRelations() {
+        relationCount.textContent = String(state.relations.length);
+        if (!state.currentTreeId) {
+          relationsList.innerHTML = '<div class="message">Sélectionnez un arbre pour voir ses relations.</div>';
+          return;
+        }
+        if (!state.relations.length) {
+          relationsList.innerHTML = '<div class="message">Aucune relation familiale pour cet arbre.</div>';
+          return;
+        }
+
+        relationsList.innerHTML = state.relations.map((relation) => `
+          <div class="item">
+            <div>
+              <strong>${relation.personne1?.prenom || ''} ${relation.personne1?.nom || ''} → ${relation.personne2?.prenom || ''} ${relation.personne2?.nom || ''}</strong>
+              <div class="meta">Type : ${relation.typeRelation}</div>
+            </div>
+            <div class="inline-actions">
+              ${canManageRelations() ? `<button class="btn btn-muted" type="button" data-relation-edit="${relation.id}">Modifier</button>` : ''}
+              ${canManageRelations() ? `<button class="btn btn-secondary" type="button" data-relation-delete="${relation.id}">Supprimer</button>` : ''}
+            </div>
+          </div>
+        `).join('');
+
+        relationsList.querySelectorAll('[data-relation-edit]').forEach((button) => {
+          button.addEventListener('click', () => {
+            const relation = state.relations.find((item) => item.id === button.getAttribute('data-relation-edit'));
+            if (!relation) return;
+            state.editingRelationId = relation.id;
+            relationForm.personneId1.value = relation.personneId1;
+            relationForm.personneId2.value = relation.personneId2;
+            relationForm.typeRelation.value = relation.typeRelation;
+            updateRoleScopedUI();
+            activateSection('relationsPanel');
+          });
+        });
+
+        relationsList.querySelectorAll('[data-relation-delete]').forEach((button) => {
+          button.addEventListener('click', async () => {
+            await deleteRelation(button.getAttribute('data-relation-delete'));
+          });
+        });
+
+        syncPrototypeDashboard();
+      }
+
+      async function loadProfile() {
+        const response = await fetch('/auth/me', { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Profil introuvable');
+        state.user = result;
+        localStorage.setItem('griotUser', JSON.stringify(state.user));
+        fillProfileForm();
+      }
+
+      async function loadTrees() {
+        const response = await fetch('/arbres', { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Chargement des arbres impossible');
+        state.trees = result;
+        if (!state.currentTreeId && result.length) {
+          state.currentTreeId = result[0].id;
+        }
+        renderTrees();
+      }
+
+      async function loadPeople() {
+        if (!state.currentTreeId) {
+          state.people = [];
+          renderPeople();
+          return;
+        }
+        const response = await fetch(`/arbres/${state.currentTreeId}/personnes`, { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Chargement des personnes impossible');
+        state.people = result;
+        renderPeople();
+      }
+
+      async function loadMembers() {
+        if (!state.currentTreeId) {
+          state.members = [];
+          renderMembers();
+          renderTreeDetail();
+          return;
+        }
+        const response = await fetch(`/arbres/${state.currentTreeId}/membres`, { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Chargement des membres impossible');
+        state.members = result;
+        renderMembers();
+        renderTreeDetail();
+      }
+
+      async function loadRelations() {
+        if (!state.currentTreeId) {
+          state.relations = [];
+          renderRelations();
+          renderTreeDetail();
+          return;
+        }
+        const response = await fetch(`/arbres/${state.currentTreeId}/relations`, { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Chargement des relations impossible');
+        state.relations = result;
+        renderRelations();
+        renderTreeDetail();
+      }
+
+      function renderSouvenirs() {
+        memoryPerson.innerHTML = '<option value="">Aucune</option>' + state.people.map((person) => `<option value="${person.id}">${person.prenom} ${person.nom}</option>`).join('');
+        if (!state.currentTreeId) {
+          memoriesList.innerHTML = '<div class="message">Sélectionnez un arbre pour consulter sa mémoire.</div>';
+          return;
+        }
+        if (!state.souvenirs.length) {
+          memoriesList.innerHTML = '<div class="message">Aucun souvenir enregistré. Commencez par raconter une histoire.</div>';
+          return;
+        }
+        memoriesList.innerHTML = state.souvenirs.map((souvenir) => `
+          <div class="item"><div><strong>${souvenir.titre}</strong><div class="meta">${souvenir.categorie} · ${souvenir.auteur?.prenom || ''} ${souvenir.auteur?.nom || ''}${souvenir.personne ? ` · ${souvenir.personne.prenom} ${souvenir.personne.nom}` : ''}</div><div class="meta" style="margin-top:6px; white-space:pre-wrap;">${souvenir.contenu || 'Sans texte.'}</div></div>${canEditPeople() ? `<button class="btn btn-secondary" type="button" data-memory-delete="${souvenir.id}">Supprimer</button>` : ''}</div>`).join('');
+        memoriesList.querySelectorAll('[data-memory-delete]').forEach((button) => button.addEventListener('click', async () => {
+          await apiRequest(`/arbres/${state.currentTreeId}/souvenirs/${button.getAttribute('data-memory-delete')}`, { method: 'DELETE', headers: authHeaders() }, 'Suppression impossible');
+          await loadSouvenirs();
+        }));
+      }
+
+      async function loadSouvenirs() {
+        if (!state.currentTreeId) { state.souvenirs = []; renderSouvenirs(); return; }
+        const response = await fetch(`/arbres/${state.currentTreeId}/souvenirs`, { headers: authHeaders() });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.message || 'Chargement des souvenirs impossible');
+        state.souvenirs = result;
+        renderSouvenirs();
+      }
+
+      async function loadTreeScopedData() {
+        await loadPeople();
+        await loadMembers();
+        await loadRelations();
+        await loadSouvenirs();
+      }
+
+      function resetPersonForm() {
+        state.editingPersonId = '';
+        personForm.reset();
+        updateRoleScopedUI();
+      }
+
+      function resetRelationForm() {
+        state.editingRelationId = '';
+        relationForm.reset();
+        updateRelationPersonOptions();
+        updateRoleScopedUI();
+      }
+
+      async function loadDashboardData() {
+        if (!state.token) return;
+        const initialRefreshLabel = refreshBtn.textContent;
+        const initialProtoRefreshLabel = protoRefreshBtn.textContent;
+        refreshBtn.disabled = true;
+        protoRefreshBtn.disabled = true;
+        refreshBtn.textContent = 'Actualisation...';
+        protoRefreshBtn.textContent = 'Actualisation...';
+        setDashboardNotice('Chargement des données...');
+        try {
+          await loadProfile();
+          await loadTrees();
+          await loadTreeScopedData();
+          dashboardCopy.textContent = `Bienvenue, ${getDisplayName(state.user)} !`;
+          dashboardMessage.textContent = 'Votre dashboard est connecté au profil, aux arbres, aux membres et aux relations.';
+          setDashboardNotice('Dashboard synchronisé.', 'success');
+          syncPrototypeDashboard();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        } finally {
+          refreshBtn.disabled = false;
+          protoRefreshBtn.disabled = false;
+          refreshBtn.textContent = initialRefreshLabel;
+          protoRefreshBtn.textContent = initialProtoRefreshLabel;
+        }
+      }
+
+      function updateUI() {
+        renderAuthMode();
+        if (state.token) {
+          if (!state.introSeen) {
+            state.pendingDashboardAfterIntro = true;
+            state.mode = 'landing';
+            setActivePage('authScreen');
+            renderAuthMode();
+            return;
+          }
+          state.pendingDashboardAfterIntro = false;
+          setActivePage('dashboardScreen');
+          activateSection(getSectionFromHash(), false);
+          loadDashboardData();
+        } else {
+          state.pendingDashboardAfterIntro = false;
+          setActivePage('authScreen');
+        }
+      }
+
+      authForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(authForm);
+
+        if (state.mode === 'forgot') {
+          try {
+            const result = await apiRequest('/auth/forgot-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email: formData.get('email') }),
+            }, 'Action impossible');
+            state.resetToken = result.resetToken || '';
+            setMessage(result.message || 'Si le compte existe, un lien de réinitialisation sera envoyé.', 'success');
+            if (state.resetToken) {
+              state.mode = 'reset';
+              renderAuthMode();
+            }
+          } catch (error) {
+            setMessage(error.message, 'error');
+          }
+          return;
+        }
+
+        if (state.mode === 'reset') {
+          const resetToken = formData.get('resetToken');
+          const newPassword = formData.get('newPassword');
+          const confirmResetPassword = formData.get('confirmResetPassword');
+          if (newPassword !== confirmResetPassword) {
+            setMessage('Les mots de passe ne correspondent pas.', 'error');
+            return;
+          }
+          try {
+            const result = await apiRequest('/auth/reset-password', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ token: resetToken, newPassword }),
+            }, 'Action impossible');
+            state.mode = 'login';
+            state.resetToken = '';
+            authForm.reset();
+            renderAuthMode();
+            setMessage(result.message || 'Mot de passe réinitialisé avec succès.', 'success');
+          } catch (error) {
+            setMessage(error.message, 'error');
+          }
+          return;
+        }
+
+        const payload = {
+          email: formData.get('email'),
+          motDePasse: formData.get('motDePasse'),
+        };
+
+        if (state.mode === 'register') {
+          payload.nom = formData.get('nom');
+          payload.prenom = formData.get('prenom');
+        }
+
+        const endpoint = state.mode === 'register' ? '/auth/register' : '/auth/login';
+
+        try {
+          const result = await apiRequest(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }, 'Action impossible');
+
+          if (state.mode === 'register') {
+            setMessage('Compte créé. Vous pouvez maintenant vous connecter.', 'success');
+            state.mode = 'login';
+            authForm.reset();
+            renderAuthMode();
+            return;
+          }
+
+          state.token = result.accessToken;
+          state.user = result.utilisateur;
+          localStorage.setItem('griotToken', state.token);
+          localStorage.setItem('griotUser', JSON.stringify(state.user));
+          setMessage('Connexion réussie.', 'success');
+          updateUI();
+        } catch (error) {
+          setMessage(error.message, 'error');
+        }
+      });
+
+      profileForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+          const payload = Object.fromEntries(new FormData(profileForm).entries());
+          const result = await apiRequest('/auth/me', {
+            method: 'PATCH',
+            headers: authHeaders(true),
+            body: JSON.stringify(payload),
+          }, 'Mise à jour impossible');
+          state.user = result;
+          localStorage.setItem('griotUser', JSON.stringify(state.user));
+          fillProfileForm();
+          setDashboardNotice('Profil mis à jour.', 'success');
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      });
+
+      treeForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        try {
+          const formData = new FormData(treeForm);
+          const result = await apiRequest('/arbres', {
+            method: 'POST',
+            headers: authHeaders(true),
+            body: JSON.stringify({
+              nom: formData.get('nom'),
+              visibilite: formData.get('visibilite') || 'prive',
+            }),
+          }, 'Création impossible');
+          treeForm.reset();
+          state.currentTreeId = result.id;
+          setDashboardNotice(`Arbre créé : ${result.nom}`, 'success');
+          await loadTrees();
+          await loadTreeScopedData();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      });
+
+      personForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!state.currentTreeId) {
+          setDashboardNotice('Sélectionnez un arbre avant d\'ajouter une personne.', 'error');
+          return;
+        }
+        try {
+          const formData = new FormData(personForm);
+          const isEditing = Boolean(state.editingPersonId);
+          const result = await apiRequest(isEditing ? `/arbres/${state.currentTreeId}/personnes/${state.editingPersonId}` : `/arbres/${state.currentTreeId}/personnes`, {
+            method: isEditing ? 'PATCH' : 'POST',
+            headers: authHeaders(true),
+            body: JSON.stringify({
+              nom: formData.get('nom'),
+              prenom: formData.get('prenom'),
+              dateNaissance: formData.get('dateNaissance') || undefined,
+              villageOrigine: formData.get('villageOrigine') || undefined,
+              biographie: formData.get('biographie') || undefined,
+            }),
+          }, isEditing ? 'Modification impossible' : 'Ajout impossible');
+          resetPersonForm();
+          setDashboardNotice(isEditing ? `Personne mise à jour : ${result.prenom} ${result.nom}` : `Personne ajoutée : ${result.prenom} ${result.nom}`, 'success');
+          await loadPeople();
+          await loadRelations();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      });
+
+      memoryForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!state.currentTreeId) { setDashboardNotice('Sélectionnez un arbre avant d’ajouter un souvenir.', 'error'); return; }
+        try {
+          const formData = new FormData(memoryForm);
+          await apiRequest(`/arbres/${state.currentTreeId}/souvenirs`, {
+            method: 'POST', headers: authHeaders(true),
+            body: JSON.stringify({ titre: formData.get('titre'), categorie: formData.get('categorie'), contenu: formData.get('contenu') || undefined, personneId: formData.get('personneId') || undefined }),
+          }, 'Enregistrement impossible');
+          memoryForm.reset();
+          setDashboardNotice('Souvenir enregistré.', 'success');
+          await loadSouvenirs();
+        } catch (error) { setDashboardNotice(error.message, 'error'); }
+      });
+
+      async function deletePerson(personId) {
+        try {
+          await apiRequest(`/arbres/${state.currentTreeId}/personnes/${personId}`, {
+            method: 'DELETE',
+            headers: authHeaders(),
+          }, 'Suppression impossible');
+          if (state.editingPersonId === personId) {
+            resetPersonForm();
+          }
+          if (state.selectedPersonId === personId) {
+            state.selectedPersonId = '';
+          }
+          setDashboardNotice('Personne supprimée.', 'success');
+          await loadPeople();
+          await loadRelations();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      }
+
+      memberInviteForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!state.currentTreeId) {
+          setDashboardNotice('Sélectionnez un arbre avant d\'inviter un membre.', 'error');
+          return;
+        }
+        try {
+          const formData = new FormData(memberInviteForm);
+          const result = await apiRequest(`/arbres/${state.currentTreeId}/membres`, {
+            method: 'POST',
+            headers: authHeaders(true),
+            body: JSON.stringify({
+              email: formData.get('email'),
+              role: formData.get('role'),
+            }),
+          }, 'Invitation impossible');
+          memberInviteForm.reset();
+          setDashboardNotice('Membre invité.', 'success');
+          await loadMembers();
+          await loadTrees();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      });
+
+      relationForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!state.currentTreeId) {
+          setDashboardNotice('Sélectionnez un arbre avant de créer une relation.', 'error');
+          return;
+        }
+        try {
+          const formData = new FormData(relationForm);
+          const isEditing = Boolean(state.editingRelationId);
+          const result = await apiRequest(isEditing ? `/arbres/${state.currentTreeId}/relations/${state.editingRelationId}` : `/arbres/${state.currentTreeId}/relations`, {
+            method: isEditing ? 'PATCH' : 'POST',
+            headers: authHeaders(true),
+            body: JSON.stringify({
+              personneId1: formData.get('personneId1'),
+              personneId2: formData.get('personneId2'),
+              typeRelation: formData.get('typeRelation'),
+            }),
+          }, isEditing ? 'Modification de relation impossible' : 'Création de relation impossible');
+          resetRelationForm();
+          setDashboardNotice(isEditing ? 'Relation familiale mise à jour.' : 'Relation familiale créée.', 'success');
+          await loadRelations();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      });
+
+      async function updateMemberRole(memberId, role) {
+        try {
+          await apiRequest(`/arbres/${state.currentTreeId}/membres/${memberId}/role`, {
+            method: 'PATCH',
+            headers: authHeaders(true),
+            body: JSON.stringify({ role }),
+          }, 'Mise à jour impossible');
+          setDashboardNotice('Rôle mis à jour.', 'success');
+          await loadMembers();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      }
+
+      async function acceptInvitation(memberId) {
+        try {
+          await apiRequest(`/arbres/${state.currentTreeId}/membres/${memberId}/accepter`, {
+            method: 'POST',
+            headers: authHeaders(),
+          }, 'Impossible d\'accepter l\'invitation');
+          setDashboardNotice('Invitation acceptée.', 'success');
+          await loadMembers();
+          await loadTrees();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      }
+
+      async function deleteRelation(relationId) {
+        try {
+          await apiRequest(`/arbres/${state.currentTreeId}/relations/${relationId}`, {
+            method: 'DELETE',
+            headers: authHeaders(),
+          }, 'Suppression impossible');
+          if (state.editingRelationId === relationId) {
+            resetRelationForm();
+          }
+          setDashboardNotice('Relation supprimée.', 'success');
+          await loadRelations();
+        } catch (error) {
+          setDashboardNotice(error.message, 'error');
+        }
+      }
+
+      motDePasseInput.addEventListener('input', (event) => {
+        const strength = checkPasswordStrength(event.target.value);
+        passwordStrength.textContent = `Robustesse : ${strength.text}`;
+        passwordStrength.style.color = strength.color;
+      });
+
+      toggleAuthBtn.addEventListener('click', () => {
+        state.mode = state.mode === 'login' ? 'register' : 'login';
+        authForm.reset();
+        renderAuthMode();
+      });
+
+      homeCreateBtn.addEventListener('click', () => {
+        state.mode = 'register';
+        authForm.reset();
+        renderAuthMode();
+      });
+
+      homeExploreBtn.addEventListener('click', () => {
+        state.mode = 'login';
+        authForm.reset();
+        renderAuthMode();
+        setMessage('Connectez-vous pour explorer les histoires familiales.', 'success');
+      });
+
+      homeLoginBtn.addEventListener('click', () => {
+        state.mode = 'login';
+        authForm.reset();
+        renderAuthMode();
+      });
+
+      homeAiBtn.addEventListener('click', () => {
+        openAiPanel();
+      });
+
+      aiCloseBtn.addEventListener('click', () => {
+        closeAiPanel();
+      });
+
+      aiOverlay.addEventListener('click', (event) => {
+        if (!aiPanel.contains(event.target)) {
+          closeAiPanel();
+        }
+      });
+
+      aiSendBtn.addEventListener('click', () => {
+        askGriot(aiInput.value);
+      });
+
+      aiInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          askGriot(aiInput.value);
+        }
+      });
+
+      aiSuggestions.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-ai-prompt]');
+        if (!button) return;
+        askGriot(button.getAttribute('data-ai-prompt'));
+      });
+
+      introSkipBtn.addEventListener('click', () => {
+        completeIntro();
+      });
+
+      forgotPasswordBtn.addEventListener('click', () => {
+        state.mode = state.mode === 'forgot' || state.mode === 'reset' ? 'login' : 'forgot';
+        state.resetToken = '';
+        authForm.reset();
+        renderAuthMode();
+      });
+
+      logoutBtn.addEventListener('click', () => {
+        state.token = '';
+        state.user = null;
+        state.currentTreeId = '';
+        state.currentRole = '';
+        state.trees = [];
+        state.people = [];
+        state.members = [];
+        state.relations = [];
+        localStorage.removeItem('griotToken');
+        localStorage.removeItem('griotUser');
+        setMessage('Vous avez été déconnecté.', 'info');
+        updateUI();
+      });
+
+      refreshBtn.addEventListener('click', () => {
+        loadDashboardData();
+      });
+
+      protoRefreshBtn.addEventListener('click', () => {
+        loadDashboardData();
+      });
+
+      protoLogoutBtn.addEventListener('click', () => {
+        logoutBtn.click();
+      });
+
+      protoOpenArbreBtn.addEventListener('click', () => {
+        openProtoTreeTab();
+      });
+
+      protoInviteBtn.addEventListener('click', () => {
+        openAdvancedSection('membersPanel');
+      });
+
+      protoQuickAddPersonBtn.addEventListener('click', () => {
+        openAdvancedSection('peoplePanel');
+      });
+
+      protoQuickStoryBtn.addEventListener('click', () => {
+        setDashboardNotice('La section Mémoire sera branchée dans une étape suivante.', 'success');
+      });
+
+      protoQuickDocBtn.addEventListener('click', () => {
+        openAdvancedSection('peoplePanel');
+      });
+
+      protoNavDashboard.addEventListener('click', () => {
+        openAdvancedSection('profilePanel');
+      });
+
+      protoNavArbre.addEventListener('click', () => {
+        openProtoTreeTab();
+      });
+
+      protoNavCarte.addEventListener('click', () => {
+        openAdvancedSection('relationsPanel');
+      });
+
+      protoNavMemoire.addEventListener('click', () => {
+        openAdvancedSection('membersPanel');
+      });
+
+      protoAiBtn.addEventListener('click', () => {
+        openProtoAiPanel();
+      });
+
+      protoAiCloseBtn.addEventListener('click', () => {
+        closeProtoAiPanel();
+      });
+
+      protoAiOverlay.addEventListener('click', (event) => {
+        if (!protoAiPanel.contains(event.target)) {
+          closeProtoAiPanel();
+        }
+      });
+
+      protoAiSendBtn.addEventListener('click', () => {
+        askGriotProto(protoAiInput.value);
+      });
+
+      protoAiInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          askGriotProto(protoAiInput.value);
+        }
+      });
+
+      protoAiSuggestions.addEventListener('click', (event) => {
+        const button = event.target.closest('[data-ai-prompt]');
+        if (!button) return;
+        askGriotProto(button.getAttribute('data-ai-prompt'));
+      });
+
+      protoTreeBackBtn.addEventListener('click', () => {
+        closeProtoTreeTab();
+      });
+
+      protoTreeAiBtn.addEventListener('click', () => {
+        openProtoAiPanel();
+      });
+
+      protoTreeFilterButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          setProtoTreeFilter(button.getAttribute('data-tree-filter'));
+        });
+      });
+
+      protoTreeOverlay.addEventListener('click', (event) => {
+        if (event.target === protoTreeOverlay) {
+          closeProtoTreeTab();
+        }
+      });
+
+      protoTreeNavDashboard.addEventListener('click', () => {
+        closeProtoTreeTab();
+        openAdvancedSection('profilePanel');
+      });
+
+      protoTreeNavCarte.addEventListener('click', () => {
+        closeProtoTreeTab();
+        openAdvancedSection('relationsPanel');
+      });
+
+      protoTreeNavMemoire.addEventListener('click', () => {
+        closeProtoTreeTab();
+        openAdvancedSection('membersPanel');
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        if (!aiOverlay.classList.contains('hidden')) {
+          closeAiPanel();
+        }
+        if (!protoAiOverlay.classList.contains('hidden')) {
+          closeProtoAiPanel();
+        }
+        if (!protoTreeOverlay.classList.contains('hidden')) {
+          closeProtoTreeTab();
+        }
+      });
+
+      document.getElementById('personCancelBtn').addEventListener('click', () => {
+        resetPersonForm();
+      });
+
+      document.getElementById('relationCancelBtn').addEventListener('click', () => {
+        resetRelationForm();
+      });
+
+      sectionNav.querySelectorAll('.section-link').forEach((button) => {
+        button.addEventListener('click', () => {
+          activateSection(button.getAttribute('data-target'));
+        });
+      });
+
+      window.addEventListener('hashchange', () => {
+        if (state.token) {
+          activateSection(getSectionFromHash(), false);
+        }
+      });
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const resetTokenFromUrl = urlParams.get('resetToken');
+      if (resetTokenFromUrl) {
+        state.mode = 'reset';
+        state.resetToken = resetTokenFromUrl;
+      }
+
+      updateUI();
+    </script>
+  </body>
+</html>
