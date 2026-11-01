@@ -26,6 +26,8 @@ jobs:
 
   backend:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: postgresql://griot:griot@localhost:5432/griot?schema=public
     defaults:
       run:
         working-directory: griot-backend
