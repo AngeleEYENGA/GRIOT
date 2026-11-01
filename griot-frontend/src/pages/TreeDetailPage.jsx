@@ -8,11 +8,14 @@ export default function TreeDetailPage({ treeId, onBack }) {
   const [personnes, setPersonnes] = useState([]);
   const [relations, setRelations] = useState([]);
   const [membres, setMembers] = useState([]);
+  const [souvenirs, setSouvenirs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('personnes');
   const [showAddPersonForm, setShowAddPersonForm] = useState(false);
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
+  const [showAddSouvenirForm, setShowAddSouvenirForm] = useState(false);
+  const [savingSouvenir, setSavingSouvenir] = useState(false);
   const [newPerson, setNewPerson] = useState({
     nom: '',
     prenom: '',
@@ -27,21 +30,29 @@ export default function TreeDetailPage({ treeId, onBack }) {
     personneId2: '',
     typeRelation: 'parent',
   });
+  const [newSouvenir, setNewSouvenir] = useState({
+    titre: '',
+    categorie: 'histoire',
+    contenu: '',
+    personneId: '',
+  });
 
   const loadTreeData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
-      const [treeData, personnesData, relationsData, membresData] = await Promise.all([
+      const [treeData, personnesData, relationsData, membresData, souvenirsData] = await Promise.all([
         api.getArbre(treeId),
         api.getPersonnes(treeId),
         api.getRelations(treeId),
         api.getMembers(treeId),
+        api.getSouvenirs(treeId),
       ]);
       setTree(treeData);
       setPersonnes(Array.isArray(personnesData) ? personnesData : personnesData.personnes || []);
       setRelations(Array.isArray(relationsData) ? relationsData : relationsData.relations || []);
       setMembers(Array.isArray(membresData) ? membresData : membresData.membres || []);
+      setSouvenirs(Array.isArray(souvenirsData) ? souvenirsData : souvenirsData.souvenirs || []);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -96,6 +107,39 @@ export default function TreeDetailPage({ treeId, onBack }) {
       setMembers([...membres, response]);
       setNewMember({ email: '', role: 'lecteur' });
       setShowAddMemberForm(false);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleAddSouvenir = async (e) => {
+    e.preventDefault();
+    if (!newSouvenir.titre.trim()) return;
+
+    try {
+      setSavingSouvenir(true);
+      setError('');
+      const response = await api.createSouvenir(treeId, {
+        ...newSouvenir,
+        titre: newSouvenir.titre.trim(),
+        contenu: newSouvenir.contenu.trim() || undefined,
+        personneId: newSouvenir.personneId || undefined,
+      });
+      setSouvenirs((current) => [response, ...current]);
+      setNewSouvenir({ titre: '', categorie: 'histoire', contenu: '', personneId: '' });
+      setShowAddSouvenirForm(false);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setSavingSouvenir(false);
+    }
+  };
+
+  const handleDeleteSouvenir = async (souvenirId) => {
+    if (!window.confirm('Supprimer ce souvenir ?')) return;
+    try {
+      await api.deleteSouvenir(treeId, souvenirId);
+      setSouvenirs((current) => current.filter((souvenir) => souvenir.id !== souvenirId));
     } catch (err) {
       setError(err.message);
     }
@@ -160,8 +204,8 @@ export default function TreeDetailPage({ treeId, onBack }) {
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8">
-            {['personnes', 'relations', 'membres'].map((tab) => (
+          <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
+            {['personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -173,6 +217,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
               >
                 {tab === 'personnes' && '👤 Personnes'}
                 {tab === 'relations' && '🤝 Relations'}
+                {tab === 'souvenirs' && '📜 Souvenirs'}
                 {tab === 'membres' && '👥 Équipe'}
               </button>
             ))}
@@ -355,6 +400,154 @@ export default function TreeDetailPage({ treeId, onBack }) {
               </div>
             )}
           </div>
+        )}
+
+        {activeTab === 'souvenirs' && (
+          <section>
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Mémoire familiale</h2>
+                <p className="text-sm text-gray-600 mt-1">Histoires et traditions transmises dans la famille.</p>
+              </div>
+              {peutAjouterPersonne && (
+                <button
+                  onClick={() => setShowAddSouvenirForm(!showAddSouvenirForm)}
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+                >
+                  {showAddSouvenirForm ? 'Annuler' : '+ Raconter un souvenir'}
+                </button>
+              )}
+            </div>
+
+            {showAddSouvenirForm && (
+              <form onSubmit={handleAddSouvenir} className="mb-8 bg-white rounded-lg shadow p-6 space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-titre">
+                      Titre
+                    </label>
+                    <input
+                      id="souvenir-titre"
+                      type="text"
+                      value={newSouvenir.titre}
+                      onChange={(e) => setNewSouvenir({ ...newSouvenir, titre: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      required
+                      maxLength={160}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-categorie">
+                      Catégorie
+                    </label>
+                    <select
+                      id="souvenir-categorie"
+                      value={newSouvenir.categorie}
+                      onChange={(e) => setNewSouvenir({ ...newSouvenir, categorie: e.target.value })}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    >
+                      <option value="histoire">Histoire</option>
+                      <option value="cuisine">Cuisine</option>
+                      <option value="danse">Danse</option>
+                      <option value="musique">Musique</option>
+                      <option value="proverbe">Proverbe</option>
+                      <option value="mariage">Mariage</option>
+                      <option value="funerailles">Funérailles</option>
+                      <option value="naissance">Naissance</option>
+                      <option value="vetements">Vêtements</option>
+                      <option value="rituel">Rituel</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-personne">
+                    Personne associée (optionnel)
+                  </label>
+                  <select
+                    id="souvenir-personne"
+                    value={newSouvenir.personneId}
+                    onChange={(e) => setNewSouvenir({ ...newSouvenir, personneId: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Toute la famille</option>
+                    {personnes.map((personne) => (
+                      <option key={personne.id} value={personne.id}>{personne.prenom} {personne.nom}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-contenu">
+                    Récit (optionnel)
+                  </label>
+                  <textarea
+                    id="souvenir-contenu"
+                    value={newSouvenir.contenu}
+                    onChange={(e) => setNewSouvenir({ ...newSouvenir, contenu: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    rows={5}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={savingSouvenir}
+                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg transition"
+                >
+                  {savingSouvenir ? 'Enregistrement...' : 'Enregistrer le souvenir'}
+                </button>
+              </form>
+            )}
+
+            {souvenirs.length === 0 ? (
+              <div className="text-center py-12 bg-white rounded-lg">
+                <p className="text-gray-600">Aucun souvenir partagé pour le moment.</p>
+                {peutAjouterPersonne && (
+                  <p className="text-sm text-gray-500 mt-2">Ajoutez une histoire, une recette ou une tradition pour commencer.</p>
+                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {souvenirs.map((souvenir) => (
+                  <article key={souvenir.id} className="bg-white rounded-lg shadow p-6">
+                    <div className="flex justify-between items-start gap-4">
+                      <div>
+                        <span className="inline-block px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-medium capitalize">
+                          {souvenir.categorie}
+                        </span>
+                        <h3 className="text-lg font-bold text-gray-900 mt-3">{souvenir.titre}</h3>
+                      </div>
+                      {peutGererArbre && (
+                        <button
+                          onClick={() => handleDeleteSouvenir(souvenir.id)}
+                          aria-label={`Supprimer ${souvenir.titre}`}
+                          className="text-red-600 hover:text-red-800 text-sm font-medium"
+                        >
+                          Supprimer
+                        </button>
+                      )}
+                    </div>
+                    {souvenir.contenu && (
+                      <p className="mt-3 text-gray-700 whitespace-pre-wrap">{souvenir.contenu}</p>
+                    )}
+                    <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap justify-between gap-2 text-xs text-gray-500">
+                      <span>
+                        {souvenir.personne
+                          ? `${souvenir.personne.prenom} ${souvenir.personne.nom}`
+                          : 'Mémoire familiale'}
+                        {souvenir.auteur && ` · partagé par ${souvenir.auteur.prenom} ${souvenir.auteur.nom}`}
+                      </span>
+                      <span>
+                        {souvenir.statutVerification === 'verifie_famille'
+                          ? 'Vérifié par la famille'
+                          : souvenir.statutVerification === 'verifie_chefferie'
+                            ? 'Vérifié par la chefferie'
+                            : 'À vérifier'}
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         )}
 
         {/* MEMBRES TAB */}

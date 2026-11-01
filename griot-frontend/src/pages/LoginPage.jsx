@@ -46,8 +46,13 @@ export default function LoginPage({ onSwitchToRegister }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-teal-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-        <h1 className="text-3xl font-bold text-green-800 mb-2">GRIOT</h1>
-        <p className="text-gray-600 mb-8">Votre généalogie, votre histoire</p>
+        <h1 className="mb-6">
+          <img
+            src="/griot-logo.jpeg"
+            alt="GRIOT"
+            className="w-40 h-40 object-contain mx-auto"
+          />
+        </h1>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {(formError || error) && (
