@@ -42,7 +42,7 @@ Dans Google Cloud Console, le client OAuth **Application Web** `GRIOT Web Client
 
 ## Base de données et migrations
 
-**État actuel :** la base Neon est créée et reliée au projet backend. `DATABASE_URL` et `DATABASE_URL_UNPOOLED` sont gérées par l’intégration Vercel. Des `JWT_SECRET` distincts pour Production et Preview sont générés directement dans les variables Vercel. Configurer la commande de build du projet backend sur `npm run build:vercel`. Le hook `prebuild` exécute aussi `prisma migrate deploy` lorsque Vercel lance la commande standard `npm run build`, afin que la migration ne soit pas omise si la configuration personnalisée est absente. Ne jamais utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction.
+**État actuel :** la base Neon est créée et reliée au projet backend. `DATABASE_URL` et `DATABASE_URL_UNPOOLED` sont gérées par l’intégration Vercel. Des `JWT_SECRET` distincts pour Production et Preview sont générés directement dans les variables Vercel. Configurer la commande de build du projet backend sur `npm run build:vercel`. Cette commande génère explicitement le client Prisma, applique ensuite `prisma migrate deploy`, puis compile NestJS. Le hook `prebuild` réalise aussi ces étapes lorsque Vercel lance la commande standard `npm run build`. Ne jamais utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction.
 
 Les migrations `20261101000000_google_oauth` et `20261101120000_product_features` ajoutent respectivement les identités Google, les commentaires de souvenirs, les adhésions institutionnelles et les métadonnées des notifications. Conserver une sauvegarde de la base avant toute migration en production.
 

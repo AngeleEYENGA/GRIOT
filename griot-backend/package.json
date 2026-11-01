@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "node scripts/migrate-on-vercel.js",
     "build": "nest build",
-    "build:vercel": "prisma migrate deploy && nest build",
+    "build:vercel": "prisma generate && prisma migrate deploy && nest build",
     "start": "cmd /c \"set PORT=3001&& nest.cmd start\"",
     "start:dev": "cmd /c \"set PORT=3001&& nest.cmd start --watch\"",
     "start:dev:clean": "powershell -NoProfile -Command \"$port=3001; $conns=Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue; if ($conns) { $conns | Select-Object -ExpandProperty OwningProcess -Unique | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue } }; $env:PORT='3001'; nest start --watch\"",
