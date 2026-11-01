@@ -20,7 +20,7 @@ class GriotAPI {
     localStorage.removeItem('griot_token');
   }
 
-  async request(endpoint, options = {}) {
+  async request(endpoint, options = {}, { allowEmptyResponse = false } = {}) {
     const url = `${API_URL}${endpoint}`;
     const headers = {
       ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -41,7 +41,9 @@ class GriotAPI {
       throw new Error(error.message || `API Error: ${response.status}`);
     }
 
-    return response.json();
+    const responseBody = await response.text();
+    if (!responseBody.trim() && allowEmptyResponse) return null;
+    return JSON.parse(responseBody);
   }
 
   async requestBlob(endpoint) {
@@ -247,7 +249,7 @@ class GriotAPI {
   }
 
   getInstitution(arbreId) {
-    return this.request(`/arbres/${arbreId}/institution`);
+    return this.request(`/arbres/${arbreId}/institution`, {}, { allowEmptyResponse: true });
   }
 
   createInstitution(arbreId, data) {
