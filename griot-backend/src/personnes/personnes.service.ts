@@ -50,8 +50,16 @@ export class PersonnesService {
       where: { id },
       data: {
         ...dto,
-        dateNaissance: dto.dateNaissance ? new Date(dto.dateNaissance) : undefined,
-        dateDeces: dto.dateDeces ? new Date(dto.dateDeces) : undefined,
+        dateNaissance: dto.dateNaissance !== undefined
+          ? dto.dateNaissance
+            ? new Date(dto.dateNaissance)
+            : null
+          : undefined,
+        dateDeces: dto.dateDeces !== undefined
+          ? dto.dateDeces
+            ? new Date(dto.dateDeces)
+            : null
+          : undefined,
       },
     });
   }

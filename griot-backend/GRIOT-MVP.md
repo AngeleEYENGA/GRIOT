@@ -80,6 +80,7 @@ Navigables depuis le rail de gauche du prototype :
 - Ajout d'un tableau de bord par arbre avec statistiques réelles sur les personnes, relations, souvenirs et collaborateurs
 - Missions et score de complétude calculés à partir des données persistées, avec accès direct aux écrans concernés
 - API du tableau de bord protégée par les droits d'accès à l'arbre et couverte par des tests automatisés
+- Fiches personnes consultables et modifiables selon les rôles, avec biographies, dates, villages d'origine, liens familiaux et souvenirs associés
 
 ### 19 juillet 2026 (v7) — début du développement réel (backend)
 - Démarrage de `griot-backend/` : projet **NestJS + Prisma + PostgreSQL** réel, destiné au déploiement (ce n'est plus une maquette)

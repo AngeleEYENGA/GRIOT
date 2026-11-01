@@ -17,11 +17,19 @@ export default function TreeDetailPage({ treeId, onBack }) {
   const [showAddPersonForm, setShowAddPersonForm] = useState(false);
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
   const [showAddSouvenirForm, setShowAddSouvenirForm] = useState(false);
+  const [selectedPerson, setSelectedPerson] = useState(null);
+  const [personDraft, setPersonDraft] = useState(null);
+  const [editingPerson, setEditingPerson] = useState(false);
+  const [savingPerson, setSavingPerson] = useState(false);
+  const [personError, setPersonError] = useState('');
   const [savingSouvenir, setSavingSouvenir] = useState(false);
   const [newPerson, setNewPerson] = useState({
     nom: '',
     prenom: '',
     dateNaissance: '',
+    dateDeces: '',
+    villageOrigine: '',
+    biographie: '',
   });
   const [newMember, setNewMember] = useState({
     email: '',
@@ -95,12 +103,61 @@ export default function TreeDetailPage({ treeId, onBack }) {
       const response = await api.createPersonne(treeId, {
         ...newPerson,
         dateNaissance: newPerson.dateNaissance || undefined,
+        dateDeces: newPerson.dateDeces || undefined,
+        villageOrigine: newPerson.villageOrigine.trim() || undefined,
+        biographie: newPerson.biographie.trim() || undefined,
       });
       setPersonnes([...personnes, response]);
-      setNewPerson({ nom: '', prenom: '', dateNaissance: '' });
+      setNewPerson({
+        nom: '',
+        prenom: '',
+        dateNaissance: '',
+        dateDeces: '',
+        villageOrigine: '',
+        biographie: '',
+      });
       setShowAddPersonForm(false);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const openPersonProfile = (person) => {
+    setSelectedPerson(person);
+    setPersonDraft({
+      nom: person.nom || '',
+      prenom: person.prenom || '',
+      dateNaissance: person.dateNaissance ? new Date(person.dateNaissance).toISOString().slice(0, 10) : '',
+      dateDeces: person.dateDeces ? new Date(person.dateDeces).toISOString().slice(0, 10) : '',
+      villageOrigine: person.villageOrigine || '',
+      biographie: person.biographie || '',
+    });
+    setEditingPerson(false);
+    setPersonError('');
+    setError('');
+  };
+
+  const handleSavePerson = async (e) => {
+    e.preventDefault();
+    if (!selectedPerson || !personDraft) return;
+
+    try {
+      setSavingPerson(true);
+      setPersonError('');
+      const response = await api.updatePersonne(treeId, selectedPerson.id, {
+        ...personDraft,
+        dateNaissance: personDraft.dateNaissance || null,
+        dateDeces: personDraft.dateDeces || null,
+      });
+      setPersonnes((current) => current.map((person) => (
+        person.id === response.id ? response : person
+      )));
+      setSelectedPerson(response);
+      setEditingPerson(false);
+    } catch (err) {
+      setPersonError(err.message);
+    } finally {
+      setSavingPerson(false);
     }
   };
 
@@ -389,6 +446,41 @@ export default function TreeDetailPage({ treeId, onBack }) {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     />
                   </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Date de décès (optionnel)
+                      </label>
+                      <input
+                        type="date"
+                        value={newPerson.dateDeces}
+                        onChange={(e) => setNewPerson({ ...newPerson, dateDeces: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Village d’origine (optionnel)
+                      </label>
+                      <input
+                        type="text"
+                        value={newPerson.villageOrigine}
+                        onChange={(e) => setNewPerson({ ...newPerson, villageOrigine: e.target.value })}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Biographie (optionnelle)
+                    </label>
+                    <textarea
+                      value={newPerson.biographie}
+                      onChange={(e) => setNewPerson({ ...newPerson, biographie: e.target.value })}
+                      rows={4}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    />
+                  </div>
                   <button
                     type="submit"
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
@@ -415,8 +507,14 @@ export default function TreeDetailPage({ treeId, onBack }) {
                         Né(e) le {new Date(person.dateNaissance).toLocaleDateString('fr-FR')}
                       </p>
                     )}
+                    {person.biographie && (
+                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{person.biographie}</p>
+                    )}
                     <div className="mt-4 flex gap-2">
-                      <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm">
+                      <button
+                        onClick={() => openPersonProfile(person)}
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
+                      >
                         Détails
                       </button>
                       {peutGererArbre && <button
@@ -745,6 +843,216 @@ export default function TreeDetailPage({ treeId, onBack }) {
           </div>
         )}
       </main>
+      {selectedPerson && personDraft && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="person-profile-title"
+            className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+          >
+            <header className="flex justify-between items-start gap-4 p-6 border-b border-gray-200">
+              <div>
+                <p className="text-sm text-green-700 font-medium">Profil familial</p>
+                <h2 id="person-profile-title" className="text-2xl font-bold text-gray-900 mt-1">
+                  {selectedPerson.prenom} {selectedPerson.nom}
+                </h2>
+              </div>
+              <button
+                onClick={() => setSelectedPerson(null)}
+                aria-label="Fermer le profil"
+                className="text-gray-500 hover:text-gray-900 text-2xl leading-none"
+              >
+                ×
+              </button>
+            </header>
+
+            {personError && (
+              <p role="alert" className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                {personError}
+              </p>
+            )}
+
+            {editingPerson ? (
+              <form onSubmit={handleSavePerson} className="p-6 space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <label className="text-sm font-medium text-gray-700">
+                    Prénom
+                    <input
+                      value={personDraft.prenom}
+                      onChange={(e) => setPersonDraft({ ...personDraft, prenom: e.target.value })}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      required
+                    />
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Nom
+                    <input
+                      value={personDraft.nom}
+                      onChange={(e) => setPersonDraft({ ...personDraft, nom: e.target.value })}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      required
+                    />
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Date de naissance
+                    <input
+                      type="date"
+                      value={personDraft.dateNaissance}
+                      onChange={(e) => setPersonDraft({ ...personDraft, dateNaissance: e.target.value })}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </label>
+                  <label className="text-sm font-medium text-gray-700">
+                    Date de décès
+                    <input
+                      type="date"
+                      value={personDraft.dateDeces}
+                      onChange={(e) => setPersonDraft({ ...personDraft, dateDeces: e.target.value })}
+                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    />
+                  </label>
+                </div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Village d’origine
+                  <input
+                    value={personDraft.villageOrigine}
+                    onChange={(e) => setPersonDraft({ ...personDraft, villageOrigine: e.target.value })}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                </label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Biographie
+                  <textarea
+                    value={personDraft.biographie}
+                    onChange={(e) => setPersonDraft({ ...personDraft, biographie: e.target.value })}
+                    rows={6}
+                    className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  />
+                </label>
+                <div className="flex justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setEditingPerson(false)}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg"
+                  >
+                    Annuler
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingPerson}
+                    className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 disabled:opacity-50 rounded-lg"
+                  >
+                    {savingPerson ? 'Enregistrement...' : 'Enregistrer'}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <div className="p-6 space-y-6">
+                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <dt className="text-sm text-gray-500">Naissance</dt>
+                    <dd className="font-medium text-gray-900">
+                      {selectedPerson.dateNaissance
+                        ? new Date(selectedPerson.dateNaissance).toLocaleDateString('fr-FR')
+                        : 'Non renseignée'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-gray-500">Décès</dt>
+                    <dd className="font-medium text-gray-900">
+                      {selectedPerson.dateDeces
+                        ? new Date(selectedPerson.dateDeces).toLocaleDateString('fr-FR')
+                        : 'Non renseigné'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-gray-500">Village d’origine</dt>
+                    <dd className="font-medium text-gray-900">{selectedPerson.villageOrigine || 'Non renseigné'}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm text-gray-500">Vérification</dt>
+                    <dd className="font-medium text-gray-900">
+                      {selectedPerson.statutVerification === 'verifie_famille'
+                        ? 'Vérifié par la famille'
+                        : selectedPerson.statutVerification === 'verifie_chefferie'
+                          ? 'Vérifié par la chefferie'
+                          : 'À vérifier'}
+                    </dd>
+                  </div>
+                </dl>
+                <section>
+                  <h3 className="font-semibold text-gray-900">Biographie</h3>
+                  <p className="mt-2 text-gray-700 whitespace-pre-wrap">
+                    {selectedPerson.biographie || 'Aucune biographie enregistrée.'}
+                  </p>
+                </section>
+                <section>
+                  <h3 className="font-semibold text-gray-900">Liens familiaux</h3>
+                  <ul className="mt-2 space-y-2">
+                    {relations
+                      .filter((relation) => (
+                        relation.personneId1 === selectedPerson.id
+                        || relation.personneId2 === selectedPerson.id
+                      ))
+                      .map((relation) => {
+                        const isFirstPerson = relation.personneId1 === selectedPerson.id;
+                        const otherPersonId = isFirstPerson ? relation.personneId2 : relation.personneId1;
+                        const otherPerson = personnes.find((person) => person.id === otherPersonId);
+                        const relationType = isFirstPerson
+                          ? relation.typeRelation
+                          : relation.typeRelation === 'parent'
+                            ? 'enfant'
+                            : relation.typeRelation === 'enfant'
+                              ? 'parent'
+                              : relation.typeRelation;
+                        return otherPerson ? (
+                          <li key={relation.id} className="text-sm text-gray-700">
+                            <span className="capitalize">{relationType}</span> : {otherPerson.prenom} {otherPerson.nom}
+                          </li>
+                        ) : null;
+                      })}
+                    {!relations.some((relation) => (
+                      relation.personneId1 === selectedPerson.id
+                      || relation.personneId2 === selectedPerson.id
+                    )) && <li className="text-sm text-gray-500">Aucun lien familial enregistré.</li>}
+                  </ul>
+                </section>
+                <section>
+                  <h3 className="font-semibold text-gray-900">Souvenirs associés</h3>
+                  <ul className="mt-2 space-y-2">
+                    {souvenirs
+                      .filter((souvenir) => (
+                        souvenir.personneId === selectedPerson.id
+                        || souvenir.personne?.id === selectedPerson.id
+                      ))
+                      .map((souvenir) => (
+                        <li key={souvenir.id} className="text-sm text-gray-700">
+                          <span className="font-medium">{souvenir.titre}</span>
+                          {souvenir.categorie && ` · ${souvenir.categorie}`}
+                        </li>
+                      ))}
+                    {!souvenirs.some((souvenir) => (
+                      souvenir.personneId === selectedPerson.id
+                      || souvenir.personne?.id === selectedPerson.id
+                    )) && <li className="text-sm text-gray-500">Aucun souvenir associé.</li>}
+                  </ul>
+                </section>
+                {peutGererArbre && (
+                  <div className="flex justify-end">
+                    <button
+                      onClick={() => setEditingPerson(true)}
+                      className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 rounded-lg"
+                    >
+                      Modifier le profil
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        </div>
+      )}
     </div>
   );
 }

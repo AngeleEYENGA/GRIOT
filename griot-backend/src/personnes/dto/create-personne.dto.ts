@@ -9,11 +9,11 @@ export class CreatePersonneDto {
 
   @IsOptional()
   @IsDateString()
-  dateNaissance?: string;
+  dateNaissance?: string | null;
 
   @IsOptional()
   @IsDateString()
-  dateDeces?: string;
+  dateDeces?: string | null;
 
   @IsOptional()
   @IsString()
