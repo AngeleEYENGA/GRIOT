@@ -132,6 +132,41 @@ a { color: var(--griot-terracotta-deep); }
 .griot-select-tree p:last-child { margin: 0; color: var(--griot-ink-soft); font-size: 13px; }
 .griot-module-empty { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .griot-module-empty > div { max-width: 700px; }
+.griot-trees-page { min-height: calc(100vh - 70px); background: var(--griot-cream); }
+.griot-trees-content { width: min(100%, 1160px); margin: 0 auto; padding: 38px 28px 56px; }
+.griot-trees-header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
+.griot-trees-header h1 { margin: 0; color: var(--griot-ink); font: 700 clamp(27px, 3vw, 36px) var(--griot-serif); }
+.griot-trees-header > div > p:last-child { margin: 8px 0 0; color: var(--griot-ink-soft); font-size: 13px; line-height: 1.6; }
+.griot-new-tree-button { flex: 0 0 auto; white-space: nowrap; }
+.griot-tree-form-card { margin: 0 0 24px; padding: 24px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); box-shadow: 0 8px 24px #2b1b120a; }
+.griot-tree-form-card .griot-section-heading { margin: 0 0 20px; }
+.griot-tree-form-card .griot-section-heading h2 { margin: 0; font: 600 20px var(--griot-serif); }
+.griot-tree-form-card .griot-section-heading p { margin: 5px 0 0; color: var(--griot-ink-soft); font-size: 12px; }
+.griot-tree-form { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 18px 20px; }
+.griot-tree-field { display: flex; min-width: 0; flex-direction: column; gap: 7px; color: var(--griot-ink); font-size: 12px; font-weight: 600; }
+.griot-required-mark { color: var(--griot-terracotta); }
+.griot-tree-field input, .griot-tree-field select { width: 100%; min-height: 43px; border: 1px solid var(--griot-line); border-radius: 9px; padding: 10px 12px; outline: none; color: var(--griot-ink); background: #fffefa; font-size: 12px; }
+.griot-tree-field input:focus, .griot-tree-field select:focus { border-color: var(--griot-terracotta); box-shadow: 0 0 0 3px #b5502a1a; }
+.griot-tree-field input::placeholder { color: #948575; }
+.griot-tree-field small { color: var(--griot-ink-soft); font-size: 11px; font-weight: 400; line-height: 1.5; }
+.griot-tree-form-actions { display: flex; grid-column: 1 / -1; justify-content: flex-end; gap: 10px; padding-top: 2px; }
+.griot-tree-form-actions .griot-button-quiet { border: 1px solid var(--griot-line); border-radius: 9px; padding: 10px 16px; }
+.griot-tree-form-actions .griot-button-quiet:hover { background: var(--griot-cream); }
+.griot-tree-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.griot-tree-card { display: flex; min-width: 0; flex-direction: column; padding: 20px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); box-shadow: 0 7px 22px #2b1b1208; transition: transform .16s ease, box-shadow .16s ease; }
+.griot-tree-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px #2b1b1212; }
+.griot-tree-card-mark { display: grid; width: 38px; height: 38px; place-items: center; border-radius: 11px; color: var(--griot-gold); background: #f3ead7; font-size: 17px; }
+.griot-tree-card-content { flex: 1; padding: 16px 0 18px; }
+.griot-tree-card-content h2 { overflow-wrap: anywhere; margin: 0 0 8px; color: var(--griot-olive); font: 700 20px var(--griot-serif); }
+.griot-tree-card-content p { margin: 0 0 11px; color: var(--griot-ink-soft); font-size: 11px; }
+.griot-tree-visibility { display: inline-flex; align-items: center; border: 1px solid var(--griot-line); border-radius: 20px; padding: 4px 9px; color: var(--griot-ink-soft); background: #f8f1e5; font-size: 10px; font-weight: 600; }
+.griot-tree-open { display: flex; width: 100%; align-items: center; justify-content: space-between; }
+.griot-tree-open span { font-size: 16px; transition: transform .16s ease; }
+.griot-tree-open:hover span { transform: translateX(3px); }
+.griot-trees-empty { margin: 0; border: 1px dashed var(--griot-line); border-radius: 12px; padding: 22px; color: var(--griot-ink-soft); background: #fffbf3; font-size: 12px; text-align: center; }
+.griot-trees-loading { display: grid; min-height: 170px; place-items: center; }
+.griot-trees-loading > span { width: 34px; height: 34px; border: 3px solid var(--griot-line); border-top-color: var(--griot-terracotta); border-radius: 50%; animation: griot-tree-spin .75s linear infinite; }
+@keyframes griot-tree-spin { to { transform: rotate(360deg); } }
 .griot-first-tree { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 28px; margin-bottom: 36px; padding: 30px; border: 1px solid var(--griot-line); border-radius: 16px; background: linear-gradient(120deg, #fffbf3 0%, #f3e7d2 100%); }
 .griot-first-tree-intro { max-width: 590px; }
 .griot-first-tree-intro h2 { margin: 0; font: 700 clamp(25px, 3vw, 36px) var(--griot-serif); }
@@ -324,6 +359,15 @@ a { color: var(--griot-terracotta-deep); }
 
 @media (max-width: 720px) {
   .griot-sidebar { display: none; }
+  .griot-trees-page { min-height: calc(100vh - 58px); }
+  .griot-trees-content { padding: 26px 16px 34px; }
+  .griot-trees-header { align-items: stretch; flex-direction: column; gap: 16px; margin-bottom: 18px; }
+  .griot-new-tree-button { width: 100%; }
+  .griot-tree-form-card { padding: 18px 15px; }
+  .griot-tree-form { grid-template-columns: 1fr; gap: 15px; }
+  .griot-tree-form-actions { grid-column: 1; }
+  .griot-tree-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .griot-tree-card { padding: 15px; }
   .griot-module-empty { align-items: flex-start; flex-direction: column; padding: 20px 16px; }
   .griot-module-empty .griot-button { width: 100%; }
   .griot-first-tree { grid-template-columns: 1fr; gap: 20px; margin-bottom: 28px; padding: 21px 17px; }
@@ -379,6 +423,9 @@ a { color: var(--griot-terracotta-deep); }
 }
 
 @media (max-width: 420px) {
+  .griot-tree-grid { grid-template-columns: 1fr; }
+  .griot-tree-form-actions { justify-content: stretch; }
+  .griot-tree-form-actions .griot-button { flex: 1; }
   .griot-home-actions .griot-button-quiet { padding-inline: 6px; }
   .griot-hero-actions { flex-direction: column; align-items: stretch; max-width: 260px; }
   .griot-route-item { gap: 9px; padding: 11px; }
