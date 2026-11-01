@@ -393,38 +393,35 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="griot-tree-workspace">
       {/* Header */}
       <header className="griot-detail-header bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="griot-detail-header-inner">
+          <div className="griot-tree-detail-head-row">
             <button
               onClick={onBack}
-              className="text-gray-600 hover:text-gray-900 font-medium"
+              className="griot-tree-back-button"
             >
               ← Retour
             </button>
           </div>
-          <h1 className="text-3xl font-bold text-green-800">{tree.nom}</h1>
-          <p className="text-gray-600 mt-1">
+          <h1>{tree.nom}</h1>
+          <p className="griot-tree-detail-summary">
             {personnes.length} personne{personnes.length !== 1 ? 's' : ''} • {membres.length} membre{membres.length !== 1 ? 's' : ''}
           </p>
         </div>
       </header>
 
       {/* Tabs */}
-      <div className="griot-detail-tabs bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
+      <div className="griot-detail-tabs">
+        <div className="griot-detail-tabs-inner">
+          <div className="griot-detail-tab-list">
             {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`py-4 px-1 font-medium text-sm border-b-2 transition ${
-                  activeTab === tab
-                    ? 'border-green-600 text-green-600'
-                    : 'border-transparent text-gray-600 hover:text-gray-900'
-                }`}
+                className={`griot-detail-tab${activeTab === tab ? ' is-active' : ''}`}
+                aria-current={activeTab === tab ? 'page' : undefined}
               >
                 {tab === 'tableau' && '📊 Tableau de bord'}
                 {tab === 'genealogie' && '🌳 Généalogie'}
@@ -443,7 +440,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       </div>
 
       {/* Main Content */}
-      <main className="griot-detail-content max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="griot-detail-content">
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
@@ -995,17 +992,18 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
         {/* MEMBRES TAB */}
         {activeTab === 'membres' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
+          <section className="griot-members-section">
+            <div className="griot-members-heading">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Rôles & permissions</h2>
-                <p className="text-gray-600 mt-1">Les accès sont définis par arbre familial.</p>
+                <p className="griot-eyebrow">ÉQUIPE FAMILIALE</p>
+                <h2>Rôles & permissions</h2>
+                <p>Choisissez qui peut voir, proposer, modifier ou valider les informations de cet arbre.</p>
               </div>
               {peutGererMembres && <button
                 onClick={() => setShowAddMemberForm(!showAddMemberForm)}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+                className="griot-button griot-button-primary"
               >
-                {showAddMemberForm ? 'Annuler' : '+ Inviter un collaborateur'}
+                {showAddMemberForm ? 'Annuler' : '+ Inviter avec un rôle'}
               </button>}
             </div>
 
@@ -1017,60 +1015,59 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             </div>
 
             {showAddMemberForm && (
-              <div className="mb-8 bg-white rounded-lg shadow p-6">
-                <form onSubmit={handleAddMember} className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <section className="griot-members-form-card">
+                <form onSubmit={handleAddMember} className="griot-members-form">
+                  <label>
+                    <span>Email</span>
                     <input
                       type="email"
                       value={newMember.email}
                       onChange={(e) => setNewMember({ ...newMember, email: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                       required
                     />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+                  </label>
+                  <label>
+                    <span>Rôle</span>
                     <select
                       value={newMember.role}
                       onChange={(e) => setNewMember({ ...newMember, role: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                     >
                       <option value="lecteur">Lecteur (lecture seule)</option>
                       <option value="contributeur">Contributeur (ajouter/modifier)</option>
-                      <option value="editeur">Éditeur (full access)</option>
-                      <option value="admin">Admin (gestion équipe)</option>
+                      <option value="editeur">Éditeur (modifier le contenu)</option>
+                      <option value="admin">Administrateur (gérer l’équipe)</option>
                     </select>
-                  </div>
+                  </label>
                   <button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+                    className="griot-button griot-button-primary"
                   >
-                    Inviter
+                    Envoyer l’invitation
                   </button>
                 </form>
-              </div>
+              </section>
             )}
 
             {membres.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg">
-                <p className="text-gray-600">Aucun collaborateur</p>
+              <div className="griot-members-empty">
+                <h3>Votre équipe commence ici</h3>
+                <p>Invitez vos proches à contribuer à la mémoire familiale.</p>
               </div>
             ) : (
-              <div className="bg-white rounded-lg shadow overflow-hidden">
-                <table className="w-full">
-                  <thead className="bg-gray-50 border-b border-gray-200">
+              <div className="griot-members-table-wrap">
+                <table className="griot-members-table">
+                  <thead>
                     <tr>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-900">Email</th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-900">Rôle</th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-gray-900">Statut</th>
+                      <th>Email</th>
+                      <th>Rôle</th>
+                      <th>Statut</th>
                     </tr>
                   </thead>
                   <tbody>
                     {membres.map((member) => (
-                      <tr key={member.id} className="border-b border-gray-200 hover:bg-gray-50">
-                        <td className="px-6 py-3 text-sm text-gray-900">{member.utilisateur?.email}</td>
-                        <td className="px-6 py-3 text-sm text-gray-600">
+                      <tr key={member.id}>
+                        <td>{member.utilisateur?.email}</td>
+                        <td>
                           {peutGererMembres && member.utilisateurId !== user?.id ? (
                             <select
                               className="griot-role-select"
@@ -1085,13 +1082,9 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                             </select>
                           ) : member.role}
                         </td>
-                        <td className="px-6 py-3 text-sm">
+                        <td>
                           <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              member.statut === 'actif'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}
+                            className={`griot-member-status${member.statut === 'actif' ? ' is-active' : ' is-pending'}`}
                           >
                             {member.statut === 'actif' ? 'Actif' : 'En attente'}
                           </span>
@@ -1102,7 +1095,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 </table>
               </div>
             )}
-          </div>
+          </section>
         )}
         {activeTab === 'origines' && (
           <OriginsPanel
