@@ -1,7 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/client';
 
-export default function TreesPage({ onSelectTree }) {
+const panelGuidance = {
+  genealogie: {
+    eyebrow: 'ARBRE GÉNÉALOGIQUE',
+    title: 'Les liens de votre famille, réunis en un seul arbre',
+    description: 'Créez un arbre familial pour ajouter des personnes et relier les générations avec les informations transmises par vos proches.',
+  },
+  personnes: {
+    eyebrow: 'FICHES PERSONNES',
+    title: 'Chaque personne mérite son histoire',
+    description: 'Les biographies, les dates et les liens familiaux seront rassemblés dans les profils de votre arbre.',
+  },
+  membres: {
+    eyebrow: 'RÔLES & PERMISSIONS',
+    title: 'Transmettez cette mémoire à plusieurs',
+    description: 'Créez un arbre pour inviter vos proches et choisir leur rôle dans la construction de la mémoire familiale.',
+  },
+  origines: {
+    eyebrow: 'ORIGINES FAMILIALES',
+    title: 'Les lieux font partie de votre histoire',
+    description: 'Les origines et les parcours apparaîtront à mesure que vous ajouterez des lieux aux profils de votre arbre.',
+  },
+  souvenirs: {
+    eyebrow: 'MÉMOIRE FAMILIALE',
+    title: 'Préservez les récits et les souvenirs',
+    description: 'Les histoires, traditions et archives trouveront leur place dans l’espace mémoire de votre arbre.',
+  },
+  chefferie: {
+    eyebrow: 'TRANSMISSION & CONFIANCE',
+    title: 'Documentez la transmission en famille',
+    description: 'L’espace de gouvernance rassemble les preuves et les demandes de vérification associées à un arbre.',
+  },
+  assistant: {
+    eyebrow: 'ASSISTANT FAMILIAL',
+    title: 'Posez des questions sur votre mémoire familiale',
+    description: 'GRIOT pourra vous aider à explorer les informations que votre famille aura enregistrées dans un arbre.',
+  },
+};
+
+const setupSteps = [
+  { number: '01', title: 'Créez votre arbre', description: 'Donnez un nom à votre espace familial.' },
+  { number: '02', title: 'Ajoutez vos proches', description: 'Construisez les profils et les liens à votre rythme.' },
+  { number: '03', title: 'Transmettez vos récits', description: 'Rassemblez souvenirs, lieux et archives.' },
+];
+
+export default function TreesPage({ activePanel = 'tableau', onSelectTree }) {
   const [trees, setTrees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -9,6 +53,7 @@ export default function TreesPage({ onSelectTree }) {
   const [newTreeVisibility, setNewTreeVisibility] = useState('prive');
   const [creatingTree, setCreatingTree] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const guidance = panelGuidance[activePanel];
 
   useEffect(() => {
     loadTrees();
@@ -47,11 +92,43 @@ export default function TreesPage({ onSelectTree }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+        {guidance ? (
+          <section className="griot-select-tree griot-module-empty">
+            <div>
+              <p className="griot-eyebrow">{guidance.eyebrow}</p>
+              <h2>{guidance.title}</h2>
+              <p>{guidance.description}</p>
+            </div>
+            <button className="griot-button griot-button-primary" onClick={() => setShowCreateForm(true)}>
+              Créer un arbre
+            </button>
+          </section>
+        ) : !loading && trees.length === 0 ? (
+          <section className="griot-first-tree">
+            <div className="griot-first-tree-intro">
+              <p className="griot-eyebrow">VOTRE ESPACE FAMILIAL</p>
+              <h2>Votre histoire familiale commence ici.</h2>
+              <p>Créez votre arbre pour réunir les personnes, les récits et les origines qui comptent pour votre famille.</p>
+              <button className="griot-button griot-button-primary" onClick={() => setShowCreateForm(true)}>
+                Créer mon premier arbre
+              </button>
+            </div>
+            <div className="griot-first-tree-steps" aria-label="Les étapes pour commencer">
+              {setupSteps.map((step) => (
+                <article key={step.number}>
+                  <span>{step.number}</span>
+                  <div><h3>{step.title}</h3><p>{step.description}</p></div>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5 mb-8">
           <div>
             <p className="griot-eyebrow">ESPACE FAMILIAL</p>
-            <h1 className="text-3xl font-bold text-gray-900">Vos arbres généalogiques</h1>
-            <p className="mt-2 text-sm text-gray-600">Choisissez un arbre pour consulter ses personnes, ses récits et ses origines.</p>
+            <h1 className="text-3xl font-bold text-gray-900">{guidance ? 'Choisissez un arbre' : 'Vos arbres généalogiques'}</h1>
+            <p className="mt-2 text-sm text-gray-600">{guidance ? 'Ouvrez un espace familial existant pour consulter cette page.' : 'Choisissez un arbre pour consulter ses personnes, ses récits et ses origines.'}</p>
           </div>
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}

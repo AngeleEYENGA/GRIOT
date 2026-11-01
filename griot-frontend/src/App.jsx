@@ -7,6 +7,7 @@ import TreesPage from './pages/TreesPage';
 import TreeDetailPage from './pages/TreeDetailPage';
 import HomePage from './pages/HomePage';
 import AppShell from './components/AppShell';
+import { StylePanel } from './components/TreeExtraScreens';
 import './index.css';
 
 function AppContent() {
@@ -81,20 +82,16 @@ function AppContent() {
           }}
         />
       ) : (
-        <>
-          {activePanel !== 'tableau' && (
-            <section className="griot-select-tree">
-              <p className="griot-eyebrow">ESPACE FAMILIAL</p>
-              <h2>Choisissez un arbre pour continuer</h2>
-              <p>Les personnes, souvenirs, origines et droits sont liés à un arbre familial.</p>
-            </section>
-          )}
+        activePanel === 'style' ? (
+          <StylePanel />
+        ) : (
           <TreesPage
+            activePanel={activePanel}
             onSelectTree={(treeId) => {
               setSelectedTreeId(treeId);
             }}
           />
-        </>
+        )
       )}
     </AppShell>
   );
