@@ -28,7 +28,7 @@ Ne jamais placer `JWT_SECRET`, un secret OAuth Google ou un mot de passe de base
 
 Dans Google Cloud Console, créer un client OAuth de type **Application Web**. Ajouter le domaine de production du frontend dans les origines JavaScript autorisées (et `http://localhost:5173` en développement). Copier l’identifiant client dans les deux projets Vercel. Cette intégration utilise le jeton d’identification Google envoyé à l’API ; l’API en vérifie la signature, l’audience et l’email confirmé avant d’émettre son propre JWT.
 
-La clé privée Google n’est pas nécessaire dans ce flux. Ne jamais publier de secrets OAuth. Vérifier également l’écran de consentement et les utilisateurs de test avant d’ouvrir l’application au public.
+Le client Web GRIOT a été créé dans le projet Google Cloud `navigue-512922`. Son ID public est dans les fichiers `.env.example`. La clé privée Google n’est pas nécessaire dans ce flux. Ne jamais publier de secrets OAuth. L’origine locale `http://localhost:5173` est déjà autorisée ; ajouter le domaine réel du frontend à l’ID client après sa création dans Vercel. Vérifier également l’écran de consentement et les utilisateurs de test avant d’ouvrir l’application au public.
 
 ## Base de données et migrations
 
