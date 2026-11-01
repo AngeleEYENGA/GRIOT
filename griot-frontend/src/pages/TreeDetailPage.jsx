@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
+import FamilyTreeView from '../components/FamilyTreeView';
 
 export default function TreeDetailPage({ treeId, onBack }) {
   const { user } = useAuth();
@@ -285,7 +286,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
-            {['tableau', 'personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
+            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -296,6 +297,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
                 }`}
               >
                 {tab === 'tableau' && '📊 Tableau de bord'}
+                {tab === 'genealogie' && '🌳 Généalogie'}
                 {tab === 'personnes' && '👤 Personnes'}
                 {tab === 'relations' && '🤝 Relations'}
                 {tab === 'souvenirs' && '📜 Souvenirs'}
@@ -395,6 +397,14 @@ export default function TreeDetailPage({ treeId, onBack }) {
               </>
             )}
           </section>
+        )}
+
+        {activeTab === 'genealogie' && (
+          <FamilyTreeView
+            personnes={personnes}
+            relations={relations}
+            onOpenProfile={openPersonProfile}
+          />
         )}
 
         {/* PERSONNES TAB */}
@@ -554,8 +564,8 @@ export default function TreeDetailPage({ treeId, onBack }) {
                     onChange={(e) => setNewRelation({ ...newRelation, typeRelation: e.target.value })}
                     className="rounded border border-gray-300 px-3 py-2"
                   >
-                    <option value="parent">Parent</option>
-                    <option value="enfant">Enfant</option>
+                    <option value="parent">Parent (personne 1 → personne 2)</option>
+                    <option value="enfant">Enfant (personne 1 → personne 2)</option>
                     <option value="conjoint">Conjoint</option>
                   </select>
                   <select
@@ -574,6 +584,11 @@ export default function TreeDetailPage({ treeId, onBack }) {
                 </form>
               )}
             </div>
+            {peutGererArbre && (
+              <p className="text-sm text-gray-500 mb-4">
+                Pour « Parent », la première personne est le parent de la seconde ; « Enfant » inverse ce sens.
+              </p>
+            )}
             {relations.length === 0 ? (
               <div className="text-center py-12 bg-white rounded-lg">
                 <p className="text-gray-600">Aucune relation définie</p>
