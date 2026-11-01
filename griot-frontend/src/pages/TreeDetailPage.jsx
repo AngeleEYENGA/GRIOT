@@ -33,6 +33,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
   const [showAddSouvenirForm, setShowAddSouvenirForm] = useState(false);
   const [selectedPerson, setSelectedPerson] = useState(null);
+  const [personProfileTab, setPersonProfileTab] = useState('bio');
   const [personDraft, setPersonDraft] = useState(null);
   const [editingPerson, setEditingPerson] = useState(false);
   const [savingPerson, setSavingPerson] = useState(false);
@@ -65,6 +66,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
     contenu: '',
     personneId: '',
   });
+  const [souvenirView, setSouvenirView] = useState('histoires');
+  const [dashboardSearch, setDashboardSearch] = useState('');
 
   const loadTreeData = useCallback(async () => {
     try {
@@ -149,6 +152,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
   const openPersonProfile = (person) => {
     setSelectedPerson(person);
+    setPersonProfileTab('bio');
     setPersonDraft({
       nom: person.nom || '',
       prenom: person.prenom || '',
@@ -277,6 +281,43 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   const peutGererArbre = ['admin', 'editeur'].includes(roleCourant);
   const peutGererMembres = roleCourant === 'admin';
   const selectedPersonId = selectedPerson?.id;
+  const recentSouvenirs = [...souvenirs]
+    .sort((first, second) => new Date(second.dateCreation || 0) - new Date(first.dateCreation || 0))
+    .slice(0, 4);
+  const displayedSouvenirs = (souvenirView === 'traditions'
+    ? souvenirs.filter((souvenir) => souvenir.categorie !== 'histoire')
+    : [...souvenirs])
+    .sort((first, second) => souvenirView === 'frise'
+      ? new Date(first.dateCreation || 0) - new Date(second.dateCreation || 0)
+      : new Date(second.dateCreation || 0) - new Date(first.dateCreation || 0));
+  const searchResults = dashboardSearch.trim()
+    ? personnes.filter((person) => `${person.prenom} ${person.nom} ${person.villageOrigine || ''}`
+      .toLocaleLowerCase('fr')
+      .includes(dashboardSearch.trim().toLocaleLowerCase('fr')))
+    : [];
+  const firstOrigin = migrations[0];
+  const originLabel = firstOrigin
+    ? `${firstOrigin.lieu.nom}${firstOrigin.lieu.pays ? `, ${firstOrigin.lieu.pays}` : ''}`
+    : personnes.find((person) => person.villageOrigine)?.villageOrigine;
+
+  const openAddPerson = () => {
+    setActiveTab('personnes');
+    setShowAddPersonForm(true);
+  };
+
+  const openAddSouvenir = () => {
+    setActiveTab('souvenirs');
+    setShowAddSouvenirForm(true);
+  };
+
+  const openAddMedia = () => {
+    if (personnes[0]) {
+      setActiveTab('personnes');
+      openPersonProfile(personnes[0]);
+    } else {
+      openAddPerson();
+    }
+  };
 
   useEffect(() => {
     if (!selectedPersonId) {
@@ -354,7 +395,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="griot-detail-header bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-4">
             <button
@@ -372,7 +413,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <div className="griot-detail-tabs bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
             {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
@@ -402,7 +443,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <main className="griot-detail-content max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
@@ -410,83 +451,129 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         )}
 
         {activeTab === 'tableau' && (
-          <section aria-labelledby="dashboard-title">
-            <div className="flex flex-wrap justify-between items-end gap-3 mb-6">
-              <div>
-                <h2 id="dashboard-title" className="text-2xl font-bold text-gray-900">Votre arbre prend vie</h2>
-                <p className="text-gray-600 mt-1">Une progression calculée à partir des informations déjà partagées.</p>
+          <section className="griot-dashboard" aria-labelledby="dashboard-title">
+            <label className="griot-dashboard-search">
+              <span className="sr-only">Rechercher dans cet arbre</span>
+              <span aria-hidden="true">⌕</span>
+              <input
+                type="search"
+                value={dashboardSearch}
+                onChange={(event) => setDashboardSearch(event.target.value)}
+                placeholder="Rechercher une personne ou un village…"
+              />
+            </label>
+            {searchResults.length > 0 && (
+              <div className="griot-dashboard-search-results" role="list">
+                {searchResults.slice(0, 5).map((person) => (
+                  <button key={person.id} onClick={() => openPersonProfile(person)} role="listitem">
+                    <span className="griot-dashboard-avatar">{person.prenom?.[0]}{person.nom?.[0]}</span>
+                    <span>{person.prenom} {person.nom}</span>
+                    <small>{person.villageOrigine || 'Ouvrir la fiche'}</small>
+                  </button>
+                ))}
               </div>
-            </div>
-            {dashboardLoading && <p className="text-gray-600">Mise à jour de la progression...</p>}
+            )}
+
+            <header className="griot-dashboard-welcome">
+              <div>
+                <p className="griot-eyebrow">VOTRE HISTOIRE CONTINUE</p>
+                <h2 id="dashboard-title">Bienvenue chez vous, {user?.prenom || ''}</h2>
+                <p>Chaque personne, chaque récit rapproche votre famille de ses racines.</p>
+              </div>
+              <span className="griot-dashboard-welcome-mark" aria-hidden="true">✦</span>
+            </header>
+
+            {dashboardLoading && <p className="griot-muted">Mise à jour de votre espace…</p>}
             {dashboard && (
               <>
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
-                  {[
-                    ['Personnes', dashboard.statistiques.personnes],
-                    ['Liens familiaux', dashboard.statistiques.relations],
-                    ['Souvenirs', dashboard.statistiques.souvenirs],
-                    ['Collaborateurs', dashboard.statistiques.membres],
-                    ['Progression', `${dashboard.completude.pourcentage}%`],
-                  ].map(([label, value]) => (
-                    <article key={label} className="bg-white rounded-lg shadow p-5">
-                      <p className="text-sm text-gray-600">{label}</p>
-                      <p className="text-2xl font-bold text-green-800 mt-2">{value}</p>
-                    </article>
-                  ))}
-                </div>
+                <div className="griot-dashboard-layout">
+                  <div className="griot-dashboard-primary">
+                    <button className="griot-tree-summary" onClick={() => setActiveTab('genealogie')}>
+                      <span className="griot-tree-summary-motif" aria-hidden="true">✦</span>
+                      <span className="griot-tree-summary-eyebrow">VOTRE ARBRE</span>
+                      <strong>{tree.nom}</strong>
+                      <span>{dashboard.statistiques.personnes} personne{dashboard.statistiques.personnes === 1 ? '' : 's'} · {dashboard.statistiques.relations} lien{dashboard.statistiques.relations === 1 ? '' : 's'} familial{dashboard.statistiques.relations === 1 ? '' : 'aux'}</span>
+                      <span className="griot-tree-summary-link">Voir la généalogie <span aria-hidden="true">→</span></span>
+                    </button>
 
-                <div className="bg-white rounded-lg shadow p-6 mb-6">
-                  <div className="flex justify-between gap-4 mb-3">
-                    <h3 className="text-lg font-semibold text-gray-900">Complétude de l’arbre</h3>
-                    <span className="text-sm text-gray-600">
-                      {dashboard.completude.missionsTerminees}/{dashboard.completude.totalMissions} missions
-                    </span>
-                  </div>
-                  <div
-                    className="h-3 bg-gray-100 rounded-full overflow-hidden"
-                    role="progressbar"
-                    aria-label="Complétude de l’arbre"
-                    aria-valuemin={0}
-                    aria-valuemax={100}
-                    aria-valuenow={dashboard.completude.pourcentage}
-                  >
-                    <div
-                      className="h-full bg-green-600 rounded-full transition-all"
-                      style={{ width: `${dashboard.completude.pourcentage}%` }}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  {dashboard.missions.map((mission) => (
-                    <article key={mission.id} className="bg-white rounded-lg shadow p-6">
-                      <div className="flex justify-between items-start gap-4">
+                    <section className="griot-dashboard-missions">
+                      <div className="griot-dashboard-section-heading">
                         <div>
-                          <h3 className="font-semibold text-gray-900">{mission.libelle}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{mission.description}</p>
+                          <p className="griot-eyebrow">VOTRE PROGRESSION</p>
+                          <h3>Complétez votre histoire</h3>
                         </div>
-                        <span className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
-                          mission.terminee
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-amber-100 text-amber-800'
-                        }`}>
-                          {mission.terminee ? 'Terminée' : 'À faire'}
-                        </span>
+                        <span>{dashboard.completude.pourcentage}%</span>
                       </div>
-                      <div className="flex justify-between items-center mt-5">
-                        <span className="text-sm text-gray-500">
-                          {mission.progression}/{mission.objectif}
-                        </span>
-                        <button
-                          onClick={() => setActiveTab(mission.onglet)}
-                          className="text-sm font-medium text-green-700 hover:text-green-900"
-                        >
-                          {mission.terminee ? 'Consulter' : 'Continuer'}
-                        </button>
+                      <div className="griot-dashboard-progress" role="progressbar" aria-label="Complétude de l’arbre" aria-valuemin={0} aria-valuemax={100} aria-valuenow={dashboard.completude.pourcentage}>
+                        <span style={{ width: `${dashboard.completude.pourcentage}%` }} />
                       </div>
-                    </article>
-                  ))}
+                      <p className="griot-dashboard-progress-caption">{dashboard.completude.missionsTerminees} mission{dashboard.completude.missionsTerminees === 1 ? '' : 's'} terminée{dashboard.completude.missionsTerminees === 1 ? '' : 's'} sur {dashboard.completude.totalMissions}</p>
+                      <div className="griot-dashboard-mission-list">
+                        {dashboard.missions.map((mission) => (
+                          <article key={mission.id}>
+                            <span className={`griot-mission-mark${mission.terminee ? ' is-done' : ''}`} aria-hidden="true">{mission.terminee ? '✓' : '○'}</span>
+                            <div><h4>{mission.libelle}</h4><p>{mission.description}</p></div>
+                            <button onClick={() => {
+                              setActiveTab(mission.onglet);
+                              if (mission.onglet === 'personnes' && mission.id === 'ajouter-personnes') setShowAddPersonForm(true);
+                              if (mission.onglet === 'souvenirs') setShowAddSouvenirForm(true);
+                            }}>{mission.terminee ? 'Voir' : 'Continuer'}</button>
+                          </article>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+
+                  <aside className="griot-dashboard-aside">
+                    <section className="griot-dashboard-stat-grid" aria-label="Résumé familial">
+                      <article><span>ORIGINES</span><strong>{originLabel || 'À renseigner'}</strong><small>{migrations.length} lieu{migrations.length === 1 ? '' : 'x'} documenté{migrations.length === 1 ? '' : 's'}</small></article>
+                      <article><span>COLLABORATION</span><strong>{dashboard.statistiques.membres} membre{dashboard.statistiques.membres === 1 ? '' : 's'}</strong><small>{membres.filter((member) => member.statut !== 'actif').length} invitation{membres.filter((member) => member.statut !== 'actif').length === 1 ? '' : 's'} en attente</small></article>
+                      <article><span>MÉMOIRE</span><strong>{dashboard.statistiques.souvenirs} récit{dashboard.statistiques.souvenirs === 1 ? '' : 's'}</strong><small>{dashboard.statistiques.personnes} profil{dashboard.statistiques.personnes === 1 ? '' : 's'} à transmettre</small></article>
+                    </section>
+
+                    <section className="griot-dashboard-quick-actions">
+                      <div className="griot-dashboard-section-heading"><h3>Faire grandir l’arbre</h3></div>
+                      <div>
+                        {peutAjouterPersonne && <button onClick={openAddPerson}><span aria-hidden="true">＋</span>Ajouter une personne</button>}
+                        {peutAjouterPersonne && <button onClick={openAddSouvenir}><span aria-hidden="true">❝</span>Raconter une histoire</button>}
+                        {peutAjouterPersonne && <button onClick={openAddMedia}><span aria-hidden="true">▧</span>Ajouter un document</button>}
+                        {peutGererMembres && <button onClick={() => setActiveTab('membres')}><span aria-hidden="true">♧</span>Gérer les rôles</button>}
+                      </div>
+                    </section>
+
+                    <section className="griot-dashboard-collaborators">
+                      <div className="griot-dashboard-section-heading">
+                        <div><p className="griot-eyebrow">ESPACE PARTAGÉ</p><h3>Collaborateurs</h3></div>
+                        {peutGererMembres && <button onClick={() => { setActiveTab('membres'); setShowAddMemberForm(true); }}>+ Inviter</button>}
+                      </div>
+                      {membres.length === 0 ? <p className="griot-muted">Aucun membre dans cet arbre.</p> : membres.slice(0, 4).map((member) => (
+                        <div className="griot-collaborator-row" key={member.id}>
+                          <span className="griot-dashboard-avatar">{member.utilisateur?.prenom?.[0] || member.utilisateur?.email?.[0] || '?'}</span>
+                          <span><strong>{member.utilisateur?.prenom} {member.utilisateur?.nom || member.utilisateur?.email}</strong><small>{member.role}</small></span>
+                          <small className={member.statut === 'actif' ? 'is-active' : 'is-pending'}>{member.statut === 'actif' ? 'Actif' : 'En attente'}</small>
+                        </div>
+                      ))}
+                      <button className="griot-dashboard-text-link" onClick={() => setActiveTab('membres')}>Voir tous les rôles →</button>
+                    </section>
+                  </aside>
                 </div>
+
+                <section className="griot-dashboard-recent">
+                  <div className="griot-dashboard-section-heading">
+                    <div><p className="griot-eyebrow">TRANSMISSION</p><h3>Souvenirs récemment partagés</h3></div>
+                    <button onClick={() => setActiveTab('souvenirs')}>Toute la mémoire →</button>
+                  </div>
+                  {recentSouvenirs.length === 0 ? (
+                    <div className="griot-dashboard-empty"><p>Les récits de votre famille trouveront leur place ici.</p><button onClick={openAddSouvenir}>Raconter le premier souvenir</button></div>
+                  ) : (
+                    <div className="griot-dashboard-memory-list">{recentSouvenirs.map((souvenir) => (
+                      <article key={souvenir.id}>
+                        <span aria-hidden="true">❝</span>
+                        <div><small>{souvenir.categorie}{souvenir.dateCreation ? ` · ${new Date(souvenir.dateCreation).toLocaleDateString('fr-FR')}` : ''}</small><h4>{souvenir.titre}</h4><p>{souvenir.contenu || 'Un souvenir conservé dans la mémoire familiale.'}</p></div>
+                      </article>
+                    ))}</div>
+                  )}
+                </section>
               </>
             )}
           </section>
@@ -503,8 +590,12 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         {/* PERSONNES TAB */}
         {activeTab === 'personnes' && (
           <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900">Personnes</h2>
+            <div className="griot-list-heading">
+              <div>
+                <p className="griot-eyebrow">VISAGES & GÉNÉRATIONS</p>
+                <h2 className="text-2xl font-bold text-gray-900">Fiches de famille</h2>
+                <p>{personnes.length} personne{personnes.length === 1 ? '' : 's'} dans cet arbre</p>
+              </div>
               {peutAjouterPersonne && <button
                 onClick={() => setShowAddPersonForm(!showAddPersonForm)}
                 className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
@@ -595,39 +686,38 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             )}
 
             {personnes.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg">
-                <p className="text-gray-600">Aucune personne ajoutée</p>
+              <div className="griot-memory-empty">
+                <span aria-hidden="true">♧</span>
+                <h3>La première branche commence ici</h3>
+                <p>Ajoutez une personne pour commencer à relier les générations et transmettre son histoire.</p>
+                {peutAjouterPersonne && <button className="griot-button griot-button-primary" onClick={openAddPerson}>Ajouter une personne</button>}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="griot-person-grid">
                 {personnes.map((person) => (
-                  <div key={person.id} className="bg-white rounded-lg shadow p-6">
-                    <h3 className="font-bold text-lg text-gray-900">
-                      {person.prenom} {person.nom}
-                    </h3>
-                    {person.dateNaissance && (
-                      <p className="text-sm text-gray-600 mt-1">
-                        Né(e) le {new Date(person.dateNaissance).toLocaleDateString('fr-FR')}
-                      </p>
-                    )}
-                    {person.biographie && (
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">{person.biographie}</p>
-                    )}
-                    <div className="mt-4 flex gap-2">
+                  <article key={person.id} className="griot-person-card">
+                    <span className="griot-person-avatar">{person.prenom?.[0]}{person.nom?.[0]}</span>
+                    <div className="griot-person-card-copy">
+                      <h3>{person.prenom} {person.nom}</h3>
+                      <p>{person.villageOrigine || 'Origine à renseigner'}</p>
+                      <small>{person.dateNaissance ? new Date(person.dateNaissance).getFullYear() : 'Date inconnue'}{person.dateDeces ? ` – ${new Date(person.dateDeces).getFullYear()}` : ''}</small>
+                      {person.biographie && <p className="griot-person-bio">{person.biographie}</p>}
+                    </div>
+                    <div className="griot-person-card-actions">
                       <button
                         onClick={() => openPersonProfile(person)}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm"
                       >
-                        Détails
+                        Ouvrir la fiche →
                       </button>
                       {peutGererArbre && <button
                         onClick={() => handleDeletePerson(person.id)}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded text-sm"
+                        aria-label={`Supprimer ${person.prenom} ${person.nom}`}
+                        className="griot-person-delete"
                       >
-                        ✕
+                        Supprimer
                       </button>}
                     </div>
-                  </div>
+                  </article>
                 ))}
               </div>
             )}
@@ -716,20 +806,41 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         )}
 
         {activeTab === 'souvenirs' && (
-          <section>
-            <div className="flex justify-between items-center mb-6">
+          <section className="griot-memory-page">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
               <div>
+                <p className="griot-eyebrow">TRANSMISSION FAMILIALE</p>
                 <h2 className="text-2xl font-bold text-gray-900">Mémoire familiale</h2>
                 <p className="text-sm text-gray-600 mt-1">Histoires et traditions transmises dans la famille.</p>
               </div>
               {peutAjouterPersonne && (
                 <button
                   onClick={() => setShowAddSouvenirForm(!showAddSouvenirForm)}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
                 >
                   {showAddSouvenirForm ? 'Annuler' : '+ Raconter un souvenir'}
                 </button>
               )}
+            </div>
+
+            <div className="griot-memory-tabs" role="tablist" aria-label="Vue de la mémoire familiale">
+              {[
+                ['histoires', 'Histoires'],
+                ['traditions', 'Traditions'],
+                ['frise', 'Frise chronologique'],
+              ].map(([view, label]) => (
+                <button
+                  key={view}
+                  type="button"
+                  role="tab"
+                  aria-selected={souvenirView === view}
+                  className={souvenirView === view ? 'is-active' : ''}
+                  onClick={() => setSouvenirView(view)}
+                >
+                  {label}
+                  {view !== 'frise' && <span>{view === 'traditions' ? souvenirs.filter((souvenir) => souvenir.categorie !== 'histoire').length : souvenirs.length}</span>}
+                </button>
+              ))}
             </div>
 
             {showAddSouvenirForm && (
@@ -810,23 +921,42 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
               </form>
             )}
 
-            {souvenirs.length === 0 ? (
-              <div className="text-center py-12 bg-white rounded-lg">
-                <p className="text-gray-600">Aucun souvenir partagé pour le moment.</p>
+            {displayedSouvenirs.length === 0 ? (
+              <div className="griot-memory-empty">
+                <span aria-hidden="true">❝</span>
+                <h3>{souvenirView === 'traditions' ? 'Aucune tradition enregistrée' : 'La mémoire familiale commence ici'}</h3>
+                <p>{souvenirView === 'traditions' ? 'Les recettes, chants, proverbes et coutumes ajoutés apparaîtront dans cette vue.' : 'Conservez une histoire, une recette ou un moment important pour les générations suivantes.'}</p>
                 {peutAjouterPersonne && (
-                  <p className="text-sm text-gray-500 mt-2">Ajoutez une histoire, une recette ou une tradition pour commencer.</p>
+                  <button className="griot-button griot-button-primary" onClick={openAddSouvenir}>Ajouter un souvenir</button>
                 )}
               </div>
+            ) : souvenirView === 'frise' ? (
+              <div className="griot-memory-timeline">
+                {displayedSouvenirs.map((souvenir) => (
+                  <article key={souvenir.id}>
+                    <span className="griot-memory-timeline-dot" aria-hidden="true" />
+                    <div className="griot-memory-timeline-date">
+                      {souvenir.dateCreation ? new Date(souvenir.dateCreation).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Date non renseignée'}
+                    </div>
+                    <div className="griot-memory-timeline-card">
+                      <span className="griot-memory-category">{souvenir.categorie}</span>
+                      <h3>{souvenir.titre}</h3>
+                      <p>{souvenir.contenu || 'Aucun récit détaillé pour le moment.'}</p>
+                      <small>{souvenir.personne ? `${souvenir.personne.prenom} ${souvenir.personne.nom}` : 'Mémoire familiale'}</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {souvenirs.map((souvenir) => (
-                  <article key={souvenir.id} className="bg-white rounded-lg shadow p-6">
+              <div className="griot-memory-grid">
+                {displayedSouvenirs.map((souvenir) => (
+                  <article key={souvenir.id} className="griot-memory-card">
                     <div className="flex justify-between items-start gap-4">
                       <div>
-                        <span className="inline-block px-3 py-1 bg-amber-50 text-amber-800 rounded-full text-xs font-medium capitalize">
+                        <span className="griot-memory-category">
                           {souvenir.categorie}
                         </span>
-                        <h3 className="text-lg font-bold text-gray-900 mt-3">{souvenir.titre}</h3>
+                        <h3>{souvenir.titre}</h3>
                       </div>
                       {peutGererArbre && (
                         <button
@@ -839,16 +969,16 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       )}
                     </div>
                     {souvenir.contenu && (
-                      <p className="mt-3 text-gray-700 whitespace-pre-wrap">{souvenir.contenu}</p>
+                      <p className="griot-memory-content">{souvenir.contenu}</p>
                     )}
-                    <div className="mt-5 pt-4 border-t border-gray-100 flex flex-wrap justify-between gap-2 text-xs text-gray-500">
+                    <div className="griot-memory-meta">
                       <span>
                         {souvenir.personne
                           ? `${souvenir.personne.prenom} ${souvenir.personne.nom}`
                           : 'Mémoire familiale'}
                         {souvenir.auteur && ` · partagé par ${souvenir.auteur.prenom} ${souvenir.auteur.nom}`}
                       </span>
-                      <span>
+                      <span className={`griot-memory-verification ${souvenir.statutVerification === 'verifie_famille' ? 'is-family' : souvenir.statutVerification === 'verifie_chefferie' ? 'is-institution' : ''}`}>
                         {souvenir.statutVerification === 'verifie_famille'
                           ? 'Vérifié par la famille'
                           : souvenir.statutVerification === 'verifie_chefferie'
@@ -1002,19 +1132,24 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             role="dialog"
             aria-modal="true"
             aria-labelledby="person-profile-title"
-            className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="griot-profile-dialog bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
           >
-            <header className="flex justify-between items-start gap-4 p-6 border-b border-gray-200">
-              <div>
-                <p className="text-sm text-green-700 font-medium">Profil familial</p>
-                <h2 id="person-profile-title" className="text-2xl font-bold text-gray-900 mt-1">
-                  {selectedPerson.prenom} {selectedPerson.nom}
-                </h2>
+            <header className="griot-profile-header">
+              <div className="griot-profile-cover" aria-hidden="true" />
+              <div className="griot-profile-heading">
+                <span className="griot-profile-avatar">{selectedPerson.prenom?.[0]}{selectedPerson.nom?.[0]}</span>
+                <div>
+                  <p>PROFIL FAMILIAL</p>
+                  <h2 id="person-profile-title">
+                    {selectedPerson.prenom} {selectedPerson.nom}
+                  </h2>
+                  <span>{selectedPerson.dateNaissance ? new Date(selectedPerson.dateNaissance).getFullYear() : 'Date inconnue'}{selectedPerson.dateDeces ? ` – ${new Date(selectedPerson.dateDeces).getFullYear()}` : ''}{selectedPerson.villageOrigine ? ` · ${selectedPerson.villageOrigine}` : ''}</span>
+                </div>
               </div>
               <button
                 onClick={() => setSelectedPerson(null)}
                 aria-label="Fermer le profil"
-                className="text-gray-500 hover:text-gray-900 text-2xl leading-none"
+                className="griot-profile-close"
               >
                 ×
               </button>
@@ -1024,6 +1159,29 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
               <p role="alert" className="mx-6 mt-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                 {personError}
               </p>
+            )}
+
+            {!editingPerson && (
+              <nav className="griot-profile-tabs" role="tablist" aria-label="Rubriques du profil">
+                {[
+                  ['bio', 'Biographie'],
+                  ['medias', 'Médias'],
+                  ['liens', 'Liens'],
+                  ['souvenirs', 'Souvenirs'],
+                  ['chronologie', 'Frise'],
+                ].map(([tab, label]) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    role="tab"
+                    aria-selected={personProfileTab === tab}
+                    className={personProfileTab === tab ? 'is-active' : ''}
+                    onClick={() => setPersonProfileTab(tab)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </nav>
             )}
 
             {editingPerson ? (
@@ -1101,8 +1259,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 </div>
               </form>
             ) : (
-              <div className="p-6 space-y-6">
-                <section>
+              <div className="griot-profile-content">
+                {personProfileTab === 'medias' && <section className="griot-profile-section">
                   <div className="flex items-center justify-between gap-4">
                     <h3 className="font-semibold text-gray-900">Médias privés</h3>
                     {peutAjouterPersonne && (
@@ -1148,8 +1306,9 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   <p className="mt-2 text-xs text-gray-500">
                     Images, audio, vidéo ou PDF · 4 Mio maximum par fichier. Les médias sont visibles uniquement par les membres de l’arbre.
                   </p>
-                </section>
-                <dl className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                </section>}
+                {personProfileTab === 'bio' && <>
+                <dl className="griot-profile-facts">
                   <div>
                     <dt className="text-sm text-gray-500">Naissance</dt>
                     <dd className="font-medium text-gray-900">
@@ -1187,7 +1346,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                     {selectedPerson.biographie || 'Aucune biographie enregistrée.'}
                   </p>
                 </section>
-                <section>
+                </>}
+                {personProfileTab === 'liens' && <section className="griot-profile-section">
                   <h3 className="font-semibold text-gray-900">Liens familiaux</h3>
                   <ul className="mt-2 space-y-2">
                     {relations
@@ -1217,8 +1377,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       || relation.personneId2 === selectedPerson.id
                     )) && <li className="text-sm text-gray-500">Aucun lien familial enregistré.</li>}
                   </ul>
-                </section>
-                <section>
+                </section>}
+                {personProfileTab === 'souvenirs' && <section className="griot-profile-section">
                   <h3 className="font-semibold text-gray-900">Souvenirs associés</h3>
                   <ul className="mt-2 space-y-2">
                     {souvenirs
@@ -1237,9 +1397,34 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       || souvenir.personne?.id === selectedPerson.id
                     )) && <li className="text-sm text-gray-500">Aucun souvenir associé.</li>}
                   </ul>
-                </section>
+                </section>}
+                {personProfileTab === 'chronologie' && (
+                  <section className="griot-profile-section">
+                    <h3 className="font-semibold text-gray-900">Repères biographiques</h3>
+                    <div className="griot-profile-timeline">
+                      {[
+                        selectedPerson.dateNaissance && {
+                          label: 'Naissance',
+                          date: selectedPerson.dateNaissance,
+                          place: selectedPerson.villageOrigine,
+                        },
+                        selectedPerson.dateDeces && {
+                          label: 'Décès',
+                          date: selectedPerson.dateDeces,
+                          place: '',
+                        },
+                      ].filter(Boolean).map((event) => (
+                        <article key={event.label}>
+                          <span aria-hidden="true" />
+                          <div><strong>{new Date(event.date).toLocaleDateString('fr-FR')}</strong><p>{event.label}{event.place ? ` · ${event.place}` : ''}</p></div>
+                        </article>
+                      ))}
+                      {!selectedPerson.dateNaissance && !selectedPerson.dateDeces && <p className="griot-muted">Aucune date biographique n’a été renseignée.</p>}
+                    </div>
+                  </section>
+                )}
                 {peutGererArbre && (
-                  <div className="flex justify-end">
+                  <div className="griot-profile-edit">
                     <button
                       onClick={() => setEditingPerson(true)}
                       className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 rounded-lg"
