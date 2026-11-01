@@ -12,6 +12,7 @@ import InstitutionSpacePage from './pages/InstitutionSpacePage';
 import AccountPage from './pages/AccountPage';
 import NavigationGuide from './pages/NavigationGuide';
 import WelcomeGuide from './components/WelcomeGuide';
+import CompanyPages from './pages/CompanyPages';
 import './index.css';
 
 function AppContent() {
@@ -19,6 +20,16 @@ function AppContent() {
   const [authMode, setAuthMode] = useState('home');
   const [selectedTreeId, setSelectedTreeId] = useState(null);
   const [activePanel, setActivePanel] = useState('tableau');
+  const [publicPage, setPublicPage] = useState(() => window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null);
+
+  useEffect(() => {
+    const syncPage = () => {
+      setPublicPage(window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null);
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+    window.addEventListener('hashchange', syncPage);
+    return () => window.removeEventListener('hashchange', syncPage);
+  }, []);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -33,6 +44,10 @@ function AppContent() {
     setAuthMode('home');
     logout();
   };
+
+  if (publicPage) {
+    return <CompanyPages page={publicPage} loggedIn={Boolean(user)} onLogin={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('login'); }} onRegister={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('register'); }} />;
+  }
 
   if (loading) {
     return (

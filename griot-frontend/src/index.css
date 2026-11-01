@@ -1174,6 +1174,108 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .griot-profile-dialog li strong { margin-left: 4px; }
 
 /* Account and enriched family dashboard */
+.griot-site-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 26px max(24px, calc((100% - 1140px) / 2)); border-top: 1px solid var(--griot-line); color: var(--griot-ink-soft); background: var(--griot-paper); font-size: 11px; line-height: 1.8; }
+.griot-site-footer p { margin: 0; }
+.griot-site-footer nav, .griot-sidebar-footer nav { display: flex; flex-wrap: wrap; gap: 14px; }
+.griot-site-footer a, .griot-sidebar-footer a { text-underline-offset: 3px; }
+.griot-footer-email { display: inline-block; overflow-wrap: anywhere; }
+.griot-sidebar-footer a { color: #e8cc98; }
+.griot-sidebar-footer nav { gap: 8px 14px; margin: 9px 0 5px; font-size: 10px; }
+.griot-mobile-company-footer { display: none; }
+.griot-home-info-link { color: var(--griot-ink-soft); font-size: 12px; text-decoration: none; }
+.griot-home-info-link:hover { color: var(--griot-terracotta); }
+.griot-company-main { max-width: 1200px; margin: auto; padding: 30px 28px 60px; }
+.griot-company-header > nav { display: flex; gap: 22px; }
+.griot-company-header > nav a { padding-block: 10px; color: var(--griot-ink-soft); font-size: 13px; text-decoration: none; }
+.griot-company-header > nav a[aria-current="page"] { border-bottom: 2px solid var(--griot-terracotta); color: var(--griot-terracotta); }
+.griot-company-hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 260px; gap: 40px; overflow: hidden; padding: 52px 44px; border-radius: 22px; color: var(--griot-paper); background: radial-gradient(ellipse at 100% 100%, #8f3e2077, transparent 70%), var(--griot-ink); }
+.griot-company-hero .griot-eyebrow { color: #dfb874; }
+.griot-company-hero h1 { margin: 22px 0; font: 500 clamp(30px, 3.8vw, 49px)/1.18 var(--griot-serif); }
+.griot-company-hero h1 em { color: #e2bd7e; font-weight: 400; }
+.griot-company-hero > div > p:not(.griot-eyebrow):not(.griot-copy-feedback) { max-width: 650px; color: #e4d6c2; font-size: 15px; line-height: 1.85; }
+.griot-company-hero .griot-button-primary { margin-top: 12px; background: #e2bd7e; color: var(--griot-ink); }
+.griot-company-emblem { position: relative; display: grid; min-height: 240px; place-items: center; color: #e2bd7e; }
+.griot-company-emblem > span { text-align: center; font: 600 45px/1.1 var(--griot-serif); letter-spacing: 4px; }
+.griot-company-emblem small { font: 500 17px 'Work Sans', sans-serif; letter-spacing: 8px; }
+.griot-company-emblem > i { position: absolute; width: 225px; height: 225px; border: 1px solid #e2bd7e66; border-radius: 50%; }
+.griot-company-emblem > i:nth-of-type(2) { width: 260px; height: 260px; border-style: dashed; border-color: #e2bd7e33; }
+.griot-company-emblem b { position: absolute; top: 3px; right: 7px; font-size: 35px; font-weight: 400; }
+.griot-company-story { display: grid; grid-template-columns: 1fr 1.2fr; gap: 55px; padding: 64px 12px 42px; }
+.griot-company-story h2, .griot-company-section-title h2, .griot-company-origin h2, .griot-company-invitation h2, .griot-contact-preparation h2 { margin: 14px 0; font: 600 clamp(25px, 2.6vw, 33px)/1.3 var(--griot-serif); }
+.griot-company-story > div > p:not(.griot-eyebrow), .griot-company-origin > p:not(.griot-eyebrow) { margin: 0 0 18px; color: var(--griot-ink-soft); font-size: 14px; line-height: 1.9; }
+.griot-company-pillars { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.griot-company-pillars article { padding: 26px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); }
+.griot-company-pillars article > span { color: var(--griot-gold); font: 500 31px var(--griot-serif); }
+.griot-company-pillars h3 { margin: 24px 0 12px; font: 600 21px var(--griot-serif); }
+.griot-company-pillars p, .griot-company-section-title > p:not(.griot-eyebrow) { color: var(--griot-ink-soft); font-size: 13px; line-height: 1.85; }
+.griot-company-origin { margin-top: 32px; padding: 35px 40px; border-left: 3px solid var(--griot-gold); border-radius: 0 16px 16px 0; background: #ece2d0; }
+.griot-company-team, .griot-company-values, .griot-company-contact-topics { margin-top: 58px; }
+.griot-company-section-title { max-width: 730px; margin-bottom: 26px; }
+.griot-founder-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+.griot-founder-grid article { display: flex; min-width: 0; flex-direction: column; padding: 30px; border: 1px solid var(--griot-line); border-radius: 18px; background: var(--griot-paper); }
+.griot-founder-top { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.griot-founder-top > span:last-child { color: var(--griot-ink-soft); font-size: 11px; }
+.griot-founder-monogram { display: grid; place-items: center; width: 64px; height: 64px; border: 4px solid #f3e9d7; border-radius: 50%; color: var(--griot-paper); background: var(--griot-terracotta-deep); font: 500 23px var(--griot-serif); }
+.griot-founder-grid article:nth-child(2) .griot-founder-monogram { background: var(--griot-olive); }
+.griot-founder-grid h3 { margin: 24px 0 10px; font: 600 23px/1.4 var(--griot-serif); overflow-wrap: anywhere; }
+.griot-founder-grid p { color: var(--griot-ink-soft); font-size: 13px; line-height: 1.85; }
+.griot-founder-grid .griot-founder-role { margin: 0; color: var(--griot-terracotta-deep); font-size: 12px; font-weight: 600; }
+.griot-founder-grid ul { display: flex; flex-wrap: wrap; gap: 7px; margin: auto 0 24px; padding: 12px 0 0; list-style: none; }
+.griot-founder-grid li { padding: 6px 9px; border: 1px solid var(--griot-line); border-radius: 999px; color: var(--griot-ink-soft); font-size: 10px; }
+.griot-founder-grid article > a { font-size: 12px; text-underline-offset: 4px; }
+.griot-company-values > div:last-child { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 20px; }
+.griot-company-values article { padding-top: 18px; border-top: 2px solid #c9932e66; }
+.griot-company-values h3 { font: 600 18px var(--griot-serif); }
+.griot-company-values article p { color: var(--griot-ink-soft); font-size: 12px; line-height: 1.8; }
+.griot-company-invitation { margin-top: 48px; padding: 38px; border: 1px solid var(--griot-line); border-radius: 18px; background: var(--griot-paper); text-align: center; }
+.griot-company-invitation > p:not(.griot-eyebrow) { max-width: 750px; margin: 16px auto 25px; color: var(--griot-ink-soft); font-size: 14px; line-height: 1.9; }
+.griot-company-hero.is-contact { grid-template-columns: minmax(0, 1fr) 220px; }
+.griot-contact-address { display: inline-block; margin: 10px 0 20px; color: #e2bd7e; font-size: clamp(15px, 2.1vw, 25px); text-underline-offset: 6px; overflow-wrap: anywhere; }
+.griot-contact-buttons { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+.griot-contact-buttons .griot-button-primary { margin: 0; }
+.griot-contact-buttons .griot-button-outline { color: #e2bd7e; background: transparent; border-color: #e2bd7e66; }
+.griot-copy-feedback { min-height: 32px; margin: 16px 0 0; color: #d1c3ad; font-size: 11px; line-height: 1.7; }
+.griot-contact-symbol { display: flex; align-self: center; flex-direction: column; gap: 18px; color: #e2bd7e; font: 400 150px/1 var(--griot-serif); text-align: center; }
+.griot-contact-symbol span { color: #d1c3ad; font: 400 13px/1.8 'Work Sans', sans-serif; }
+.griot-contact-topic-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.griot-contact-topic-grid article { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 26px; border: 1px solid var(--griot-line); border-radius: 15px; background: var(--griot-paper); }
+.griot-contact-topic-grid article > span { color: var(--griot-gold); font: 500 30px var(--griot-serif); }
+.griot-contact-topic-grid h3 { margin: 22px 0 10px; font: 600 22px/1.35 var(--griot-serif); }
+.griot-contact-topic-grid p { flex: 1; color: var(--griot-ink-soft); font-size: 13px; line-height: 1.8; }
+.griot-contact-topic-grid small { margin: 10px 0 20px; font-size: 10px; line-height: 1.7; }
+.griot-contact-preparation { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 40px; margin-top: 36px; padding: 34px; border-radius: 15px; background: #e8e8d8; }
+.griot-contact-preparation p, .griot-contact-preparation li { color: var(--griot-ink-soft); font-size: 13px; line-height: 1.85; }
+.griot-contact-preparation ul { display: grid; gap: 12px; padding-left: 20px; }
+.griot-contact-privacy { margin-top: 22px; padding: 22px 28px; border: 1px solid var(--griot-line); border-radius: 12px; }
+.griot-contact-privacy strong { color: var(--griot-olive); font-size: 13px; }
+.griot-contact-privacy p { margin-bottom: 0; color: var(--griot-ink-soft); font-size: 12px; line-height: 1.8; }
+@media (prefers-reduced-motion: no-preference) {
+  .griot-company-main { animation: griot-soft-entry .5s ease-out; }
+  .griot-founder-grid article, .griot-contact-topic-grid article { transition: border-color .2s ease, box-shadow .2s ease; }
+  .griot-founder-grid article:hover, .griot-contact-topic-grid article:hover { border-color: #c9932e99; box-shadow: 0 8px 25px #2b1b120a; }
+}
+@media (max-width: 900px) {
+  .griot-company-hero, .griot-company-hero.is-contact { grid-template-columns: 1fr; }
+  .griot-company-emblem, .griot-contact-symbol { display: none; }
+  .griot-company-story { grid-template-columns: 1fr; gap: 15px; padding-top: 38px; }
+  .griot-company-values > div:last-child { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .griot-contact-topic-grid { grid-template-columns: 1fr; }
+  .griot-company-header { height: auto; min-height: 78px; flex-wrap: wrap; gap: 14px; padding-block: 16px; }
+}
+@media (max-width: 720px) {
+  .griot-mobile-company-footer { display: block; }
+  .griot-mobile-company-footer .griot-site-footer { padding-bottom: calc(85px + env(safe-area-inset-bottom)); }
+  .griot-site-footer { align-items: flex-start; flex-direction: column; padding: 22px 18px; font-size: 11px; }
+  .griot-company-main { padding: 18px 16px 34px; }
+  .griot-company-hero { padding: 30px 22px; border-radius: 16px; }
+  .griot-company-hero > div > p:not(.griot-eyebrow):not(.griot-copy-feedback) { font-size: 13px; }
+  .griot-company-pillars, .griot-founder-grid, .griot-contact-preparation { grid-template-columns: 1fr; }
+  .griot-company-values > div:last-child { gap: 16px; }
+  .griot-company-origin, .griot-founder-grid article, .griot-company-invitation, .griot-contact-preparation { padding: 25px 22px; }
+  .griot-company-header .griot-home-actions { width: 100%; justify-content: flex-end; }
+  .griot-home .griot-home-header { height: auto; min-height: 66px; flex-wrap: wrap; gap: 15px; padding-block: 14px; }
+  .griot-home .griot-home-actions { flex-wrap: wrap; justify-content: flex-end; gap: 10px; }
+}
 .griot-help-trigger { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 30px; border: 1px solid var(--griot-line); border-radius: 50%; color: var(--griot-olive); background: var(--griot-paper); font-weight: 700; }
 .griot-help-trigger:hover { border-color: var(--griot-gold); background: #c9932e15; }
 .griot-welcome-guide { display: flex; align-items: center; gap: 16px; margin: 24px 28px 0; padding: 18px 20px; border: 1px solid #c9932e66; border-radius: 12px; background: #fff8e9; }

@@ -1,0 +1,57 @@
+import { useState } from 'react';
+import SiteFooter, { CONTACT_EMAIL } from '../components/SiteFooter';
+
+const founders = [
+  { initials: 'JM', name: 'IROUNG à NYAM Jean Merveil', label: 'Associé 1', title: 'Communication, marketing & négociation', text: 'Jean Merveil porte la communication et le marketing de GAM Labs. Il prend en charge les échanges, les négociations et le développement des relations autour de GRIOT.', skills: ['Communication', 'Marketing', 'Négociation'], topic: 'Communication et partenariats' },
+  { initials: 'AM', name: 'EYENGA ABESSOLO Angèle Myrlaine', label: 'Associée 2', title: 'Architecture, technologie & opérations', text: 'Angèle Myrlaine conçoit l’architecture de GRIOT et pilote les dimensions fonctionnelles, techniques et opérationnelles. Elle transforme les besoins des utilisateurs en une plateforme concrète et fait évoluer son fonctionnement.', skills: ['Architecture', 'Produit & technique', 'Opérations'], topic: 'Produit et technique' },
+];
+const values = [
+  ['Innovation', 'Concevoir des outils à partir des réalités des familles et des communautés africaines.'],
+  ['Excellence', 'Faire progresser la qualité et la simplicité d’usage, à chaque étape du projet.'],
+  ['Confiance', 'Placer la protection des informations et le respect des personnes au cœur de nos choix.'],
+  ['Impact', 'Mettre la technologie au service d’un bénéfice culturel, social et humain durable.'],
+  ['Transmission', 'Aider les générations à conserver et à partager leurs connaissances et leurs histoires.'],
+];
+const contactTopics = [
+  { title: 'Communication & partenariats', name: founders[0].name, text: 'Vous représentez une communauté, une institution culturelle, un média ou un partenaire potentiel ? Parlons de votre projet et des possibilités de collaboration.', subject: 'Communication et partenariats', mark: '01' },
+  { title: 'Produit & accompagnement technique', name: founders[1].name, text: 'Une question sur le fonctionnement de GRIOT, un retour d’expérience ou une difficulté technique ? Décrivez votre besoin pour nous aider à comprendre votre situation.', subject: 'Produit et technique', mark: '02' },
+  { title: 'Familles, diaspora & patrimoine', name: 'L’équipe GAM Labs', text: 'Vous souhaitez démarrer une mémoire familiale, partager une initiative de transmission ou explorer un projet avec votre communauté ? Écrivez-nous pour en discuter.', subject: 'Mémoire familiale et patrimoine', mark: '03' },
+];
+const mailLink = (subject) => `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(`GRIOT — ${subject}`)}`;
+
+function AboutPage({ onContact }) {
+  return <>
+    <section className="griot-company-hero"><div><p className="griot-eyebrow">À PROPOS DE NOUS · GAM LABS</p><h1>Des racines à préserver.<br /><em>Un avenir à transmettre.</em></h1><p>Nous créons GRIOT pour que les histoires de famille, les savoirs et les liens entre les générations continuent de vivre.</p><button className="griot-button griot-button-primary" onClick={onContact}>Rencontrons-nous →</button></div><div className="griot-company-emblem" aria-hidden="true"><span>GAM<br /><small>LABS</small></span><i /><i /><b>✦</b></div></section>
+    <section className="griot-company-story"><div><p className="griot-eyebrow">NOTRE RAISON D’ÊTRE</p><h2>La mémoire se transmet.<br />Elle mérite aussi de se préserver.</h2></div><div><p>Les histoires familiales se racontent souvent à voix haute : un nom expliqué par un aîné, le souvenir d’un village, une recette, un chant ou le récit d’un départ. Avec la distance, les migrations et la dispersion des archives, ces traces peuvent devenir difficiles à retrouver.</p><p>GAM Labs est un projet technologique camerounais qui veut mettre le numérique au service des personnes et de leurs patrimoines. GRIOT, notre premier produit, rapproche généalogie, récits, archives et lieux d’origine dans un même espace familial.</p><p>Notre point de départ est le Cameroun ; notre ambition est de tisser progressivement des liens avec les familles, les communautés et les diasporas africaines.</p></div></section>
+    <section className="griot-company-pillars" aria-label="Notre mission">{[
+      ['01', 'Relier les personnes', 'Rassembler les générations et les parcours pour rendre une histoire familiale plus lisible.'],
+      ['02', 'Préserver les voix', 'Donner une place aux biographies, aux récits, aux images et aux traditions qui font vivre la mémoire.'],
+      ['03', 'Construire ensemble', 'Encourager la contribution des proches dans le respect des accès et des choix de chaque famille.'],
+    ].map(([number, title, text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}</section>
+    <section className="griot-company-origin"><p className="griot-eyebrow">POURQUOI « GRIOT » ?</p><h2>Un nom tourné vers la mémoire vivante.</h2><p>D’abord imaginé autour de la généalogie et de la cartographie des origines sous le nom GénéaMap Afrique, le projet s’est élargi à la transmission familiale et culturelle. Le nom GRIOT rend hommage à la place des gardiens et passeurs de mémoire dans de nombreuses cultures africaines.</p><p>Notre démarche : accompagner la transmission humaine avec des outils numériques, en respectant les personnes, les communautés et les savoirs qu’elles choisissent de partager.</p></section>
+    <section className="griot-company-team"><div className="griot-company-section-title"><p className="griot-eyebrow">L’ÉQUIPE ASSOCIÉE</p><h2>Deux expertises, une même ambition.</h2><p>Faire se rencontrer la relation humaine, la vision produit et la réalisation technique.</p></div><div className="griot-founder-grid">{founders.map((person) => <article key={person.initials}><div className="griot-founder-top"><span className="griot-founder-monogram" aria-hidden="true">{person.initials}</span><span>{person.label}</span></div><h3>{person.name}</h3><p className="griot-founder-role">{person.title}</p><p>{person.text}</p><ul aria-label="Domaines de responsabilité">{person.skills.map((skill) => <li key={skill}>{skill}</li>)}</ul><a href={mailLink(person.topic)}>Échanger avec {person.initials === 'JM' ? 'Jean Merveil' : 'Angèle Myrlaine'} →</a></article>)}</div></section>
+    <section className="griot-company-values"><div className="griot-company-section-title"><p className="griot-eyebrow">CE QUI NOUS GUIDE</p><h2>La technologie au service de la transmission.</h2></div><div>{values.map(([title, text]) => <article key={title}><h3>{title}</h3><p>{text}</p></article>)}</div></section>
+    <section className="griot-company-invitation"><p className="griot-eyebrow">UNE HISTOIRE À CONSTRUIRE ENSEMBLE</p><h2>Familles, diaspora, communautés et institutions.</h2><p>Vous partagez cette envie de préserver les mémoires ? Nous souhaitons échanger avec les familles, les chefferies, les acteurs culturels, les chercheurs et les partenaires qui s’intéressent à la transmission.</p><button className="griot-button griot-button-primary" onClick={onContact}>Parlons de votre projet →</button></section>
+  </>;
+}
+
+function ContactPage({ onAbout }) {
+  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
+  const copyEmail = async () => {
+    try { await navigator.clipboard.writeText(CONTACT_EMAIL); setCopied(true); setCopyError(false); }
+    catch { setCopyError(true); }
+  };
+  return <>
+    <section className="griot-company-hero is-contact"><div><p className="griot-eyebrow">CONTACT · GAM LABS</p><h1>Une question, une idée,<br /><em>une histoire à partager ?</em></h1><p>Parlons de GRIOT, de votre mémoire familiale ou d’un projet de collaboration.</p><a className="griot-contact-address" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a><div className="griot-contact-buttons"><a className="griot-button griot-button-primary" href={mailLink('Prise de contact')}>Nous écrire ↗</a><button className="griot-button griot-button-outline" onClick={copyEmail}>{copied ? 'Adresse copiée ✓' : 'Copier l’adresse'}</button></div><p className="griot-copy-feedback" role="status">{copyError ? 'La copie automatique est indisponible. Vous pouvez sélectionner et copier l’adresse affichée.' : copied ? 'L’adresse est prête à être collée dans votre messagerie.' : 'Les liens de contact ouvrent votre application de messagerie.'}</p></div><div className="griot-contact-symbol" aria-hidden="true">↗<span>Un premier échange.<br />De nouvelles perspectives.</span></div></section>
+    <section className="griot-company-contact-topics"><div className="griot-company-section-title"><p className="griot-eyebrow">LE BON POINT DE DÉPART</p><h2>Quel est le sujet de votre message ?</h2><p>Une adresse commune, des responsabilités complémentaires pour orienter votre demande.</p></div><div className="griot-contact-topic-grid">{contactTopics.map((topic) => <article key={topic.mark}><span>{topic.mark}</span><h3>{topic.title}</h3><p>{topic.text}</p><small>{topic.name}</small><a className="griot-dashboard-text-link" href={mailLink(topic.subject)}>Écrire à l’équipe →</a></article>)}</div></section>
+    <section className="griot-contact-preparation"><div><p className="griot-eyebrow">POUR FACILITER L’ÉCHANGE</p><h2>Quelques précisions font toute la différence.</h2><p>Présentez-vous, indiquez le sujet et expliquez ce que vous souhaitez réaliser. Pour une difficulté technique, précisez l’écran concerné et les étapes suivies.</p></div><ul><li>Votre nom et, si nécessaire, celui de votre organisation.</li><li>Le contexte de votre demande ou de votre projet.</li><li>Pour un incident : l’appareil, le navigateur et le message d’erreur éventuel.</li><li>Pour un partenariat : le public concerné et l’objectif de transmission.</li></ul></section>
+    <aside className="griot-contact-privacy"><strong>Gardons vos informations familiales protégées.</strong><p>Ne transmettez pas votre mot de passe ni de documents d’identité. Si une capture d’écran est utile, masquez les informations personnelles des proches qui ne sont pas nécessaires à votre demande.</p></aside>
+    <section className="griot-company-invitation"><p className="griot-eyebrow">FAISONS CONNAISSANCE</p><h2>Découvrez les personnes derrière GRIOT.</h2><p>Notre mission, notre démarche et les rôles de l’équipe associée.</p><button className="griot-button griot-button-outline" onClick={onAbout}>À propos de nous →</button></section>
+  </>;
+}
+
+export default function CompanyPages({ page, onLogin, onRegister, loggedIn }) {
+  const about = page === 'apropos';
+  return <div className="griot-company-page"><header className="griot-home-header griot-company-header"><a className="griot-home-brand" href="#/" aria-label="Retour à GRIOT"><img src="/griot-icon.svg" alt="" /><span>GRIOT</span></a><nav aria-label="Navigation publique"><a href="#/a-propos" aria-current={about ? 'page' : undefined}>À propos</a><a href="#/contact" aria-current={!about ? 'page' : undefined}>Contact</a></nav><div className="griot-home-actions">{loggedIn ? <a className="griot-button griot-button-primary" href="#/">Mon espace familial →</a> : <><button className="griot-button griot-button-quiet" onClick={onLogin}>Se connecter</button><button className="griot-button griot-button-primary" onClick={onRegister}>Créer un compte</button></>}</div></header><main className="griot-company-main">{about ? <AboutPage onContact={() => { window.location.hash = '/contact'; }} /> : <ContactPage onAbout={() => { window.location.hash = '/a-propos'; }} />}</main><SiteFooter /></div>;
+}

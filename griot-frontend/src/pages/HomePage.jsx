@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../api/client';
 import InstallAppButton from '../components/InstallAppButton';
+import SiteFooter from '../components/SiteFooter';
 
 export default function HomePage({ onLogin, onRegister }) {
   const [query, setQuery] = useState('');
@@ -32,6 +33,8 @@ export default function HomePage({ onLogin, onRegister }) {
           <span>GRIOT</span>
         </a>
         <div className="griot-home-actions">
+          <a className="griot-home-info-link" href="#/a-propos">À propos</a>
+          <a className="griot-home-info-link" href="#/contact">Contact</a>
           <InstallAppButton compact />
           <button className="griot-button griot-button-quiet" onClick={onLogin}>Se connecter</button>
           <button className="griot-button griot-button-primary" onClick={onRegister}>Créer un compte</button>
@@ -117,10 +120,7 @@ export default function HomePage({ onLogin, onRegister }) {
         </section>
       </main>
 
-      <footer className="griot-home-footer">
-        <span>© 2026 GAM Labs</span>
-        <span>La mémoire des peuples, entre les mains des familles.</span>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

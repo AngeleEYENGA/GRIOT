@@ -17,6 +17,15 @@ Une mémoire familiale ne se résume pas à des noms et des dates. Elle comprend
 
 Les membres apportent les informations : un lieu proposé, une relation ou une réponse de l’assistant ne constitue pas à lui seul une preuve historique.
 
+## GAM Labs et contact
+
+Les pages publiques [À propos de nous](https://griot-frontend-teal.vercel.app/#/a-propos) et [Contact](https://griot-frontend-teal.vercel.app/#/contact) présentent la mission, les valeurs et l’équipe associée, sans nécessiter de compte. Elles sont accessibles depuis l’accueil et le pied de page des espaces familiaux.
+
+- **IROUNG à NYAM Jean Merveil** : communication, marketing et négociation.
+- **EYENGA ABESSOLO Angèle Myrlaine** : architecture, technologie, fonctions produit et opérations.
+
+Contact commun : **[contact.gamlabs@proton.me](mailto:contact.gamlabs@proton.me)**. Les liens de contact ouvrent la messagerie de l’utilisateur avec un objet adapté ; ils n’envoient aucun message automatiquement.
+
 ## Premiers pas et navigation
 
 1. Créez un compte ou connectez-vous. Google OAuth nécessite la configuration décrite dans [DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md).

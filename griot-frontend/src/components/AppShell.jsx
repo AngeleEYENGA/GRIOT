@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import InstallAppButton from './InstallAppButton';
 import NotificationCenter from './NotificationCenter';
+import SiteFooter from './SiteFooter';
 
 const navigation = [
   { id: 'tableau', label: 'Tableau de bord' },
@@ -82,10 +83,7 @@ export default function AppShell({
           ))}
         </nav>
 
-        <div className="griot-sidebar-footer">
-          <p>© 2026 GAM Labs</p>
-          <span>Préserver. Transmettre. Relier.</span>
-        </div>
+        <SiteFooter compact />
       </aside>
 
       <div className="griot-main-column">
@@ -107,6 +105,7 @@ export default function AppShell({
         </header>
 
         <main className="griot-shell-content">{children}</main>
+        <div className="griot-mobile-company-footer"><SiteFooter /></div>
 
         <nav className="griot-mobile-nav" aria-label="Navigation mobile">
           {['tableau', 'genealogie', 'personnes', 'souvenirs'].map((id) => navigation.find((item) => item.id === id)).map((item) => (
