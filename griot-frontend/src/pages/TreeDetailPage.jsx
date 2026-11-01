@@ -9,6 +9,74 @@ import {
   StylePanel,
 } from '../components/TreeExtraScreens';
 
+function TreeMotif({ size = 120 }) {
+  const angles = [-58, -30, 0, 30, 58];
+
+  return (
+    <svg aria-hidden="true" width={size} height={size * 1.3} viewBox="0 0 100 130">
+      <line x1="50" y1="38" x2="50" y2="92" stroke="var(--griot-ink)" strokeWidth="3" />
+      {angles.map((angle, index) => {
+        const radians = (angle * Math.PI) / 180;
+        const x = 50 + Math.sin(radians) * 32;
+        const y = 38 - Math.cos(radians) * 30;
+
+        return (
+          <g key={`ancestor-${index}`}>
+            <line x1="50" y1="38" x2={x} y2={y} stroke="var(--griot-ink)" strokeWidth="2.5" />
+            <circle cx={x} cy={y} r={index === 2 ? 8 : 6.5} fill="var(--griot-gold)" stroke="var(--griot-ink)" strokeWidth="2" />
+          </g>
+        );
+      })}
+      {angles.map((angle, index) => {
+        const radians = (angle * Math.PI) / 180;
+        const x = 50 + Math.sin(radians) * 32;
+        const y = 92 + Math.cos(radians) * 30;
+
+        return (
+          <g key={`descendant-${index}`}>
+            <line x1="50" y1="92" x2={x} y2={y} stroke="var(--griot-ink)" strokeWidth="2.5" />
+            <circle cx={x} cy={y} r={index === 2 ? 8 : 6.5} fill="var(--griot-terracotta)" stroke="var(--griot-ink)" strokeWidth="2" />
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
+function MemoryVerificationBadge({ status }) {
+  const verification = status === 'verifie_famille'
+    ? { label: 'Vérifié par la famille', className: 'is-family', icon: 'family' }
+    : status === 'verifie_chefferie'
+      ? { label: 'Vérifié par la chefferie', className: 'is-institution', icon: 'institution' }
+      : { label: 'À vérifier', className: 'is-pending', icon: 'pending' };
+
+  return (
+    <span className={`griot-memory-verification ${verification.className}`}>
+      <svg aria-hidden="true" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {verification.icon === 'family' && (
+          <>
+            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+            <circle cx="10" cy="7" r="4" />
+            <path d="m16 11 2 2 4-4" />
+          </>
+        )}
+        {verification.icon === 'institution' && (
+          <>
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M5 10v11m14-11v11M9 10v11m6-11v11" />
+          </>
+        )}
+        {verification.icon === 'pending' && (
+          <>
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 11v5m0-8h.01" />
+          </>
+        )}
+      </svg>
+      {verification.label}
+    </span>
+  );
+}
+
 export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabProp, onTabChange }) {
   const { user } = useAuth();
   const [tree, setTree] = useState(null);
@@ -477,7 +545,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 <h2 id="dashboard-title">Bienvenue chez vous, {user?.prenom || ''}</h2>
                 <p>Chaque personne, chaque récit rapproche votre famille de ses racines.</p>
               </div>
-              <span className="griot-dashboard-welcome-mark" aria-hidden="true">✦</span>
+              <span className="griot-dashboard-welcome-mark"><TreeMotif size={24} /></span>
             </header>
 
             {dashboardLoading && <p className="griot-muted">Mise à jour de votre espace…</p>}
@@ -486,7 +554,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 <div className="griot-dashboard-layout">
                   <div className="griot-dashboard-primary">
                     <button className="griot-tree-summary" onClick={() => setActiveTab('genealogie')}>
-                      <span className="griot-tree-summary-motif" aria-hidden="true">✦</span>
+                      <span className="griot-tree-summary-motif"><TreeMotif size={112} /></span>
                       <span className="griot-tree-summary-eyebrow">VOTRE ARBRE</span>
                       <strong>{tree.nom}</strong>
                       <span>{dashboard.statistiques.personnes} personne{dashboard.statistiques.personnes === 1 ? '' : 's'} · {dashboard.statistiques.relations} lien{dashboard.statistiques.relations === 1 ? '' : 's'} familial{dashboard.statistiques.relations === 1 ? '' : 'aux'}</span>
@@ -975,13 +1043,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                           : 'Mémoire familiale'}
                         {souvenir.auteur && ` · partagé par ${souvenir.auteur.prenom} ${souvenir.auteur.nom}`}
                       </span>
-                      <span className={`griot-memory-verification ${souvenir.statutVerification === 'verifie_famille' ? 'is-family' : souvenir.statutVerification === 'verifie_chefferie' ? 'is-institution' : ''}`}>
-                        {souvenir.statutVerification === 'verifie_famille'
-                          ? 'Vérifié par la famille'
-                          : souvenir.statutVerification === 'verifie_chefferie'
-                            ? 'Vérifié par la chefferie'
-                            : 'À vérifier'}
-                      </span>
+                      <MemoryVerificationBadge status={souvenir.statutVerification} />
                     </div>
                   </article>
                 ))}
@@ -1324,13 +1386,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   </div>
                   <div>
                     <dt className="text-sm text-gray-500">Vérification</dt>
-                    <dd className="font-medium text-gray-900">
-                      {selectedPerson.statutVerification === 'verifie_famille'
-                        ? 'Vérifié par la famille'
-                        : selectedPerson.statutVerification === 'verifie_chefferie'
-                          ? 'Vérifié par la chefferie'
-                          : 'À vérifier'}
-                    </dd>
+                    <dd><MemoryVerificationBadge status={selectedPerson.statutVerification} /></dd>
                   </div>
                 </dl>
                 <section>
