@@ -364,6 +364,65 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   const peutAjouterPersonne = ['admin', 'editeur', 'contributeur'].includes(roleCourant);
   const peutGererArbre = ['admin', 'editeur'].includes(roleCourant);
   const peutGererMembres = roleCourant === 'admin';
+  const getMissionAccess = (mission) => {
+    if (mission.terminee) return '';
+    if (mission.id === 'inviter-proche' && !peutGererMembres) {
+      return 'Invitation réservée à un administrateur de l’arbre.';
+    }
+    if (mission.id === 'relier-personnes' && !peutGererArbre) {
+      return 'Création des liens réservée à un administrateur ou éditeur.';
+    }
+    if (['ajouter-personnes', 'partager-souvenir', 'documenter-biographie'].includes(mission.id) && !peutAjouterPersonne) {
+      return 'Ajout réservé à un administrateur, éditeur ou contributeur.';
+    }
+    return '';
+  };
+  const handleMissionAction = (mission) => {
+    if (mission.terminee) {
+      if (mission.id === 'ajouter-personnes' || mission.id === 'documenter-biographie') {
+        const person = mission.id === 'documenter-biographie'
+          ? personnes.find((item) => item.biographie?.trim())
+          : null;
+        if (person) openPersonProfile(person);
+        else setActiveTab('personnes');
+        return;
+      }
+      setActiveTab(mission.onglet);
+      return;
+    }
+    if (mission.id === 'ajouter-personnes' || mission.id === 'documenter-biographie') {
+      if (mission.id === 'documenter-biographie' && peutGererArbre) {
+        const person = personnes.find((item) => !item.biographie?.trim());
+        if (person) {
+          openPersonProfile(person);
+          setEditingPerson(true);
+          return;
+        }
+      }
+      setActiveTab('personnes');
+      setShowAddPersonForm(true);
+      return;
+    }
+    if (mission.id === 'relier-personnes') {
+      if (personnes.length < 2) {
+        setActiveTab('personnes');
+        setShowAddPersonForm(true);
+        return;
+      }
+      setActiveTab('relations');
+      return;
+    }
+    if (mission.id === 'partager-souvenir') {
+      openAddSouvenir();
+      return;
+    }
+    if (mission.id === 'inviter-proche') {
+      setActiveTab('membres');
+      setShowAddMemberForm(true);
+      return;
+    }
+    setActiveTab(mission.onglet);
+  };
   const selectedPersonId = selectedPerson?.id;
   const recentSouvenirs = [...souvenirs]
     .sort((first, second) => new Date(second.dateCreation || 0) - new Date(first.dateCreation || 0))
@@ -590,17 +649,27 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       </div>
                       <p className="griot-dashboard-progress-caption">{dashboard.completude.missionsTerminees} mission{dashboard.completude.missionsTerminees === 1 ? '' : 's'} terminée{dashboard.completude.missionsTerminees === 1 ? '' : 's'} sur {dashboard.completude.totalMissions}</p>
                       <div className="griot-dashboard-mission-list">
-                        {dashboard.missions.map((mission) => (
-                          <article key={mission.id}>
-                            <span className={`griot-mission-mark${mission.terminee ? ' is-done' : ''}`} aria-hidden="true">{mission.terminee ? '✓' : '○'}</span>
-                            <div><h4>{mission.libelle}</h4><p>{mission.description}</p></div>
-                            <button onClick={() => {
-                              setActiveTab(mission.onglet);
-                              if (mission.onglet === 'personnes' && mission.id === 'ajouter-personnes') setShowAddPersonForm(true);
-                              if (mission.onglet === 'souvenirs') setShowAddSouvenirForm(true);
-                            }}>{mission.terminee ? 'Voir' : 'Continuer'}</button>
-                          </article>
-                        ))}
+                        {dashboard.missions.map((mission) => {
+                          const accessReason = getMissionAccess(mission);
+                          const needsMorePeople = mission.id === 'relier-personnes' && personnes.length < 2;
+                          return (
+                            <article key={mission.id} className={accessReason ? 'is-locked' : ''}>
+                              <span className={`griot-mission-mark${mission.terminee ? ' is-done' : ''}`} aria-hidden="true">{mission.terminee ? '✓' : accessReason ? '⌑' : '○'}</span>
+                              <div>
+                                <h4>{mission.libelle}</h4>
+                                <p>{accessReason || (needsMorePeople ? 'Ajoutez deux personnes avant de créer leur lien familial.' : mission.description)}</p>
+                              </div>
+                              <button
+                                type="button"
+                                disabled={Boolean(accessReason)}
+                                aria-label={accessReason ? `${mission.libelle} — ${accessReason}` : undefined}
+                                onClick={() => handleMissionAction(mission)}
+                              >
+                                {accessReason ? 'Accès limité' : needsMorePeople ? 'Ajouter des personnes' : mission.terminee ? 'Voir' : 'Continuer'}
+                              </button>
+                            </article>
+                          );
+                        })}
                       </div>
                     </section>
                   </div>

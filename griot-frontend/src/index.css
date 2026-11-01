@@ -643,9 +643,11 @@ a { color: var(--griot-terracotta-deep); }
 .griot-dashboard-mission-list article { display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 9px; align-items: center; padding: 11px 0; border-top: 1px solid var(--griot-line); }
 .griot-mission-mark { color: #a2937a; font-size: 16px; }
 .griot-mission-mark.is-done { color: var(--griot-olive); }
+.griot-dashboard-mission-list article.is-locked .griot-mission-mark { color: #9b8872; }
 .griot-dashboard-mission-list h4 { margin: 0; font: 600 12px var(--griot-serif); }
 .griot-dashboard-mission-list p { margin: 4px 0 0; color: var(--griot-ink-soft); font-size: 10px; line-height: 1.45; }
 .griot-dashboard-mission-list article > button { padding: 6px 9px; border: 1px solid var(--griot-line); border-radius: 7px; color: var(--griot-terracotta-deep); background: transparent; font-size: 9px; font-weight: 700; }
+.griot-dashboard-mission-list article > button:disabled { border-color: #e8dfd0; color: #8c7965; background: #f5f0e7; cursor: not-allowed; }
 .griot-dashboard-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .griot-dashboard-stat-grid article { min-width: 0; padding: 13px; }
 .griot-dashboard-stat-grid article:last-child { grid-column: 1 / -1; }
