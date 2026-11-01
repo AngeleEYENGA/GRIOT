@@ -54,14 +54,21 @@ export default function HomePage({ onLogin, onRegister }) {
           </div>
 
           <div className="griot-tree-ornament" aria-hidden="true">
-            <span className="griot-tree-root">✦</span>
-            <span className="griot-tree-branch branch-one" />
-            <span className="griot-tree-branch branch-two" />
-            <span className="griot-tree-branch branch-three" />
-            <span className="griot-tree-leaf leaf-one">✦</span>
-            <span className="griot-tree-leaf leaf-two">✦</span>
-            <span className="griot-tree-leaf leaf-three">✦</span>
-            <span className="griot-tree-leaf leaf-four">✦</span>
+            <svg viewBox="0 0 280 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path className="griot-illustration-ground" d="M37 265h206" />
+              <path className="griot-illustration-trunk" d="M140 264V145m0 54-66-58m66 39 66-57m-66 18-1-76" />
+              <path className="griot-illustration-branch" d="m74 141-24-25m24 25 24-25m108 2-23-25m23 25 24-24m-90-67-22-22m22 22 22-22" />
+              <path className="griot-illustration-leaf" d="M35 105c14-19 31-18 39 0-13 18-30 19-39 0Zm54-5c13-19 31-18 39 0-13 18-30 19-39 0Zm62-35c14-19 31-18 39 0-13 18-30 19-39 0Zm52 16c14-19 31-18 39 0-13 18-30 19-39 0ZM118 32c14-19 31-18 39 0-13 18-30 19-39 0Z" />
+              <g className="griot-illustration-portraits">
+                <circle cx="74" cy="142" r="20" />
+                <circle cx="206" cy="123" r="20" />
+                <circle cx="139" cy="58" r="20" />
+                <path d="M58 148c2-9 8-13 16-13s14 4 16 13m100-13c2-9 8-13 16-13s14 4 16 13M123 64c2-9 8-13 16-13s14 4 16 13" />
+              </g>
+              <circle className="griot-illustration-fruit" cx="139" cy="214" r="7" />
+              <circle className="griot-illustration-fruit" cx="111" cy="232" r="5" />
+              <circle className="griot-illustration-fruit" cx="168" cy="232" r="5" />
+            </svg>
           </div>
         </section>
 
