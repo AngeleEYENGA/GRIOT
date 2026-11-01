@@ -21,31 +21,45 @@ export class MembresArbreService {
    * encore construit en V1 (cf. §14 du dossier de conception) : ici on
    * suppose que l'utilisateur a déjà un compte.
    */
-  async invite(arbreId: string, dto: InviteMembreDto) {
-    const utilisateur = await this.prisma.utilisateur.findFirst({
-      where: { email: { equals: dto.email.trim(), mode: 'insensitive' } },
-    });
-    if (!utilisateur) {
-      throw new NotFoundException(
-        "Aucun compte GRIOT trouvé pour cet email. L'invitation d'un compte inexistant n'est pas encore prise en charge.",
-      );
-    }
+  async invite(arbreId: string, dto: InviteMembreDto, inviteurId?: string) {
+    return this.prisma.$transaction(async (transaction) => {
+      const utilisateur = await transaction.utilisateur.findFirst({
+        where: { email: { equals: dto.email.trim(), mode: 'insensitive' } },
+      });
+      if (!utilisateur) {
+        throw new NotFoundException(
+          "Aucun compte GRIOT trouvé pour cet email. L'invitation d'un compte inexistant n'est pas encore prise en charge.",
+        );
+      }
 
-    const dejaMembre = await this.prisma.membreArbre.findUnique({
-      where: { utilisateurId_arbreId: { utilisateurId: utilisateur.id, arbreId } },
-    });
-    if (dejaMembre) {
-      throw new BadRequestException('Cette personne est déjà membre de cet arbre.');
-    }
+      const dejaMembre = await transaction.membreArbre.findUnique({
+        where: { utilisateurId_arbreId: { utilisateurId: utilisateur.id, arbreId } },
+      });
+      if (dejaMembre) {
+        throw new BadRequestException('Cette personne est déjà membre de cet arbre.');
+      }
 
-    return this.prisma.membreArbre.create({
-      data: {
-        utilisateurId: utilisateur.id,
-        arbreId,
-        role: dto.role,
-        statut: 'invite',
-      },
-      include: { utilisateur: { select: { id: true, nom: true, prenom: true, email: true } } },
+      const membre = await transaction.membreArbre.create({
+        data: {
+          utilisateurId: utilisateur.id,
+          arbreId,
+          role: dto.role,
+          statut: 'invite',
+        },
+        include: { utilisateur: { select: { id: true, nom: true, prenom: true, email: true } } },
+      });
+
+      await transaction.notification.create({
+        data: {
+          utilisateurId: utilisateur.id,
+          type: 'invitation_arbre',
+          contenu: 'Vous avez reçu une invitation à rejoindre un arbre familial.',
+          cibleType: 'membre_arbre',
+          cibleId: membre.id,
+          arbreId,
+        },
+      });
+      return membre;
     });
   }
 
@@ -69,10 +83,30 @@ export class MembresArbreService {
   }
 
   async acceptInvitation(utilisateurId: string, membreId: string) {
-    const membre = await this.prisma.membreArbre.findUnique({ where: { id: membreId } });
-    if (!membre || membre.utilisateurId !== utilisateurId) {
-      throw new NotFoundException('Invitation introuvable.');
-    }
-    return this.prisma.membreArbre.update({ where: { id: membreId }, data: { statut: 'actif' } });
+    return this.prisma.$transaction(async (transaction) => {
+      const membre = await transaction.membreArbre.findUnique({
+        where: { id: membreId },
+        include: { arbre: { select: { nom: true, proprietaireId: true } } },
+      });
+      if (!membre || membre.utilisateurId !== utilisateurId) {
+        throw new NotFoundException('Invitation introuvable.');
+      }
+      const accepted = await transaction.membreArbre.update({
+        where: { id: membreId },
+        data: { statut: 'actif' },
+      });
+      if (membre.arbre.proprietaireId !== utilisateurId) {
+        await transaction.notification.create({
+          data: {
+            utilisateurId: membre.arbre.proprietaireId,
+            type: 'invitation_acceptee',
+            contenu: `Un membre a accepté votre invitation à rejoindre « ${membre.arbre.nom} ».`,
+            cibleType: 'arbre',
+            arbreId: membre.arbreId,
+          },
+        });
+      }
+      return accepted;
+    });
   }
 }

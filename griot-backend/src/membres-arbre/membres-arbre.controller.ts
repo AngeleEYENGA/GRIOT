@@ -24,8 +24,8 @@ export class MembresArbreController {
   // Inviter / changer un rôle : réservé aux administrateurs (§7 du dossier de conception)
   @Roles('admin')
   @Post()
-  invite(@Param('arbreId') arbreId: string, @Body() dto: InviteMembreDto) {
-    return this.membresArbreService.invite(arbreId, dto);
+  invite(@Param('arbreId') arbreId: string, @Req() req, @Body() dto: InviteMembreDto) {
+    return this.membresArbreService.invite(arbreId, dto, req.user.id);
   }
 
   @Roles('admin')

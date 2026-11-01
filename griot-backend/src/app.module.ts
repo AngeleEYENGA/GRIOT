@@ -12,6 +12,7 @@ import { SouvenirsModule } from './souvenirs/souvenirs.module';
 import { MediasModule } from './medias/medias.module';
 import { GeographieModule } from './geographie/geographie.module';
 import { GouvernanceModule } from './gouvernance/gouvernance.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   controllers: [AppController],
@@ -28,6 +29,7 @@ import { GouvernanceModule } from './gouvernance/gouvernance.module';
     MediasModule,
     GeographieModule,
     GouvernanceModule,
+    NotificationsModule,
   ],
 })
 export class AppModule {}

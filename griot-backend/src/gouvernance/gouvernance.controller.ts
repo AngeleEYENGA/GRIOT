@@ -7,6 +7,7 @@ import { CreateInstitutionDto } from './dto/create-institution.dto';
 import { CreatePreuveDto } from './dto/create-preuve.dto';
 import { GouvernanceService } from './gouvernance.service';
 import { UpdateStatutPreuveDto } from './dto/update-statut-preuve.dto';
+import { InviteInstitutionMembreDto } from './dto/invite-institution-membre.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiTags('gouvernance familiale')
@@ -23,8 +24,17 @@ export class GouvernanceController {
 
   @Roles('admin')
   @Post('institution')
-  createInstitution(@Param('arbreId') arbreId: string, @Body() dto: CreateInstitutionDto) {
-    return this.gouvernanceService.createInstitution(arbreId, dto);
+  createInstitution(@Param('arbreId') arbreId: string, @Req() req, @Body() dto: CreateInstitutionDto) {
+    return this.gouvernanceService.createInstitution(arbreId, req.user.id, dto);
+  }
+
+  @Roles('admin')
+  @Post('institution/membres')
+  inviteInstitutionMember(
+    @Param('arbreId') arbreId: string,
+    @Body() dto: InviteInstitutionMembreDto,
+  ) {
+    return this.gouvernanceService.inviteInstitutionMember(arbreId, dto);
   }
 
   @Roles('admin', 'editeur', 'contributeur', 'lecteur')

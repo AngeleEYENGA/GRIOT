@@ -31,6 +31,17 @@ enum StatutMembre {
   en_attente
 }
 
+enum RoleInstitution {
+  administrateur
+  validateur
+  lecteur
+}
+
+enum StatutMembreInstitution {
+  actif
+  invite
+}
+
 enum StatutUtilisateur {
   actif
   suspendu
@@ -143,7 +154,9 @@ model Utilisateur {
 
   arbresPossedes    Arbre[]              @relation("proprietaire")
   membresArbre      MembreArbre[]
+  membresInstitution MembreInstitution[]
   souvenirsCrees    Souvenir[]           @relation("auteur")
+  commentairesSouvenirs CommentaireSouvenir[]
   preuvesCreees     Preuve[]             @relation("auteurPreuve")
   notifications     Notification[]
   syncQueue         SyncQueue[]
@@ -265,6 +278,7 @@ model Souvenir {
 
   medias  Media[]
   preuves Preuve[]
+  commentaires CommentaireSouvenir[]
 
   @@map("souvenirs")
 }
@@ -328,6 +342,19 @@ model Media {
   @@map("medias")
 }
 
+model CommentaireSouvenir {
+  id            String      @id @default(uuid())
+  souvenirId    String
+  souvenir      Souvenir    @relation(fields: [souvenirId], references: [id], onDelete: Cascade)
+  auteurId      String
+  auteur        Utilisateur @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  contenu       String
+  dateCreation  DateTime    @default(now())
+
+  @@index([souvenirId, dateCreation])
+  @@map("commentaires_souvenirs")
+}
+
 // ---------------------------------------------------------
 // GEOLOCALISATION / MIGRATIONS
 // ---------------------------------------------------------
@@ -377,6 +404,10 @@ model Notification {
   utilisateur   Utilisateur @relation(fields: [utilisateurId], references: [id])
   type          String
   contenu       String
+  cibleType     String?
+  cibleId       String?
+  arbreId       String?
+  institutionId String?
   lue           Boolean  @default(false)
   dateCreation  DateTime @default(now())
 
@@ -448,6 +479,22 @@ model Institution {
   nom                String
   type               String
   statutVerification StatutVerification @default(non_verifie)
+  membres             MembreInstitution[]
 
   @@map("institutions")
+}
+
+model MembreInstitution {
+  id             String                @id @default(uuid())
+  institutionId  String
+  institution    Institution           @relation(fields: [institutionId], references: [id], onDelete: Cascade)
+  utilisateurId  String
+  utilisateur    Utilisateur           @relation(fields: [utilisateurId], references: [id], onDelete: Cascade)
+  role           RoleInstitution       @default(lecteur)
+  statut         StatutMembreInstitution @default(invite)
+  dateInvitation DateTime              @default(now())
+
+  @@unique([institutionId, utilisateurId])
+  @@index([utilisateurId, statut])
+  @@map("membres_institution")
 }

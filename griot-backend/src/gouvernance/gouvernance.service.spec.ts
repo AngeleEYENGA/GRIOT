@@ -7,6 +7,8 @@ describe('GouvernanceService', () => {
   let service: GouvernanceService;
   let moduleRef: TestingModule;
   const transaction = {
+    institution: { create: jest.fn() },
+    membreInstitution: { create: jest.fn() },
     preuve: { update: jest.fn() },
     personne: { update: jest.fn() },
     souvenir: { update: jest.fn() },
@@ -42,6 +44,33 @@ describe('GouvernanceService', () => {
     })).rejects.toThrow(BadRequestException);
 
     expect(prisma.preuve.create).not.toHaveBeenCalled();
+  });
+
+  it('grants the creator administrator access when creating an institution', async () => {
+    prisma.institution.findUnique.mockResolvedValue(null);
+    transaction.institution.create.mockResolvedValue({
+      id: 'institution-1',
+      arbreId: 'tree-1',
+      nom: 'Chefferie',
+      type: 'chefferie',
+    });
+
+    await service.createInstitution('tree-1', 'user-1', {
+      nom: 'Chefferie',
+      type: 'chefferie',
+    });
+
+    expect(transaction.institution.create).toHaveBeenCalledWith({
+      data: { arbreId: 'tree-1', nom: 'Chefferie', type: 'chefferie' },
+    });
+    expect(transaction.membreInstitution.create).toHaveBeenCalledWith({
+      data: {
+        institutionId: 'institution-1',
+        utilisateurId: 'user-1',
+        role: 'administrateur',
+        statut: 'actif',
+      },
+    });
   });
 
   it('validates a proof and marks its person as family-verified atomically', async () => {

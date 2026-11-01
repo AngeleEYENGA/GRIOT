@@ -107,6 +107,44 @@ export class MediasController {
   }
 
   @Roles('admin', 'editeur', 'contributeur', 'lecteur')
+  @Get('souvenirs/:souvenirId/medias')
+  findSouvenirMedias(
+    @Param('arbreId') arbreId: string,
+    @Param('souvenirId') souvenirId: string,
+  ) {
+    return this.mediasService.findSouvenirMedias(arbreId, souvenirId);
+  }
+
+  @Roles('admin', 'editeur', 'contributeur')
+  @Post('souvenirs/:souvenirId/medias')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { file: { type: 'string', format: 'binary' } },
+      required: ['file'],
+    },
+  })
+  @UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: MAX_PHOTO_SIZE, files: 1 },
+  }))
+  uploadSouvenirMedia(
+    @Param('arbreId') arbreId: string,
+    @Param('souvenirId') souvenirId: string,
+    @UploadedFile(new ParseFilePipe({
+      validators: [
+        new MaxFileSizeValidator({ maxSize: MAX_PHOTO_SIZE }),
+        new FileTypeValidator({
+          fileType: ACCEPTED_MEDIA_TYPES,
+          overrideMimeType: true,
+        }),
+      ],
+    })) file: UploadedPhoto,
+  ) {
+    return this.mediasService.uploadSouvenirMedia(arbreId, souvenirId, file);
+  }
+
+  @Roles('admin', 'editeur', 'contributeur', 'lecteur')
   @Get('medias/:mediaId/contenu')
   async getPhotoContent(
     @Param('arbreId') arbreId: string,

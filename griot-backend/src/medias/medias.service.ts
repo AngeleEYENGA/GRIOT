@@ -98,6 +98,55 @@ export class MediasService {
     }
   }
 
+  async findSouvenirMedias(arbreId: string, souvenirId: string) {
+    await this.findSouvenir(arbreId, souvenirId);
+    return this.prisma.media.findMany({
+      where: { souvenirId },
+      select: { id: true, type: true, tailleOctets: true, dateUpload: true },
+      orderBy: { dateUpload: 'desc' },
+    });
+  }
+
+  async uploadSouvenirMedia(arbreId: string, souvenirId: string, file: UploadedPhoto) {
+    await this.findSouvenir(arbreId, souvenirId);
+    const supportedMedia = SUPPORTED_MEDIA[file.mimetype];
+    if (!supportedMedia) {
+      throw new BadRequestException(
+        'Formats acceptés : JPEG, PNG, WebP, MP3, M4A, OGG, WAV, WebM, MP4 et PDF.',
+      );
+    }
+    if (file.buffer.byteLength > MAX_PHOTO_SIZE) {
+      throw new BadRequestException('Un fichier média ne peut pas dépasser 4 Mio.');
+    }
+    this.assertBlobStorageConfigured();
+
+    const pathname = `arbres/${arbreId}/souvenirs/${souvenirId}/${supportedMedia.type}/${randomUUID()}.${supportedMedia.extension}`;
+    const blob = await put(pathname, file.buffer, {
+      access: 'private',
+      contentType: file.mimetype,
+    });
+
+    try {
+      return await this.prisma.media.create({
+        data: {
+          souvenirId,
+          type: supportedMedia.type,
+          url: blob.pathname,
+          tailleOctets: file.buffer.byteLength,
+        },
+        select: { id: true, type: true, tailleOctets: true, dateUpload: true },
+      });
+    } catch (databaseError) {
+      try {
+        await del(blob.pathname);
+      } catch (cleanupError) {
+        const detail = cleanupError instanceof Error ? cleanupError.message : String(cleanupError);
+        throw new Error(`Impossible d’enregistrer le média et de nettoyer le fichier créé : ${detail}`);
+      }
+      throw databaseError;
+    }
+  }
+
   async getPersonPhotoContent(arbreId: string, mediaId: string) {
     const media = await this.prisma.media.findFirst({
       where: {
@@ -114,7 +163,10 @@ export class MediasService {
     const media = await this.prisma.media.findFirst({
       where: {
         id: mediaId,
-        personne: { is: { arbreId } },
+        OR: [
+          { personne: { is: { arbreId } } },
+          { souvenir: { is: { arbreId } } },
+        ],
       },
       select: { url: true },
     });
@@ -147,6 +199,15 @@ export class MediasService {
       throw new NotFoundException('Personne introuvable sur cet arbre.');
     }
     return personne;
+  }
+
+  private async findSouvenir(arbreId: string, souvenirId: string) {
+    const souvenir = await this.prisma.souvenir.findFirst({
+      where: { id: souvenirId, arbreId },
+      select: { id: true },
+    });
+    if (!souvenir) throw new NotFoundException('Souvenir introuvable sur cet arbre.');
+    return souvenir;
   }
 
   private assertBlobStorageConfigured() {
