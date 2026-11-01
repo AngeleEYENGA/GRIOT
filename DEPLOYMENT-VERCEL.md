@@ -26,13 +26,11 @@ Ne jamais placer `JWT_SECRET`, un secret OAuth Google ou un mot de passe de base
 
 ## Google OAuth
 
-Dans Google Cloud Console, le client OAuth **Application Web** `GRIOT Web Client` est créé dans le projet `navigue-512922`. Les origines JavaScript `http://localhost:5173` et `https://griot-frontend-teal.vercel.app` y sont autorisées. L’identifiant client est renseigné dans les deux projets Vercel. Cette intégration utilise le jeton d’identification Google envoyé à l’API ; l’API en vérifie la signature, l’audience et l’email confirmé avant d’émettre son propre JWT.
-
-Le client Web GRIOT a été créé dans le projet Google Cloud `navigue-512922`. Son ID public est dans les fichiers `.env.example`. La clé privée Google n’est pas nécessaire dans ce flux. Ne jamais publier de secrets OAuth. L’origine locale `http://localhost:5173` est déjà autorisée ; ajouter le domaine réel du frontend à l’ID client après sa création dans Vercel. Vérifier également l’écran de consentement et les utilisateurs de test avant d’ouvrir l’application au public.
+Dans Google Cloud Console, le client OAuth **Application Web** `GRIOT Web Client` est créé dans le projet `navigue-512922`. Les origines `http://localhost:5173` et `https://griot-frontend-teal.vercel.app` sont autorisées. L’identifiant client public est renseigné dans le frontend Vercel et les exemples d’environnement. Le flux vérifie le jeton Google côté API. Le client OAuth est en mode « Test » : seuls les utilisateurs tests (dont le compte propriétaire) peuvent se connecter. Les URLs Vercel de prévisualisation ne sont pas encore autorisées.
 
 ## Base de données et migrations
 
-**L’API est déployée sur Vercel mais n’est pas encore opérationnelle** : il lui manque une base PostgreSQL persistante et un `JWT_SECRET` de production. Ajouter `DATABASE_URL` et `JWT_SECRET` dans les variables du projet backend avant de considérer l’API en service. Appliquer les migrations une seule fois depuis un environnement de livraison sûr : `npx prisma migrate deploy` dans `griot-backend`. Ne pas utiliser `prisma migrate dev` en production et ne pas lancer les migrations au démarrage de chaque fonction.
+**État actuel :** les projets Vercel frontend et backend sont créés et leurs déploiements sont déclarés « Ready », mais l’API renvoie une erreur 500 lors de l’initialisation. La base PostgreSQL de production et le `JWT_SECRET` ne sont pas encore configurés. Ajouter ces variables dans Vercel, puis appliquer les migrations une fois avec `npx prisma migrate deploy` depuis un environnement de livraison sûr. Ne pas utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction. Tant que ces étapes ne sont pas faites, inscription, connexion et données persistantes ne peuvent pas fonctionner.
 
 La migration `20261101000000_google_oauth` ajoute la table des identités Google et rend le mot de passe facultatif pour les comptes OAuth. Conserver une sauvegarde de la base avant toute migration en production.
 
@@ -42,4 +40,4 @@ Copier `griot-backend/.env.example` en `.env` dans le dossier backend et configu
 
 ## GitHub
 
-Le workflow `.github/workflows/ci.yml` vérifie le lint et le build frontend ainsi que la génération Prisma et le build backend à chaque push ou pull request vers `main` et `develop`. Dans Vercel, importer les deux projets depuis le dépôt et activer les déploiements automatiques.
+Le dépôt GitHub est relié aux deux projets Vercel, avec déploiement automatique. Le workflow `.github/workflows/ci.yml` vérifie le lint/build frontend, l’audit de ses dépendances et la génération Prisma/build backend. Le commit `7cbe082` passe ces contrôles.
