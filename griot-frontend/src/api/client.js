@@ -93,6 +93,10 @@ class GriotAPI {
     return this.request(`/arbres/${arbreId}`);
   }
 
+  getTreeDashboard(arbreId) {
+    return this.request(`/arbres/${arbreId}/tableau-de-bord`);
+  }
+
   updateArbre(arbreId, data) {
     return this.request(`/arbres/${arbreId}`, {
       method: 'PATCH',

@@ -25,4 +25,9 @@ export class ArbresController {
   findOne(@Param('arbreId') arbreId: string, @Req() req) {
     return this.arbresService.findOne(arbreId, req.user.id);
   }
+
+  @Get(':arbreId/tableau-de-bord')
+  getDashboard(@Param('arbreId') arbreId: string, @Req() req) {
+    return this.arbresService.getDashboard(arbreId, req.user.id);
+  }
 }

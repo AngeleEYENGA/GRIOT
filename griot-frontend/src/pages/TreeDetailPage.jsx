@@ -9,9 +9,11 @@ export default function TreeDetailPage({ treeId, onBack }) {
   const [relations, setRelations] = useState([]);
   const [membres, setMembers] = useState([]);
   const [souvenirs, setSouvenirs] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [dashboardLoading, setDashboardLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('personnes');
+  const [activeTab, setActiveTab] = useState('tableau');
   const [showAddPersonForm, setShowAddPersonForm] = useState(false);
   const [showAddMemberForm, setShowAddMemberForm] = useState(false);
   const [showAddSouvenirForm, setShowAddSouvenirForm] = useState(false);
@@ -63,6 +65,27 @@ export default function TreeDetailPage({ treeId, onBack }) {
   useEffect(() => {
     loadTreeData();
   }, [loadTreeData]);
+
+  useEffect(() => {
+    if (activeTab !== 'tableau') return undefined;
+
+    let cancelled = false;
+    setDashboardLoading(true);
+    api.getTreeDashboard(treeId)
+      .then((data) => {
+        if (!cancelled) setDashboard(data);
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message);
+      })
+      .finally(() => {
+        if (!cancelled) setDashboardLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, treeId]);
 
   const handleAddPerson = async (e) => {
     e.preventDefault();
@@ -205,7 +228,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-8 overflow-x-auto whitespace-nowrap">
-            {['personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
+            {['tableau', 'personnes', 'relations', 'souvenirs', 'membres'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -215,6 +238,7 @@ export default function TreeDetailPage({ treeId, onBack }) {
                     : 'border-transparent text-gray-600 hover:text-gray-900'
                 }`}
               >
+                {tab === 'tableau' && '📊 Tableau de bord'}
                 {tab === 'personnes' && '👤 Personnes'}
                 {tab === 'relations' && '🤝 Relations'}
                 {tab === 'souvenirs' && '📜 Souvenirs'}
@@ -231,6 +255,89 @@ export default function TreeDetailPage({ treeId, onBack }) {
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
           </div>
+        )}
+
+        {activeTab === 'tableau' && (
+          <section aria-labelledby="dashboard-title">
+            <div className="flex flex-wrap justify-between items-end gap-3 mb-6">
+              <div>
+                <h2 id="dashboard-title" className="text-2xl font-bold text-gray-900">Votre arbre prend vie</h2>
+                <p className="text-gray-600 mt-1">Une progression calculée à partir des informations déjà partagées.</p>
+              </div>
+            </div>
+            {dashboardLoading && <p className="text-gray-600">Mise à jour de la progression...</p>}
+            {dashboard && (
+              <>
+                <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+                  {[
+                    ['Personnes', dashboard.statistiques.personnes],
+                    ['Liens familiaux', dashboard.statistiques.relations],
+                    ['Souvenirs', dashboard.statistiques.souvenirs],
+                    ['Collaborateurs', dashboard.statistiques.membres],
+                    ['Progression', `${dashboard.completude.pourcentage}%`],
+                  ].map(([label, value]) => (
+                    <article key={label} className="bg-white rounded-lg shadow p-5">
+                      <p className="text-sm text-gray-600">{label}</p>
+                      <p className="text-2xl font-bold text-green-800 mt-2">{value}</p>
+                    </article>
+                  ))}
+                </div>
+
+                <div className="bg-white rounded-lg shadow p-6 mb-6">
+                  <div className="flex justify-between gap-4 mb-3">
+                    <h3 className="text-lg font-semibold text-gray-900">Complétude de l’arbre</h3>
+                    <span className="text-sm text-gray-600">
+                      {dashboard.completude.missionsTerminees}/{dashboard.completude.totalMissions} missions
+                    </span>
+                  </div>
+                  <div
+                    className="h-3 bg-gray-100 rounded-full overflow-hidden"
+                    role="progressbar"
+                    aria-label="Complétude de l’arbre"
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-valuenow={dashboard.completude.pourcentage}
+                  >
+                    <div
+                      className="h-full bg-green-600 rounded-full transition-all"
+                      style={{ width: `${dashboard.completude.pourcentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {dashboard.missions.map((mission) => (
+                    <article key={mission.id} className="bg-white rounded-lg shadow p-6">
+                      <div className="flex justify-between items-start gap-4">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{mission.libelle}</h3>
+                          <p className="text-sm text-gray-600 mt-1">{mission.description}</p>
+                        </div>
+                        <span className={`shrink-0 text-xs font-medium px-3 py-1 rounded-full ${
+                          mission.terminee
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-amber-100 text-amber-800'
+                        }`}>
+                          {mission.terminee ? 'Terminée' : 'À faire'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center mt-5">
+                        <span className="text-sm text-gray-500">
+                          {mission.progression}/{mission.objectif}
+                        </span>
+                        <button
+                          onClick={() => setActiveTab(mission.onglet)}
+                          className="text-sm font-medium text-green-700 hover:text-green-900"
+                        >
+                          {mission.terminee ? 'Consulter' : 'Continuer'}
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
         )}
 
         {/* PERSONNES TAB */}
