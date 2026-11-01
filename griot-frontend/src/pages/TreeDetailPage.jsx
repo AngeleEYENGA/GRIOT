@@ -146,6 +146,21 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   const [souvenirView, setSouvenirView] = useState('histoires');
   const [dashboardSearch, setDashboardSearch] = useState('');
 
+  useEffect(() => {
+    setSelectedPerson(null);
+    setPersonDraft(null);
+    setEditingPerson(false);
+  }, [activeTab]);
+
+  useEffect(() => {
+    if (!selectedPerson) return;
+    const closeOnEscape = (event) => {
+      if (event.key === 'Escape') setSelectedPerson(null);
+    };
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [selectedPerson]);
+
   const loadTreeData = useCallback(async () => {
     try {
       setLoading(true);
@@ -1343,12 +1358,14 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         {activeTab === 'style' && <StylePanel />}
       </main>
       {selectedPerson && personDraft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+        <div className="griot-profile-overlay" onMouseDown={(event) => {
+          if (event.target === event.currentTarget) setSelectedPerson(null);
+        }}>
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="person-profile-title"
-            className="griot-profile-dialog bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            className="griot-profile-dialog"
           >
             <header className="griot-profile-header">
               <div className="griot-profile-cover" aria-hidden="true" />
