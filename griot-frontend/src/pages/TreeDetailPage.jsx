@@ -686,8 +686,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             </div>
 
             {showAddPersonForm && (
-              <div className="mb-8 bg-white rounded-lg shadow p-6">
-                <form onSubmit={handleAddPerson} className="space-y-4">
+              <div className="griot-form-card griot-person-create-card">
+                <form onSubmit={handleAddPerson} className="griot-person-create-form">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
@@ -811,7 +811,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-900">Relations familiales</h2>
               {peutGererArbre && personnes.length >= 2 && (
-                <form onSubmit={handleAddRelation} className="flex flex-wrap gap-2">
+                <form onSubmit={handleAddRelation} className="griot-relation-form flex flex-wrap gap-2">
                   <select
                     aria-label="Première personne"
                     value={newRelation.personneId1}
@@ -925,7 +925,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             </div>
 
             {showAddSouvenirForm && (
-              <form onSubmit={handleAddSouvenir} className="mb-8 bg-white rounded-lg shadow p-6 space-y-4">
+              <form onSubmit={handleAddSouvenir} className="griot-form-card griot-souvenir-create-form">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-titre">
@@ -1280,7 +1280,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             )}
 
             {editingPerson ? (
-              <form onSubmit={handleSavePerson} className="p-6 space-y-4">
+              <form onSubmit={handleSavePerson} className="griot-person-edit-form">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <label className="text-sm font-medium text-gray-700">
                     Prénom

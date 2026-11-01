@@ -746,6 +746,99 @@ a { color: var(--griot-terracotta-deep); }
   transition: border-color .16s ease, box-shadow .16s ease;
 }
 
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) label:not(.sr-only) {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+  color: var(--griot-ink-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]),
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) select,
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--griot-line);
+  border-radius: var(--griot-radius-control, 9px);
+  padding: 10px 12px;
+  color: var(--griot-ink);
+  background-color: #fffefa;
+  font: inherit;
+  font-size: 12px;
+  transition: border-color .16s ease, box-shadow .16s ease;
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) textarea {
+  min-height: 112px;
+  resize: vertical;
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) input[type="file"] {
+  width: 100%;
+  min-height: 44px;
+  border: 1px dashed var(--griot-line);
+  border-radius: var(--griot-radius-control, 9px);
+  padding: 7px;
+  color: var(--griot-ink-soft);
+  background-color: #fffefa;
+  font-size: 12px;
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) input[type="file"]::file-selector-button {
+  margin-right: 10px;
+  border: 0;
+  border-radius: 7px;
+  padding: 7px 10px;
+  color: var(--griot-ink);
+  background: var(--griot-cream);
+  font: inherit;
+  font-weight: 600;
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):focus,
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) select:focus,
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) textarea:focus {
+  border-color: var(--griot-gold);
+  outline: 0;
+  box-shadow: var(--griot-focus-ring, 0 0 0 3px #c9932e2e);
+}
+
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) input::placeholder,
+.griot-shell-content form:not(.griot-search-form):not(.griot-relation-form) textarea::placeholder {
+  color: #948575;
+}
+
+.griot-shell-content .griot-person-create-form,
+.griot-shell-content .griot-person-edit-form {
+  display: grid;
+  gap: 14px;
+}
+
+.griot-shell-content .griot-person-create-form > div:first-child,
+.griot-shell-content .griot-person-create-form > div:nth-child(3),
+.griot-shell-content .griot-souvenir-create-form > div:first-child,
+.griot-shell-content .griot-person-edit-form > div:first-child {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.griot-person-create-card,
+.griot-souvenir-create-form {
+  margin-bottom: 24px;
+}
+
+.griot-profile-dialog > .griot-person-edit-form {
+  padding: 24px;
+}
+
+.griot-shell-content .griot-person-create-form > button {
+  justify-self: start;
+}
+
 .griot-shell-content .griot-dashboard-search input {
   min-height: 0;
   border: 0;
@@ -795,6 +888,16 @@ a { color: var(--griot-terracotta-deep); }
   .griot-memory-timeline-date { text-align: left; }
   .griot-profile-header { min-height: 135px; padding-inline: 14px; }
   .griot-profile-content { padding: 12px; }
+  .griot-profile-dialog > .griot-person-edit-form { padding: 16px; }
+}
+
+@media (max-width: 640px) {
+  .griot-shell-content .griot-person-create-form > div:first-child,
+  .griot-shell-content .griot-person-create-form > div:nth-child(3),
+  .griot-shell-content .griot-souvenir-create-form > div:first-child,
+  .griot-shell-content .griot-person-edit-form > div:first-child {
+    grid-template-columns: 1fr;
+  }
 }
 
 :root {
