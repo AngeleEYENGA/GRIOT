@@ -42,15 +42,15 @@ Dans Google Cloud Console, le client OAuth **Application Web** `GRIOT Web Client
 
 ## Base de données et migrations
 
-**État actuel :** la base Neon est créée et reliée au projet backend. `DATABASE_URL` et `DATABASE_URL_UNPOOLED` sont gérées par l’intégration Vercel. Des `JWT_SECRET` distincts pour Production et Preview sont générés directement dans les variables Vercel. Configurer la commande de build du projet backend sur `npm run build:vercel`, puis redéployer : `prisma migrate deploy` appliquera les migrations de façon idempotente au build avant le démarrage de l’API. Ne jamais utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction.
+**État actuel :** la base Neon est créée et reliée au projet backend. `DATABASE_URL` et `DATABASE_URL_UNPOOLED` sont gérées par l’intégration Vercel. Des `JWT_SECRET` distincts pour Production et Preview sont générés directement dans les variables Vercel. Configurer la commande de build du projet backend sur `npm run build:vercel`. Le hook `prebuild` exécute aussi `prisma migrate deploy` lorsque Vercel lance la commande standard `npm run build`, afin que la migration ne soit pas omise si la configuration personnalisée est absente. Ne jamais utiliser `prisma migrate dev` en production ni lancer les migrations à chaque démarrage de fonction.
 
-La migration `20261101000000_google_oauth` ajoute la table des identités Google et rend le mot de passe facultatif pour les comptes OAuth. Conserver une sauvegarde de la base avant toute migration en production.
+Les migrations `20261101000000_google_oauth` et `20261101120000_product_features` ajoutent respectivement les identités Google, les commentaires de souvenirs, les adhésions institutionnelles et les métadonnées des notifications. Conserver une sauvegarde de la base avant toute migration en production.
 
 ## Écrans connectés et ordre de déploiement
 
-La nouvelle interface utilise les routes API de recherche des arbres publics, des migrations, des preuves et des institutions. Elle s’appuie sur les tables Prisma déjà existantes (`Arbre`, `Migration`, `Lieu`, `Preuve`, `Institution`) et n’ajoute donc pas de migration de schéma. Lors de sa publication, déployer d’abord le backend puis le frontend afin que les routes soient disponibles avant que l’interface les appelle.
+La console chefferie, les commentaires de souvenirs et les invitations institutionnelles utilisent les nouvelles tables de la migration `20261101120000_product_features`. Le backend doit donc être déployé avec `npm run build:vercel` avant le frontend; cette commande applique les migrations avant la compilation. Les médias audio restent privés dans Vercel Blob et transitent par les routes API authentifiées.
 
-La recherche publique ne retourne que le nom de l’arbre et un décompte de personnes pour les arbres ayant explicitement la visibilité `public`. Les profils, souvenirs et médias restent protégés par l’authentification et l’appartenance à l’arbre. Les coordonnées de la carte sont saisies par les membres; aucune API de géocodage externe n’est appelée.
+La recherche publique ne retourne que le nom de l’arbre et un décompte de personnes pour les arbres ayant explicitement la visibilité `public`. Les profils, souvenirs et médias restent protégés par l’authentification et l’appartenance à l’arbre. Les coordonnées de la carte sont saisies par les membres; aucune API de géocodage externe n’est appelée. La PWA utilise un manifeste, des icônes de 192 et 512 pixels et un service worker qui met en cache uniquement l’app shell et les ressources statiques, jamais les réponses API.
 
 ## Développement local
 
