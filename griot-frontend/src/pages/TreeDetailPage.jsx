@@ -8,6 +8,7 @@ import {
   OriginsPanel,
   StylePanel,
 } from '../components/TreeExtraScreens';
+import SouvenirInteractions from '../components/SouvenirInteractions';
 
 function TreeMotif({ size = 120 }) {
   const angles = [-58, -30, 0, 30, 58];
@@ -111,6 +112,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [photosRefresh, setPhotosRefresh] = useState(0);
   const [savingSouvenir, setSavingSouvenir] = useState(false);
+  const [newSouvenirAudio, setNewSouvenirAudio] = useState(null);
   const [newPerson, setNewPerson] = useState({
     nom: '',
     prenom: '',
@@ -304,7 +306,21 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       });
       setSouvenirs((current) => [response, ...current]);
       setNewSouvenir({ titre: '', categorie: 'histoire', contenu: '', personneId: '' });
+      const audioFile = newSouvenirAudio;
+      setNewSouvenirAudio(null);
       setShowAddSouvenirForm(false);
+      if (audioFile) {
+        try {
+          const uploadedMedia = await api.uploadSouvenirMedia(treeId, response.id, audioFile);
+          setSouvenirs((current) => current.map((souvenir) => (
+            souvenir.id === response.id
+              ? { ...souvenir, medias: [uploadedMedia] }
+              : souvenir
+          )));
+        } catch (uploadError) {
+          setError(`Le souvenir a été enregistré, mais l’enregistrement audio n’a pas pu être téléversé : ${uploadError.message}`);
+        }
+      }
     } catch (err) {
       setError(err.message);
     } finally {
@@ -976,6 +992,28 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                     rows={5}
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1" htmlFor="souvenir-audio">
+                    Enregistrement audio (4 Mio maximum, facultatif)
+                  </label>
+                  <input
+                    id="souvenir-audio"
+                    type="file"
+                    accept="audio/mpeg,audio/mp4,audio/ogg,audio/wav,audio/webm"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0] || null;
+                      if (file && file.size > 4 * 1024 * 1024) {
+                        setNewSouvenirAudio(null);
+                        setError('L’enregistrement audio ne peut pas dépasser 4 Mio.');
+                        event.target.value = '';
+                        return;
+                      }
+                      setError('');
+                      setNewSouvenirAudio(file);
+                    }}
+                  />
+                  {newSouvenirAudio && <p className="griot-memory-audio-selection">{newSouvenirAudio.name}</p>}
+                </div>
                 <button
                   type="submit"
                   disabled={savingSouvenir}
@@ -1008,6 +1046,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       <h3>{souvenir.titre}</h3>
                       <p>{souvenir.contenu || 'Aucun récit détaillé pour le moment.'}</p>
                       <small>{souvenir.personne ? `${souvenir.personne.prenom} ${souvenir.personne.nom}` : 'Mémoire familiale'}</small>
+                      <SouvenirInteractions arbreId={treeId} souvenir={souvenir} role={roleCourant} userId={user?.id} />
                     </div>
                   </article>
                 ))}
@@ -1045,6 +1084,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                       </span>
                       <MemoryVerificationBadge status={souvenir.statutVerification} />
                     </div>
+                    <SouvenirInteractions arbreId={treeId} souvenir={souvenir} role={roleCourant} userId={user?.id} />
                   </article>
                 ))}
               </div>

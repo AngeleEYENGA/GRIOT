@@ -66,6 +66,7 @@ function getGenerations(personnes, relations) {
 export default function FamilyTreeView({ personnes, relations, onOpenProfile }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
+  const [focusPersonId, setFocusPersonId] = useState('');
   const [zoom, setZoom] = useState(1);
   const generations = useMemo(
     () => getGenerations(personnes, relations),
@@ -74,6 +75,39 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
   const relatedIds = useMemo(() => new Set(
     relations.flatMap((relation) => [relation.personneId1, relation.personneId2]),
   ), [relations]);
+  const branchIds = useMemo(() => {
+    if (!['ancestors', 'descendants'].includes(filter)) return null;
+    const visibleBranch = new Set();
+    if (!focusPersonId) return visibleBranch;
+
+    const pending = [focusPersonId];
+    visibleBranch.add(focusPersonId);
+    for (let index = 0; index < pending.length; index += 1) {
+      const currentId = pending[index];
+      relations.forEach((relation) => {
+        const parentId = relation.typeRelation === 'parent'
+          ? relation.personneId1
+          : relation.typeRelation === 'enfant'
+            ? relation.personneId2
+            : null;
+        const childId = relation.typeRelation === 'parent'
+          ? relation.personneId2
+          : relation.typeRelation === 'enfant'
+            ? relation.personneId1
+            : null;
+        const nextId = filter === 'ancestors' && childId === currentId
+          ? parentId
+          : filter === 'descendants' && parentId === currentId
+            ? childId
+            : null;
+        if (nextId && !visibleBranch.has(nextId)) {
+          visibleBranch.add(nextId);
+          pending.push(nextId);
+        }
+      });
+    }
+    return visibleBranch;
+  }, [filter, focusPersonId, relations]);
   const visiblePeople = useMemo(() => {
     const normalizedQuery = query.trim().toLocaleLowerCase('fr');
     let matchingIds = null;
@@ -96,12 +130,13 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
 
     return personnes.filter((person) => {
       if (matchingIds && !matchingIds.has(person.id)) return false;
+      if (branchIds && !branchIds.has(person.id)) return false;
       if (filter === 'linked') return relatedIds.has(person.id);
       if (filter === 'unlinked') return !relatedIds.has(person.id);
       if (filter === 'deceased') return Boolean(person.dateDeces);
       return true;
     });
-  }, [filter, personnes, query, relatedIds, relations]);
+  }, [branchIds, filter, personnes, query, relatedIds, relations]);
   const layout = useMemo(() => {
     const rows = new Map();
     visiblePeople.forEach((person) => {
@@ -175,7 +210,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
         </div>
       </div>
 
-      <div className="griot-family-tree-filters">
+      <div className={`griot-family-tree-filters${branchIds ? ' has-branch-filter' : ''}`}>
         <label className="sr-only" htmlFor="genealogy-search">Rechercher une personne</label>
         <input
           id="genealogy-search"
@@ -194,7 +229,18 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
           <option value="linked">Avec un lien familial</option>
           <option value="unlinked">Sans lien familial</option>
           <option value="deceased">Personnes décédées</option>
+          <option value="ancestors">Branche des ancêtres</option>
+          <option value="descendants">Branche des descendants</option>
         </select>
+        {branchIds && (
+          <>
+            <label className="sr-only" htmlFor="genealogy-focus-person">Personne de référence</label>
+            <select id="genealogy-focus-person" value={focusPersonId} onChange={(event) => setFocusPersonId(event.target.value)}>
+              <option value="">Choisir une personne de référence</option>
+              {personnes.map((person) => <option key={person.id} value={person.id}>{person.prenom} {person.nom}</option>)}
+            </select>
+          </>
+        )}
       </div>
 
       {visiblePeople.length === 0 ? (
@@ -202,6 +248,8 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
           <p>
             {personnes.length === 0
               ? 'Ajoutez des personnes pour construire l’arbre.'
+              : branchIds && !focusPersonId
+                ? 'Choisissez une personne de référence pour afficher sa branche familiale.'
               : 'Aucune personne ne correspond à ces critères.'}
           </p>
         </div>

@@ -8,6 +8,7 @@ import TreeDetailPage from './pages/TreeDetailPage';
 import HomePage from './pages/HomePage';
 import AppShell from './components/AppShell';
 import { StylePanel } from './components/TreeExtraScreens';
+import InstitutionSpacePage from './pages/InstitutionSpacePage';
 import './index.css';
 
 function AppContent() {
@@ -70,7 +71,9 @@ function AppContent() {
       onNavigate={navigate}
       user={user}
     >
-      {selectedTreeId ? (
+      {activePanel === 'institutions' ? (
+        <InstitutionSpacePage />
+      ) : selectedTreeId ? (
         <TreeDetailPage
           key={selectedTreeId}
           treeId={selectedTreeId}

@@ -146,9 +146,9 @@ prisma/
 
 Chaque route protégée par `@Roles(...)` est imbriquée sous `/arbres/:arbreId/...`. Le `RolesGuard` va chercher, pour l'utilisateur authentifié, son `MembreArbre` sur **cet arbre précis** — pas un rôle global. C'est la traduction directe de la règle du §7 du dossier de conception : *"chaque endpoint vérifie le rôle de l'utilisateur sur l'arbre concerné, et non un rôle global"*.
 
-## Prochains lots (non construits ici)
+## Lots encore à construire
 
-Voir `GRIOT-Conception-SI.md`, section Roadmap, pour la suite : Mémoire (Lot 3), Hors ligne (Lot 4), Carte & migrations (Lot 5), IA (Lot 6), moteur de navigation d'arbre (Lot 7), Visualization Engine (Lot 8), Source & Preuve — API (Lot 9).
+Le MVP inclut désormais les souvenirs avec commentaires et médias privés, les parcours migratoires, les preuves et les espaces institutionnels protégés. Les lots restant à développer sont la synchronisation hors ligne complète, les fonctions IA et le moteur de visualisation avancé; voir `GRIOT-Conception-SI.md`, section Roadmap.
 
 ## Déploiement
 

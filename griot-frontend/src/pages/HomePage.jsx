@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../api/client';
+import InstallAppButton from '../components/InstallAppButton';
 
 export default function HomePage({ onLogin, onRegister }) {
   const [query, setQuery] = useState('');
@@ -31,6 +32,7 @@ export default function HomePage({ onLogin, onRegister }) {
           <span>GRIOT</span>
         </a>
         <div className="griot-home-actions">
+          <InstallAppButton compact />
           <button className="griot-button griot-button-quiet" onClick={onLogin}>Se connecter</button>
           <button className="griot-button griot-button-primary" onClick={onRegister}>Créer un compte</button>
         </div>

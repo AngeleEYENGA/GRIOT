@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import InstallAppButton from './InstallAppButton';
+import NotificationCenter from './NotificationCenter';
 
 const navigation = [
   { id: 'tableau', label: 'Tableau de bord' },
@@ -8,6 +10,7 @@ const navigation = [
   { id: 'origines', label: 'Carte des origines' },
   { id: 'souvenirs', label: 'Mémoire familiale' },
   { id: 'chefferie', label: 'Espace chefferie' },
+  { id: 'institutions', label: 'Console chefferie' },
   { id: 'assistant', label: 'Demander à GRIOT' },
   { id: 'style', label: 'Charte graphique' },
 ];
@@ -21,6 +24,7 @@ function NavigationIcon({ name }) {
     origines: <><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10" r="2.5" /></>,
     souvenirs: <><path d="M5 3h11l4 4v14H5z" /><path d="M15 3v5h5M8 12h8m-8 4h8" /></>,
     chefferie: <><path d="m3 9 9-6 9 6M4 20h16M6 9v11m4-11v11m4-11v11m4-11v11M3 9h18" /></>,
+    institutions: <><path d="m3 9 9-6 9 6M4 20h16M6 9v11m4-11v11m4-11v11m4-11v11M3 9h18" /><path d="M9 5.2h6" /></>,
     assistant: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2L12 3Z" /><path d="m19 15 .8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8L19 15Z" /></>,
     style: <><circle cx="12" cy="12" r="9" /><path d="M12 3v18a9 9 0 0 0 0-18Z" /></>,
   };
@@ -87,6 +91,8 @@ export default function AppShell({
             <span>{treeName || activePage?.label || 'Votre espace familial'}</span>
           </div>
           <div className="griot-user-menu">
+            <NotificationCenter />
+            <InstallAppButton compact />
             <span className="griot-user-name">{user?.prenom} {user?.nom}</span>
             <button className="griot-logout" onClick={onLogout}>Déconnexion</button>
           </div>

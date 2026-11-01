@@ -290,6 +290,38 @@ class GriotAPI {
     });
   }
 
+  getNotifications() {
+    return this.request('/notifications');
+  }
+
+  markNotificationRead(notificationId) {
+    return this.request(`/notifications/${notificationId}/lue`, { method: 'PATCH' });
+  }
+
+  getInstitutionSpace() {
+    return this.request('/institutions/espace');
+  }
+
+  acceptInstitutionInvite(institutionId, membreId) {
+    return this.request(`/institutions/${institutionId}/membres/${membreId}/accepter`, {
+      method: 'POST',
+    });
+  }
+
+  reviewInstitutionProof(institutionId, proofId, statutValidation) {
+    return this.request(`/institutions/${institutionId}/preuves/${proofId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ statutValidation }),
+    });
+  }
+
+  inviteInstitutionMember(arbreId, email, role = 'lecteur') {
+    return this.request(`/arbres/${arbreId}/institution/membres`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+  }
+
   // 🎤 SOUVENIRS (Memories)
   createSouvenir(arbreId, data) {
     return this.request(`/arbres/${arbreId}/souvenirs`, {
@@ -300,6 +332,36 @@ class GriotAPI {
 
   getSouvenirs(arbreId) {
     return this.request(`/arbres/${arbreId}/souvenirs`);
+  }
+
+  getSouvenirComments(arbreId, souvenirId) {
+    return this.request(`/arbres/${arbreId}/souvenirs/${souvenirId}/commentaires`);
+  }
+
+  createSouvenirComment(arbreId, souvenirId, contenu) {
+    return this.request(`/arbres/${arbreId}/souvenirs/${souvenirId}/commentaires`, {
+      method: 'POST',
+      body: JSON.stringify({ contenu }),
+    });
+  }
+
+  deleteSouvenirComment(arbreId, souvenirId, commentId) {
+    return this.request(`/arbres/${arbreId}/souvenirs/${souvenirId}/commentaires/${commentId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  uploadSouvenirMedia(arbreId, souvenirId, file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.request(`/arbres/${arbreId}/souvenirs/${souvenirId}/medias`, {
+      method: 'POST',
+      body: formData,
+    });
+  }
+
+  getSouvenirMediaBlob(arbreId, mediaId) {
+    return this.requestBlob(`/arbres/${arbreId}/medias/${mediaId}/contenu`);
   }
 
   deleteSouvenir(arbreId, souvenirId) {

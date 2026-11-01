@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api/client';
 
 function PageIntro({ eyebrow, title, description, children }) {
@@ -17,9 +17,30 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [replayIndex, setReplayIndex] = useState(-1);
+  const [replayPlaying, setReplayPlaying] = useState(false);
   const [draft, setDraft] = useState({ personneId: '', lieu: '', pays: '', dateEvenement: '', latitude: '', longitude: '' });
   const canEdit = ['admin', 'editeur', 'contributeur'].includes(role);
-  const mapped = migrations.filter((item) => item.lieu.latitude !== null && item.lieu.longitude !== null);
+  const mapped = migrations.flatMap((item, index) => (
+    item.lieu.latitude !== null && item.lieu.longitude !== null
+      ? [{ ...item, routeIndex: index }]
+      : []
+  ));
+  const visibleMapped = replayIndex < 0
+    ? mapped
+    : mapped.filter((item) => item.routeIndex <= replayIndex);
+
+  useEffect(() => {
+    if (!replayPlaying) return undefined;
+    if (replayIndex >= migrations.length - 1) {
+      setReplayPlaying(false);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => {
+      setReplayIndex((current) => current + 1);
+    }, 1100);
+    return () => window.clearTimeout(timer);
+  }, [migrations.length, replayIndex, replayPlaying]);
 
   const saveMigration = async (event) => {
     event.preventDefault();
@@ -50,10 +71,21 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
     setError('');
     try {
       await api.deleteMigration(arbreId, id);
+      setReplayPlaying(false);
+      setReplayIndex(-1);
       await onRefresh();
     } catch (requestError) {
       setError(requestError.message);
     }
+  };
+
+  const toggleReplay = () => {
+    if (replayPlaying) {
+      setReplayPlaying(false);
+      return;
+    }
+    if (replayIndex < 0 || replayIndex >= migrations.length - 1) setReplayIndex(0);
+    setReplayPlaying(true);
   };
 
   return (
@@ -67,6 +99,19 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
       </PageIntro>
 
       {error && <p className="griot-inline-error" role="alert">{error}</p>}
+
+      {migrations.length > 0 && (
+        <div className="griot-route-replay">
+          <button type="button" className="griot-button griot-button-outline" onClick={toggleReplay}>
+            {replayPlaying ? 'Mettre en pause' : replayIndex > -1 && replayIndex < migrations.length - 1 ? 'Reprendre le parcours' : 'Rejouer le parcours'}
+          </button>
+          <p aria-live="polite">
+            {replayIndex < 0
+              ? 'Visualisez les étapes dans leur ordre de transmission.'
+              : `${replayPlaying ? 'Étape' : 'En pause à l’étape'} ${replayIndex + 1} sur ${migrations.length} · ${migrations[replayIndex]?.lieu.nom}`}
+          </p>
+        </div>
+      )}
 
       {formOpen && (
         <form className="griot-form-card griot-grid-form" onSubmit={saveMigration}>
@@ -109,11 +154,11 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
                 <rect width="720" height="280" rx="14" fill="#efe4d0" />
                 {[1, 2, 3].map((line) => <line key={`v-${line}`} x1={line * 180} x2={line * 180} y1="0" y2="280" stroke="#ddcaa9" strokeDasharray="4 7" />)}
                 {[1, 2].map((line) => <line key={`h-${line}`} x1="0" x2="720" y1={line * 90} y2={line * 90} stroke="#ddcaa9" strokeDasharray="4 7" />)}
-                {mapped.length > 1 && <polyline points={mapped.map(({ lieu }) => `${((lieu.longitude + 180) / 360) * 680 + 20},${((90 - lieu.latitude) / 180) * 240 + 20}`).join(' ')} fill="none" stroke="#b5502a" strokeWidth="3" strokeDasharray="6 6" />}
-                {mapped.map((item) => {
+                {visibleMapped.length > 1 && <polyline points={visibleMapped.map(({ lieu }) => `${((lieu.longitude + 180) / 360) * 680 + 20},${((90 - lieu.latitude) / 180) * 240 + 20}`).join(' ')} fill="none" stroke="#b5502a" strokeWidth="3" strokeDasharray="6 6" />}
+                {visibleMapped.map((item) => {
                   const x = ((item.lieu.longitude + 180) / 360) * 680 + 20;
                   const y = ((90 - item.lieu.latitude) / 180) * 240 + 20;
-                  return <g key={item.id}><circle cx={x} cy={y} r="8" fill="#b5502a" stroke="#fffbf3" strokeWidth="3" /><title>{item.lieu.nom} · {item.personne.prenom} {item.personne.nom}</title></g>;
+                  return <g key={item.id}><circle cx={x} cy={y} r={item.routeIndex === replayIndex ? 11 : 8} fill="#b5502a" stroke="#fffbf3" strokeWidth="3" /><title>{item.lieu.nom} · {item.personne.prenom} {item.personne.nom}</title></g>;
                 })}
               </svg>
             </section>
@@ -139,6 +184,8 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
 
 export function GovernancePanel({ arbreId, institution, preuves, personnes, role, onRefresh }) {
   const [institutionDraft, setInstitutionDraft] = useState({ nom: '', type: 'chefferie' });
+  const [institutionInviteEmail, setInstitutionInviteEmail] = useState('');
+  const [institutionInviteRole, setInstitutionInviteRole] = useState('validateur');
   const [proofDraft, setProofDraft] = useState({ type: 'témoignage familial', personneId: '', urlDocument: '' });
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -170,6 +217,21 @@ export function GovernancePanel({ arbreId, institution, preuves, personnes, role
         personneId: proofDraft.personneId || undefined,
       });
       setProofDraft({ type: 'témoignage familial', personneId: '', urlDocument: '' });
+      await onRefresh();
+    } catch (requestError) {
+      setError(requestError.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const inviteInstitutionMember = async (event) => {
+    event.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      await api.inviteInstitutionMember(arbreId, institutionInviteEmail, institutionInviteRole);
+      setInstitutionInviteEmail('');
       await onRefresh();
     } catch (requestError) {
       setError(requestError.message);
@@ -213,6 +275,22 @@ export function GovernancePanel({ arbreId, institution, preuves, personnes, role
           </form>
         )}
       </section>
+
+      {institution && role === 'admin' && (
+        <section className="griot-institution-invite">
+          <div><h3>Donner accès à l’institution</h3><p>Invitez un compte GRIOT existant à consulter ou valider les preuves de cet arbre.</p></div>
+          <form onSubmit={inviteInstitutionMember}>
+            <label className="sr-only" htmlFor="institution-member-email">Adresse email</label>
+            <input id="institution-member-email" type="email" required maxLength={254} value={institutionInviteEmail} onChange={(event) => setInstitutionInviteEmail(event.target.value)} placeholder="nom@exemple.fr" />
+            <label className="sr-only" htmlFor="institution-member-role">Rôle institutionnel</label>
+            <select id="institution-member-role" value={institutionInviteRole} onChange={(event) => setInstitutionInviteRole(event.target.value)}>
+              <option value="validateur">Validateur</option>
+              <option value="lecteur">Lecteur</option>
+            </select>
+            <button className="griot-button griot-button-primary" disabled={saving}>{saving ? 'Invitation…' : 'Inviter'}</button>
+          </form>
+        </section>
+      )}
 
       <section className="griot-governance-grid">
         <div className="griot-form-card">
