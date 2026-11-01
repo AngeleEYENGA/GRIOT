@@ -60,6 +60,9 @@
     "typescript": "^5.5.0"
   },
   "overrides": {
+    "@vercel/cli-config": {
+      "zod": "^4.6.6"
+    },
     "js-yaml": "^5.5.0",
     "multer": "^2.5.0"
   }
