@@ -146,38 +146,36 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
   ));
 
   return (
-    <section aria-labelledby="genealogy-title">
-      <div className="flex flex-wrap justify-between items-end gap-3 mb-6">
+    <section className="griot-family-tree" aria-labelledby="genealogy-title">
+      <div className="griot-family-tree-heading">
         <div>
-          <h2 id="genealogy-title" className="text-2xl font-bold text-gray-900">Arbre généalogique</h2>
-          <p className="text-sm text-gray-600 mt-1">
+          <h2 id="genealogy-title">Arbre généalogique</h2>
+          <p>
             {visiblePeople.length} personne{visiblePeople.length !== 1 ? 's' : ''} affichée{visiblePeople.length !== 1 ? 's' : ''} sur {personnes.length}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="griot-family-tree-zoom">
           <button
             type="button"
             onClick={() => setZoom((current) => Math.max(0.65, current - 0.15))}
             disabled={zoom <= 0.65}
             aria-label="Dézoomer l’arbre"
-            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-40"
           >
             −
           </button>
-          <span className="text-sm text-gray-600 min-w-12 text-center">{Math.round(zoom * 100)}%</span>
+          <span>{Math.round(zoom * 100)}%</span>
           <button
             type="button"
             onClick={() => setZoom((current) => Math.min(1.6, current + 0.15))}
             disabled={zoom >= 1.6}
             aria-label="Zoomer l’arbre"
-            className="px-3 py-2 border border-gray-300 rounded-lg disabled:opacity-40"
           >
             +
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_220px] gap-3 mb-5">
+      <div className="griot-family-tree-filters">
         <label className="sr-only" htmlFor="genealogy-search">Rechercher une personne</label>
         <input
           id="genealogy-search"
@@ -185,14 +183,12 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="Rechercher par nom, village ou biographie"
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
         />
         <label className="sr-only" htmlFor="genealogy-filter">Filtrer les personnes</label>
         <select
           id="genealogy-filter"
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg"
         >
           <option value="all">Toutes les personnes</option>
           <option value="linked">Avec un lien familial</option>
@@ -202,21 +198,21 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
       </div>
 
       {visiblePeople.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-lg">
-          <p className="text-gray-600">
+        <div className="griot-family-tree-empty">
+          <p>
             {personnes.length === 0
               ? 'Ajoutez des personnes pour construire l’arbre.'
               : 'Aucune personne ne correspond à ces critères.'}
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow overflow-auto">
+        <div className="griot-family-tree-canvas">
           <div
             className="relative"
             style={{ width: layout.width * zoom, height: layout.height * zoom }}
           >
             <div
-              className="absolute top-0 left-0"
+              className="griot-family-tree-layer"
               style={{
                 width: layout.width,
                 height: layout.height,
@@ -226,7 +222,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
             >
               <svg
                 aria-hidden="true"
-                className="absolute inset-0 pointer-events-none"
+                className="griot-family-tree-links"
                 width={layout.width}
                 height={layout.height}
               >
@@ -253,14 +249,14 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
                       <path
                         d={`M ${startX} ${startY} C ${startX} ${curveY}, ${endX} ${curveY}, ${endX} ${endY}`}
                         fill="none"
-                        stroke="#7b8b72"
+                        stroke="var(--griot-gold)"
                         strokeWidth="2"
                       />
                       <text
                         x={(startX + endX) / 2}
                         y={curveY - 5}
                         textAnchor="middle"
-                        fill="#52634a"
+                        fill="var(--griot-ink-soft)"
                         fontSize="12"
                       >
                         {relation.typeRelation}
@@ -272,7 +268,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
               {[...layout.rows.entries()].map(([generation, row]) => (
                 <div
                   key={generation}
-                  className="absolute left-0 right-0 flex justify-center gap-12"
+                  className="griot-family-tree-generation"
                   style={{ top: 20 + generation * GENERATION_GAP }}
                 >
                   {row.map((person) => {
@@ -283,17 +279,17 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
                         type="button"
                         onClick={() => onOpenProfile(person)}
                         aria-label={`Ouvrir le profil de ${person.prenom} ${person.nom}`}
-                        className="relative z-10 flex items-center gap-3 text-left bg-white border border-green-200 hover:border-green-600 hover:shadow-md rounded-xl p-4"
+                        className="griot-family-tree-node"
                         style={{ width: NODE_WIDTH, height: NODE_HEIGHT }}
                       >
-                        <span className="flex items-center justify-center shrink-0 w-12 h-12 rounded-full bg-green-100 text-green-800 font-bold">
+                        <span className="griot-family-tree-avatar">
                           {initials}
                         </span>
-                        <span className="min-w-0">
-                          <span className="block font-semibold text-gray-900 truncate">
+                        <span className="griot-family-tree-person">
+                          <span className="griot-family-tree-name">
                             {person.prenom} {person.nom}
                           </span>
-                          <span className="block text-xs text-gray-600 mt-1 truncate">
+                          <span className="griot-family-tree-origin">
                             {person.villageOrigine || (person.dateNaissance
                               ? new Date(person.dateNaissance).getFullYear()
                               : 'Profil à compléter')}

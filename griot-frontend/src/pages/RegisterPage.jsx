@@ -61,79 +61,69 @@ export default function RegisterPage({ onSwitchToLogin, onBackToHome }) {
           <span>GRIOT</span>
           <small>La mémoire numérique des familles</small>
         </h1>
-        <p className="text-gray-600 mb-8">Créer un compte</p>
+        <p className="griot-auth-title">Créer un compte</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="griot-auth-form">
           {(formError || error) && (
             <div className="griot-auth-error">
               {formError || error}
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+          <div className="griot-auth-name-fields">
+            <label className="griot-auth-field">Nom
               <input
                 type="text"
                 name="nom"
                 value={formData.nom}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Mvondo"
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+            </label>
+            <label className="griot-auth-field">Prénom
               <input
                 type="text"
                 name="prenom"
                 value={formData.prenom}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Jean"
               />
-            </div>
+            </label>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <label className="griot-auth-field">Email
             <input
               type="email"
               name="email"
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              placeholder="your@email.com"
+              placeholder="vous@exemple.fr"
             />
-          </div>
+          </label>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone (optionnel)</label>
+          <label className="griot-auth-field">Téléphone <span>(optionnel)</span>
             <input
               type="tel"
               name="telephone"
               value={formData.telephone}
               onChange={handleChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               placeholder="+33 6 12 34 56 78"
             />
-          </div>
+          </label>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+          <label className="griot-auth-field">Mot de passe
             <input
               type="password"
               name="motDePasse"
               value={formData.motDePasse}
               onChange={handleChange}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
               placeholder="••••••••"
             />
-          </div>
+          </label>
 
           <button
             type="submit"
@@ -145,23 +135,22 @@ export default function RegisterPage({ onSwitchToLogin, onBackToHome }) {
         </form>
 
         {import.meta.env.VITE_GOOGLE_CLIENT_ID && (
-          <div className="mt-5">
-            <div className="flex items-center gap-3 mb-4 text-xs text-gray-500">
-              <span className="h-px flex-1 bg-gray-200" />
+          <div className="griot-auth-google">
+            <div className="griot-auth-divider">
+              <span />
               ou continuer avec
-              <span className="h-px flex-1 bg-gray-200" />
+              <span />
             </div>
-            <div className="flex justify-center">
+            <div className="griot-auth-google-button">
               <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setFormError('La connexion Google a échoué.')} />
             </div>
           </div>
         )}
 
         <div className="griot-auth-switch">
-          <p className="text-gray-600">Déjà inscrit ?</p>
+          <p>Déjà inscrit ?</p>
           <button
             onClick={onSwitchToLogin}
-            className="text-green-600 hover:text-green-700 font-medium mt-2"
           >
             Se connecter
           </button>

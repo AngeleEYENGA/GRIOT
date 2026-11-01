@@ -452,7 +452,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <p className="text-red-600 mb-4">Arbre non trouvé</p>
-          <button onClick={onBack} className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+          <button onClick={onBack} className="griot-button griot-button-primary">
             Retour
           </button>
         </div>
@@ -663,7 +663,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
               </div>
               {peutAjouterPersonne && <button
                 onClick={() => setShowAddPersonForm(!showAddPersonForm)}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+                className="griot-button griot-button-primary"
               >
                 {showAddPersonForm ? 'Annuler' : '+ Ajouter une personne'}
               </button>}
@@ -742,7 +742,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   </div>
                   <button
                     type="submit"
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition"
+                    className="griot-button griot-button-primary"
                   >
                     Ajouter
                   </button>
@@ -826,7 +826,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                     <option value="">Personne 2</option>
                     {personnes.map((person) => <option key={person.id} value={person.id}>{person.prenom} {person.nom}</option>)}
                   </select>
-                  <button type="submit" className="rounded bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700">
+                  <button type="submit" className="griot-button griot-button-primary">
                     Ajouter le lien
                   </button>
                 </form>
@@ -881,7 +881,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
               {peutAjouterPersonne && (
                 <button
                   onClick={() => setShowAddSouvenirForm(!showAddSouvenirForm)}
-                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition font-medium"
+                  className="griot-button griot-button-primary"
                 >
                   {showAddSouvenirForm ? 'Annuler' : '+ Raconter un souvenir'}
                 </button>
@@ -979,7 +979,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                 <button
                   type="submit"
                   disabled={savingSouvenir}
-                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2 rounded-lg transition"
+                  className="griot-button griot-button-primary"
                 >
                   {savingSouvenir ? 'Enregistrement...' : 'Enregistrer le souvenir'}
                 </button>
@@ -1300,14 +1300,14 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   <button
                     type="button"
                     onClick={() => setEditingPerson(false)}
-                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg"
+                    className="griot-button griot-button-outline"
                   >
                     Annuler
                   </button>
                   <button
                     type="submit"
                     disabled={savingPerson}
-                    className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 disabled:opacity-50 rounded-lg"
+                    className="griot-button griot-button-primary"
                   >
                     {savingPerson ? 'Enregistrement...' : 'Enregistrer'}
                   </button>
@@ -1319,7 +1319,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   <div className="flex items-center justify-between gap-4">
                     <h3 className="font-semibold text-gray-900">Médias privés</h3>
                     {peutAjouterPersonne && (
-                      <label className="px-3 py-2 text-sm text-white bg-green-700 hover:bg-green-800 rounded-lg cursor-pointer">
+                      <label className="griot-button griot-button-primary">
                         {uploadingPhoto ? 'Envoi...' : 'Ajouter un fichier'}
                         <input
                           type="file"
@@ -1476,7 +1476,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
                   <div className="griot-profile-edit">
                     <button
                       onClick={() => setEditingPerson(true)}
-                      className="px-4 py-2 text-white bg-green-700 hover:bg-green-800 rounded-lg"
+                      className="griot-button griot-button-primary"
                     >
                       Modifier le profil
                     </button>
