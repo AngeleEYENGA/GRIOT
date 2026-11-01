@@ -3,6 +3,7 @@ import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 
 const panelGuidance = {
+  rapports: { eyebrow: 'RAPPORTS FAMILIAUX', title: 'Conservez une copie de votre histoire', description: 'Choisissez un arbre pour imprimer sa généalogie et préparer un rapport avec ses personnes, ses liens, ses parcours et ses récits.' },
   genealogie: {
     eyebrow: 'ARBRE GÉNÉALOGIQUE',
     title: 'Les liens de votre famille, réunis en un seul arbre',

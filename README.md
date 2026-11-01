@@ -36,7 +36,7 @@ Contact commun : **[contact.gamlabs@proton.me](mailto:contact.gamlabs@proton.me)
 6. Dans **Carte des origines**, associez des lieux et des étapes à une personne.
 7. Invitez vos proches avec le rôle adapté. Ils doivent disposer d’un compte et accepter l’invitation depuis la cloche des notifications.
 
-Un **guide de navigation en six étapes** est disponible avec le bouton **?**, le menu de gauche et le menu mobile **Plus**. Un encart de bienvenue l’indique aux nouveaux utilisateurs. Masquer cet encart conserve l’accès au guide ; ce choix est mémorisé localement par compte et navigateur.
+Un **guide de navigation en huit étapes** est disponible avec le bouton **?**, le menu de gauche et le menu mobile **Plus**. Un encart de bienvenue l’indique aux nouveaux utilisateurs. Masquer cet encart conserve l’accès au guide ; ce choix est mémorisé localement par compte et navigateur.
 
 Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourcis sont en bas et **Plus** affiche les autres écrans. Dans un arbre, **Retour** ramène à la liste des arbres. L’avatar ouvre **Mon compte**.
 
@@ -73,6 +73,29 @@ Le catalogue intégré comprend **34 195 villes et 252 entrées de pays/territoi
 - **Enregistrement :** le lieu et les coordonnées sont transmis au backend GRIOT seulement lors de l’enregistrement, puis accessibles aux membres autorisés de l’arbre.
 
 Les données sont fournies par **[GeoNames](https://www.geonames.org/)** sous **[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)**, puis réduites et transformées pour GRIOT. L’attribution apparaît dans le formulaire. Voir les [fichiers sources et leur format](https://download.geonames.org/export/dump/readme.txt) et la [provenance de l’extrait](griot-frontend/public/data/geonames-source.json). Actualisation : `python scripts/update-geography.py`, puis examiner les différences avant publication.
+
+## Impression, rapports et personnalisation
+
+Dans **Rapports & impression**, choisissez les personnes, les liens, les parcours, les biographies et les récits à inclure. Le rapport s’imprime depuis le navigateur ; choisissez **Enregistrer en PDF** pour conserver une copie. Les fichiers médias ne sont pas intégrés. Les personnes et relations peuvent aussi être exportées en CSV, avec protection contre l’interprétation de formules par un tableur.
+
+Le bouton **Imprimer** de la généalogie adapte la vue filtrée à une page A4 paysage. Pour un grand arbre, filtrez une branche afin de conserver des noms lisibles. Les exports restent des documents privés à partager avec discernement.
+
+La **Charte graphique** permet de choisir un mode clair, sombre ou adapté au système et une palette héritage, forêt ou océan. Les changements s’appliquent immédiatement à l’application et sont mémorisés dans le navigateur de cet appareil.
+
+## Utiliser GRIOT au village, hors réseau
+
+1. Sur un appareil personnel, ouvrez GRIOT avec une connexion et choisissez **Mode hors ligne → Activer et préparer mes arbres**.
+2. Attendez la confirmation. L’interface, le fond mondial Natural Earth et le catalogue de villes sont disponibles après préparation ; les données textuelles des arbres sont conservées dans IndexedDB, séparées par compte.
+3. Sans réseau, retrouvez les arbres préparés et leurs données. Les copies peuvent être anciennes ; les médias privés ne sont pas téléchargés.
+4. Ajoutez des personnes, souvenirs textuels, lieux et relations : ce sont des **brouillons locaux**, pas encore publiés pour la famille. Ils survivent à un rechargement de la page.
+5. Au retour du réseau, choisissez **Envoyer les brouillons**. Le serveur vérifie la session et les permissions. Les références aux personnes créées hors ligne sont remplacées par les identifiants confirmés par le serveur.
+6. Si le serveur refuse un ajout, le brouillon est conservé. Si une réponse est incertaine après une coupure, le brouillon est bloqué pour éviter un doublon : vérifiez l’arbre en ligne et sauvegardez les notes avant une reprise manuelle.
+
+Si la session a expiré pendant le séjour, utilisez **Reprendre la connexion sans perdre les brouillons** sur cette même page, avec le mot de passe ou Google selon votre compte. Il n’est pas nécessaire de se déconnecter et d’effacer les copies. La reconnexion est limitée au compte qui a préparé les données locales.
+
+**Sauvegarder mes brouillons** télécharge une copie JSON ; ce fichier est une sauvegarde, pas un import automatique. La déconnexion ou l’effacement des copies supprime les données locales du compte. Une confirmation est demandée à la déconnexion en présence de brouillons. Le stockage peut aussi être effacé par l’appareil : ce mode ne remplace pas une sauvegarde durable. La copie locale n’est pas chiffrée séparément ; protégez votre appareil et évitez cette option sur un poste partagé.
+
+Le fond **[Natural Earth](https://www.naturalearthdata.com/)** provient des limites de pays à petite échelle et relève du domaine public. Il est hébergé avec GRIOT ; aucune tuile cartographique externe n’est requise. La carte permet de zoomer, de se déplacer, de filtrer par personne et de rejouer les étapes chronologiquement. Les étapes sans date viennent ensuite, selon l’ordre saisi. Les lignes ne constituent pas des itinéraires routiers. Les villages mentionnés dans les profils peuvent être ajoutés comme étapes après confirmation du pays et des coordonnées.
 
 ## Rôles et confidentialité
 
@@ -164,9 +187,9 @@ La CI ajoute les audits de dépendances. Les tests de calcul ne remplacent pas l
 Les changements poussés sur `main` déclenchent GitHub Actions et Vercel. Vérifiez la CI, les deux déploiements et les routes en production. Le backend applique les migrations au build ; ne lancez jamais `prisma migrate dev` sur la base de production. Configuration complète : **[DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md)**.
 
 - L’assistant utilise des réponses guidées et un contexte limité de l’arbre ; ce n’est pas une IA générative connectée à des archives historiques.
-- La carte des origines est une représentation schématique du parcours, sans navigation routière.
+- La carte représente les étapes déclarées par la famille sur un fond mondial simplifié. Elle ne permet pas la navigation routière et ne constitue pas une preuve historique.
 - Les données géographiques constituent un instantané à vérifier et à actualiser ; elles ne couvrent pas tous les villages.
-- La PWA met en cache l’interface et des ressources statiques. La synchronisation complète des données familiales hors connexion n’est pas implémentée.
+- Le mode hors ligne couvre les copies préparées et les nouveaux brouillons de personnes, liens, récits textuels et lieux. Modifications, suppressions, invitations et médias nécessitent une connexion. Il ne s’agit pas d’une synchronisation générale des modifications concurrentes.
 - « Mon compte » ne propose pas encore le changement d’adresse e-mail ni la suppression de compte. Les comptes Google gèrent leur mot de passe chez Google.
 
 Le modèle métier et la conception du système sont détaillés dans [GRIOT-Conception-SI.md](GRIOT-Conception-SI.md).

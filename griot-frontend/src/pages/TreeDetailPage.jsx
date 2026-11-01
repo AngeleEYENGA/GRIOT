@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 import FamilyTreeView from '../components/FamilyTreeView';
+import FamilyReports from '../components/FamilyReports';
 import DashboardInsights, { DashboardMetrics } from '../components/DashboardInsights';
 import {
   AssistantPanel,
@@ -573,6 +574,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       <header className="griot-detail-header bg-white border-b border-gray-200">
         <div className="griot-detail-header-inner">
           <div className="griot-tree-detail-head-row">
+            <button className="griot-button griot-button-outline" onClick={() => setActiveTab('rapports')}>Rapports & impression</button>
             <button
               onClick={onBack}
               className="griot-tree-back-button"
@@ -591,7 +593,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       <div className="griot-detail-tabs">
         <div className="griot-detail-tabs-inner">
           <div className="griot-detail-tab-list">
-            {['tableau', 'genealogie', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
+            {['tableau', 'genealogie', 'rapports', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -600,6 +602,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
               >
                 {tab === 'tableau' && '📊 Tableau de bord'}
                 {tab === 'genealogie' && '🌳 Généalogie'}
+                {tab === 'rapports' && 'Rapports & impression'}
                 {tab === 'personnes' && '👤 Personnes'}
                 {tab === 'relations' && '🤝 Relations'}
                 {tab === 'souvenirs' && '📜 Souvenirs'}
@@ -616,6 +619,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
       {/* Main Content */}
       <main className="griot-detail-content">
+        {activeTab === 'rapports' && <FamilyReports tree={tree} personnes={personnes} relations={relations} souvenirs={souvenirs} migrations={migrations} />}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
             {error}
@@ -775,6 +779,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
         {activeTab === 'genealogie' && (
           <FamilyTreeView
+            treeName={tree.nom}
             personnes={personnes}
             relations={relations}
             onOpenProfile={openPersonProfile}

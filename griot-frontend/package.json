@@ -5,13 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/write-offline-assets.js",
     "lint": "oxlint",
     "test": "node --test src/utils/*.test.js",
     "preview": "vite preview"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
+    "leaflet": "^1.9.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

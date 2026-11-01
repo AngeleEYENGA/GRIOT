@@ -1,4 +1,4 @@
-const CACHE_NAME = 'griot-shell-v1';
+const CACHE_NAME = 'griot-shell-v3';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -8,12 +8,23 @@ const APP_SHELL = [
   '/manifest.webmanifest',
 ];
 
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'GRIOT_OFFLINE_READY') event.ports[0]?.postMessage({ ready: true, version: CACHE_NAME });
+});
+
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting()),
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    const response = await fetch('/', { cache: 'reload' });
+    if (!response.ok) throw new Error('App shell unavailable');
+    const manifest = await fetch('/offline-assets.json', { cache: 'reload' });
+    if (!manifest.ok) throw new Error('Offline manifest unavailable');
+    const assets = await manifest.json();
+    await cache.addAll([...APP_SHELL.filter((path) => path !== '/' && path !== '/index.html'), ...assets, '/data/world.geojson']);
+    await cache.put('/index.html', response.clone());
+    await cache.put('/', response);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', (event) => {
@@ -47,7 +58,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (!/\.(?:js|css|svg|png|jpe?g|webmanifest|woff2?)$/i.test(url.pathname)) return;
+  if (!/\.(?:js|css|svg|png|jpe?g|webmanifest|woff2?)$/i.test(url.pathname) && !['/data/cities.json', '/data/world.geojson'].includes(url.pathname)) return;
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) return cached;

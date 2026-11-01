@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { getGenealogyEdge, getRelationLabel } from '../utils/familyRelations';
+import { printSection } from '../utils/exports';
 
 const NODE_WIDTH = 220;
 const NODE_HEIGHT = 106;
@@ -58,7 +59,7 @@ function getGenerations(personnes, relations) {
   return generations;
 }
 
-export default function FamilyTreeView({ personnes, relations, onOpenProfile }) {
+export default function FamilyTreeView({ personnes, relations, onOpenProfile, treeName }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [focusPersonId, setFocusPersonId] = useState('');
@@ -170,7 +171,8 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
   ));
 
   return (
-    <section className="griot-family-tree" aria-labelledby="genealogy-title">
+    <section className="griot-family-tree" aria-labelledby="genealogy-title" style={{ '--tree-print-scale': Math.min(1, 980 / layout.width, 590 / layout.height), '--tree-print-height': `${layout.height * Math.min(1, 980 / layout.width, 590 / layout.height)}px` }}>
+      <div className="griot-print-tree-title"><h1>{treeName || 'Arbre familial'}</h1><p>GRIOT · Vue filtrée de {visiblePeople.length} personnes · {new Date().toLocaleDateString('fr-FR')}</p></div>
       <div className="griot-family-tree-heading">
         <div>
           <h2 id="genealogy-title">Arbre généalogique</h2>
@@ -179,6 +181,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile }) 
           </p>
         </div>
         <div className="griot-family-tree-zoom">
+          <button type="button" className="griot-print-tree-button" onClick={() => printSection('tree')}>Imprimer</button>
           <button
             type="button"
             onClick={() => setZoom((current) => Math.max(0.65, current - 0.15))}

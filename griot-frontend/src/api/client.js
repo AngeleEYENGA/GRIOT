@@ -1,9 +1,12 @@
 // API Client pour communiquer avec le backend NestJS
+import { readOffline, writeOffline, clearOffline, offlineEvent, remapLocalIds } from '../utils/offlineStore';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
 
 class GriotAPI {
   constructor() {
     this.token = localStorage.getItem('griot_token');
+    this.offlineUser = localStorage.getItem('griot-offline-user');
+    this.queueLock = Promise.resolve();
   }
 
   setToken(token) {
@@ -16,11 +19,26 @@ class GriotAPI {
   }
 
   clearToken() {
+    const scope = this.offlineUser;
+    if (scope) {
+      localStorage.removeItem(`griot-offline-enabled:${scope}`);
+      localStorage.removeItem(`griot-offline-prepared:${scope}`);
+      clearOffline(scope).catch(() => {});
+    }
+    localStorage.removeItem('griot-offline-user');
+    this.offlineUser = null;
     this.token = null;
     localStorage.removeItem('griot_token');
   }
 
-  async request(endpoint, options = {}, { allowEmptyResponse = false } = {}) {
+  async request(endpoint, options = {}, { allowEmptyResponse = false, skipOfflineQueue = false, requireNetwork = false, expectedUserId } = {}) {
+    const method = options.method || 'GET';
+    if (!navigator.onLine) {
+      if (requireNetwork) throw new Error('Une connexion réelle est nécessaire pour cette opération.');
+      if (method === 'GET') return this.cachedResponse(endpoint);
+      if (skipOfflineQueue) throw new Error('Connexion interrompue pendant l’envoi.');
+      return this.queueDraft(endpoint, options);
+    }
     const url = `${API_URL}${endpoint}`;
     const headers = {
       ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
@@ -31,19 +49,156 @@ class GriotAPI {
       headers['Authorization'] = `Bearer ${this.token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    let response;
+    try { response = await fetch(url, { ...options, headers }); }
+    catch {
+      if (method === 'GET' && !requireNetwork) return this.cachedResponse(endpoint);
+      throw new Error('Connexion interrompue. Vérifiez si l’ajout a été enregistré avant de réessayer.');
+    }
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.message || `API Error: ${response.status}`);
+      const failure = new Error(error.message || `API Error: ${response.status}`);
+      failure.status = response.status;
+      throw failure;
     }
 
     const responseBody = await response.text();
-    if (!responseBody.trim() && allowEmptyResponse) return null;
-    return JSON.parse(responseBody);
+    const data = !responseBody.trim() && allowEmptyResponse ? null : JSON.parse(responseBody);
+    const identity = endpoint === '/auth/me' ? data?.id : /^\/auth\/(login|register|google)$/.test(endpoint) ? data?.utilisateur?.id : null;
+    if (expectedUserId && identity !== expectedUserId) throw new Error('Choisissez le compte qui a préparé ces arbres. Les brouillons ont été conservés.');
+    if (identity) {
+      if (this.offlineUser && this.offlineUser !== identity) {
+        localStorage.removeItem(`griot-offline-enabled:${this.offlineUser}`);
+        await clearOffline(this.offlineUser).catch(() => {});
+      }
+      this.offlineUser = identity;
+      localStorage.setItem('griot-offline-user', identity);
+    }
+    if (method === 'GET' && this.offlineEnabled()) {
+      await writeOffline(`${this.offlineUser}:cache:${endpoint}`, { data, savedAt: new Date().toISOString() }).catch(() => {});
+    }
+    return data;
+  }
+
+  offlineEnabled() { return Boolean(this.offlineUser && localStorage.getItem(`griot-offline-enabled:${this.offlineUser}`) === '1'); }
+  async renewOfflineSession({ email, motDePasse, credential }) {
+    const response = await this.request(credential ? '/auth/google' : '/auth/login', { method: 'POST', body: JSON.stringify(credential ? { credential } : { email, motDePasse }) }, { requireNetwork: true, expectedUserId: this.offlineUser });
+    this.setToken(response.accessToken);
+    return this.request('/auth/me', {}, { requireNetwork: true });
+  }
+  async cachedResponse(endpoint) {
+    if (this.offlineEnabled()) {
+      const cached = await readOffline(`${this.offlineUser}:cache:${endpoint}`);
+      if (cached) { this.lastCachedAt = cached.savedAt; offlineEvent(); return cached.data; }
+    }
+    throw new Error('Cette page n’est pas disponible hors ligne. Préparez vos arbres depuis « Mode hors ligne » avec une connexion.');
+  }
+  async queueDraft(endpoint, options) {
+    if (!this.offlineEnabled() || options.method !== 'POST' || !/^\/arbres\/[^/]+\/(personnes|souvenirs|migrations|relations)$/.test(endpoint)) {
+      throw new Error('Cette action nécessite une connexion. Hors ligne, seuls les ajouts de personnes, souvenirs, lieux et liens peuvent être conservés comme brouillons.');
+    }
+    const task = this.queueLock.then(async () => {
+      const snapshot = await readOffline(`${this.offlineUser}:cache:${endpoint}`);
+      if (!snapshot || !Array.isArray(snapshot.data)) throw new Error('Préparez cet arbre en ligne avant d’y ajouter un brouillon.');
+      const body = JSON.parse(options.body);
+      const id = `local-${crypto.randomUUID()}`;
+      const dateCreation = new Date().toISOString();
+      const result = { ...body, id, dateCreation, _offline: true };
+      if (endpoint.endsWith('/migrations')) {
+        const people = await readOffline(`${this.offlineUser}:cache:${endpoint.replace(/migrations$/, 'personnes')}`);
+        result.personne = people?.data.find((person) => person.id === body.personneId);
+        result.lieu = { nom: body.lieu, pays: body.pays || '', latitude: body.latitude ?? null, longitude: body.longitude ?? null };
+      }
+      const queue = await this.pendingDrafts();
+      await writeOffline(`${this.offlineUser}:queue`, [...queue, { id, endpoint, body, dateCreation }]);
+      await writeOffline(`${this.offlineUser}:cache:${endpoint}`, { data: [...snapshot.data, result], savedAt: snapshot.savedAt });
+      offlineEvent();
+      return result;
+    });
+    this.queueLock = task.catch(() => {});
+    return task;
+  }
+  async pendingDrafts() { return this.offlineUser ? (await readOffline(`${this.offlineUser}:queue`)) || [] : []; }
+  async prepareOffline() {
+    if (!navigator.onLine) throw new Error('Une connexion est nécessaire pour préparer vos arbres.');
+    if (import.meta.env.PROD) {
+      if (!('serviceWorker' in navigator)) throw new Error('Ce navigateur ne permet pas la préparation de l’interface hors ligne.');
+      const registration = await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('L’interface hors ligne n’est pas prête. Rechargez la page en ligne puis réessayez.')), 20000))]);
+      await new Promise((resolve, reject) => {
+        const channel = new MessageChannel();
+        const timer = setTimeout(() => { channel.port1.close(); reject(new Error('La nouvelle interface hors ligne doit terminer sa mise à jour. Rechargez la page en ligne puis réessayez.')); }, 5000);
+        channel.port1.onmessage = ({ data }) => { clearTimeout(timer); channel.port1.close(); if (data.ready) resolve(); else reject(new Error('Interface hors ligne indisponible.')); };
+        (navigator.serviceWorker.controller || registration.active).postMessage({ type: 'GRIOT_OFFLINE_READY' }, [channel.port2]);
+      });
+    }
+    const profile = await this.request('/auth/me', {}, { requireNetwork: true });
+    localStorage.setItem(`griot-offline-enabled:${profile.id}`, '1');
+    await writeOffline(`${profile.id}:cache:/auth/me`, { data: profile, savedAt: new Date().toISOString() });
+    if ((await this.pendingDrafts()).length) throw new Error('Envoyez vos brouillons avant de rafraîchir la copie locale.');
+    const trees = await this.request('/arbres', {}, { requireNetwork: true });
+    for (const tree of trees) {
+      for (const suffix of ['', '/personnes', '/relations', '/membres', '/souvenirs', '/migrations', '/preuves', '/institution', '/tableau-de-bord']) {
+        await this.request(`/arbres/${tree.id}${suffix}`, {}, { allowEmptyResponse: true, requireNetwork: true });
+      }
+    }
+    for (const path of ['/data/cities.json', '/data/world.geojson']) {
+      const response = await fetch(path);
+      if (!response.ok) throw new Error('Le catalogue ou le fond cartographique n’a pas pu être téléchargé.');
+      if ('caches' in window) { const cache = await caches.open('griot-geography-v1'); await cache.put(path, response); }
+    }
+    localStorage.setItem(`griot-offline-prepared:${profile.id}`, new Date().toISOString());
+    this.lastCachedAt = null;
+    offlineEvent();
+    return trees.length;
+  }
+  async syncDrafts() {
+    if (!navigator.onLine) throw new Error('Reconnectez-vous pour envoyer les brouillons.');
+    if (this.syncing) return;
+    this.syncing = true;
+    const scope = this.offlineUser;
+    const session = this.token;
+    const checkSession = () => { if (this.offlineUser !== scope || this.token !== session) throw new Error('La session a changé. L’envoi des brouillons a été arrêté.'); };
+    try {
+      // Revalidate the session with the server before publishing any local draft.
+      await this.request('/auth/me', {}, { requireNetwork: true });
+      checkSession();
+      const mapping = (await readOffline(`${scope}:mapping`)) || {};
+      let queue = await this.pendingDrafts();
+      for (const item of [...queue]) {
+        checkSession();
+        if (item.uncertain) throw new Error('Un envoi a été interrompu. Vérifiez l’arbre en ligne avant de retenter ce brouillon.');
+        try {
+          const saved = await this.request(item.endpoint, { method: 'POST', body: JSON.stringify(remapLocalIds(item.body, mapping)) }, { skipOfflineQueue: true });
+          checkSession();
+          if (!saved?.id) throw new Error('Réponse serveur non confirmée.');
+          mapping[item.id] = saved.id;
+          await writeOffline(`${scope}:mapping`, mapping);
+          queue = queue.filter((entry) => entry.id !== item.id);
+          await writeOffline(`${scope}:queue`, queue);
+          offlineEvent();
+        } catch (error) {
+          checkSession();
+          if (!error.status) {
+            queue = queue.map((entry) => entry.id === item.id ? { ...entry, uncertain: true } : entry);
+            await writeOffline(`${scope}:queue`, queue);
+          }
+          throw error;
+        }
+      }
+      await this.prepareOffline();
+    } finally { this.syncing = false; offlineEvent(); }
+  }
+  async removeOffline() {
+    if (this.offlineUser) {
+      localStorage.removeItem(`griot-offline-enabled:${this.offlineUser}`);
+      localStorage.removeItem(`griot-offline-prepared:${this.offlineUser}`);
+      await clearOffline(this.offlineUser);
+    }
+    offlineEvent();
+  }
+  async exportDrafts() {
+    return { format: 'griot-offline-drafts-v1', exportedAt: new Date().toISOString(), drafts: await this.pendingDrafts() };
   }
 
   async requestBlob(endpoint) {

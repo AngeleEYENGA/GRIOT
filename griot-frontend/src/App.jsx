@@ -13,6 +13,7 @@ import AccountPage from './pages/AccountPage';
 import NavigationGuide from './pages/NavigationGuide';
 import WelcomeGuide from './components/WelcomeGuide';
 import CompanyPages from './pages/CompanyPages';
+import OfflinePage, { NetworkStatus } from './pages/OfflinePage';
 import './index.css';
 
 function AppContent() {
@@ -38,11 +39,11 @@ function AppContent() {
   const navigate = (panel) => {
     setActivePanel(panel);
   };
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    if (await logout() === false) return;
     setSelectedTreeId(null);
     setActivePanel('tableau');
     setAuthMode('home');
-    logout();
   };
 
   if (publicPage) {
@@ -93,8 +94,11 @@ function AppContent() {
       onNavigate={navigate}
       user={user}
     >
+      <NetworkStatus onOpen={() => setActivePanel('offline')} />
       {activePanel === 'tableau' && <WelcomeGuide key={user.id} onOpen={() => setActivePanel('guide')} />}
-      {activePanel === 'guide' ? (
+      {activePanel === 'offline' ? (
+        <OfflinePage />
+      ) : activePanel === 'guide' ? (
         <NavigationGuide onNavigate={navigate} />
       ) : activePanel === 'compte' ? (
         <AccountPage onLogout={handleLogout} onBack={() => setActivePanel('tableau')} />

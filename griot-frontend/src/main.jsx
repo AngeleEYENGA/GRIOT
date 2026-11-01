@@ -2,6 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
+import { ThemeProvider } from './contexts/ThemeContext'
 import { GoogleOAuthProvider } from '@react-oauth/google'
 
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -11,7 +12,7 @@ const application = googleClientId
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {application}
+    <ThemeProvider>{application}</ThemeProvider>
   </StrictMode>,
 )
 

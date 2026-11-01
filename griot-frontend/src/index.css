@@ -1174,6 +1174,94 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .griot-profile-dialog li strong { margin-left: 4px; }
 
 /* Account and enriched family dashboard */
+html[data-griot-palette="forest"] { --griot-terracotta: #346b4d; --griot-terracotta-deep: #24553b; --griot-gold: #93803b; --griot-olive: #34634d; --griot-cream: #edf2e9; --griot-paper: #fafff7; --griot-ink: #1e3328; --griot-ink-soft: #425d4c; --griot-line: #c5d6c8; }
+html[data-griot-palette="ocean"] { --griot-terracotta: #236b84; --griot-terracotta-deep: #1b5269; --griot-gold: #ab8037; --griot-olive: #2b6274; --griot-cream: #ecf3f5; --griot-paper: #f8fdff; --griot-ink: #182f3c; --griot-ink-soft: #425b6a; --griot-line: #c4d5df; }
+html[data-griot-mode="dark"] { color-scheme: dark; --griot-cream: #171c1e; --griot-paper: #232b2d; --griot-ink: #f2e7d5; --griot-ink-soft: #c6c7bd; --griot-line: #465251; --griot-gold: #e3b66e; --griot-terracotta: #eeac84; --griot-terracotta-deep: #edb595; --griot-olive: #b5d0a3; }
+html[data-griot-mode="dark"][data-griot-palette="ocean"] { --griot-terracotta: #8bc9dd; --griot-terracotta-deep: #9ddbed; --griot-olive: #91c9d8; }
+html[data-griot-mode="dark"][data-griot-palette="forest"] { --griot-terracotta: #a5d2ab; --griot-terracotta-deep: #b7dcbc; }
+html[data-griot-mode="dark"] .griot-sidebar { background: #121a18; color: #f2e7d5; }
+html[data-griot-mode="dark"] :is(.griot-account-hero,.griot-overview-stats article,.griot-guide-hero,.griot-guide-detail,.griot-guide-faq,.griot-guide-steps button,.griot-welcome-guide,.griot-company-origin,.griot-company-invitation,.griot-story-studio,.griot-story-prompts article,.griot-account-card,.griot-insight-card,.griot-map-card,.griot-metric-card,.griot-coverage-track,.griot-report-preview,.griot-settings-card,.griot-live-map-card,.griot-contact-preparation,.griot-first-tree,.griot-family-tree-node) { color: var(--griot-ink); background: var(--griot-paper); border-color: var(--griot-line); }
+html[data-griot-mode="dark"] :is(.griot-members-table th,.griot-relations-table th,.griot-role-cards article,.griot-dashboard-quick-actions > div:last-child button,.griot-guide-detail aside,.griot-notifications-heading,.griot-tree-form-card,.griot-profile-content > section,.griot-form-card) { color: var(--griot-ink); background: var(--griot-paper); }
+html[data-griot-mode="dark"] :is(input,select,textarea) { color: var(--griot-ink); background: #172123; border-color: var(--griot-line); }
+html[data-griot-mode="dark"] :is(.griot-sidebar .griot-brand,.griot-sidebar-caption,.griot-sidebar-footer) { color: #dcc9a5; }
+html[data-griot-mode="dark"] :is(.griot-company-hero,.griot-hero,.griot-overview-hero,.griot-tree-summary,.griot-roots-card) { color: #fff3df; background: linear-gradient(130deg,#172d2e,#30413b); }
+html[data-griot-mode="dark"] :is(.griot-button-primary,.griot-notifications-list article button) { color: #132523; background: var(--griot-gold); }
+html[data-griot-mode="dark"] :is(.griot-family-tree-heading h2,.griot-dashboard-welcome h2,.griot-guide-faq h2,.griot-report-preview h1,.griot-report-preview h2) { color: var(--griot-ink); }
+.griot-settings-card { margin: 20px 0; padding: 24px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); }
+.griot-settings-card :is(p,li) { color: var(--griot-ink-soft); font-size: 13px; line-height: 1.8; }
+.griot-settings-card :is(h2,h3) { font: 600 23px var(--griot-serif); }
+.griot-setting-options { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin: 18px 0; }
+.griot-setting-options label { font-size: 13px; }
+.griot-setting-options input { accent-color: var(--griot-terracotta); }
+.griot-setting-options button[aria-pressed="true"] { border-color: var(--griot-olive); color: var(--griot-paper); background: var(--griot-olive); }
+html[data-griot-mode="dark"] .griot-setting-options button[aria-pressed="true"] { color: #172123; }
+.griot-offline-page { max-width: 1100px; margin: auto; padding: 32px 24px 60px; }
+.griot-offline-page h1 { font: 600 35px var(--griot-serif); }
+.griot-offline-page > p:not(.griot-eyebrow) { font-size: 14px; line-height: 1.8; }
+.griot-network-status { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 15px 24px; border-bottom: 1px solid var(--griot-line); color: var(--griot-ink); background: var(--griot-paper); font-size: 12px; line-height: 1.6; }
+.griot-network-status button { border: 0; background: transparent; color: var(--griot-terracotta-deep); font-size: 12px; }
+.griot-live-map-card { margin: 20px 0; padding: 18px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); }
+.griot-live-map-card h3 { margin: 0 0 12px; font: 600 22px var(--griot-serif); }
+.griot-live-map-card p, .griot-live-map-card small { font-size: 12px; line-height: 1.8; color: var(--griot-ink-soft); }
+.griot-live-map { isolation: isolate; z-index: 0; width: 100%; height: 440px; margin: 15px 0; border-radius: 12px; background: #e0edf0; }
+.griot-live-map .leaflet-control-zoom a { background: #fff; color: #293b30; }
+.griot-live-map .leaflet-popup-content { color: #253527; }
+.griot-live-map .leaflet-popup-content p { color: #33443b; }
+.griot-live-map.leaflet-container { background: #dfeef2; }
+.griot-map-filter { display: grid; max-width: 420px; gap: 8px; margin-top: 22px; font-size: 12px; }
+.griot-map-filter select { padding: 10px; border: 1px solid var(--griot-line); border-radius: 8px; color: var(--griot-ink); background: var(--griot-paper); }
+.griot-report-controls { margin-bottom: 24px; }
+.griot-report-controls h2 { font: 600 30px var(--griot-serif); }
+.griot-report-controls p { max-width: 900px; font-size: 13px; line-height: 1.8; }
+.griot-report-preview { padding: 32px; border: 1px solid var(--griot-line); border-radius: 12px; background: var(--griot-paper); overflow-wrap: anywhere; }
+.griot-report-preview header { padding-bottom: 20px; border-bottom: 2px solid var(--griot-line); }
+.griot-report-preview h1 { margin: 10px 0; font: 600 32px var(--griot-serif); }
+.griot-report-preview :is(p,li,td,th) { font-size: 12px; line-height: 1.8; }
+.griot-report-preview h2 { margin-top: 30px; font: 600 23px var(--griot-serif); }
+.griot-report-preview h3 { font: 600 17px var(--griot-serif); }
+.griot-report-preview table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.griot-report-preview :is(td,th) { padding: 10px 8px; border-bottom: 1px solid var(--griot-line); vertical-align: top; text-align: left; }
+.griot-report-text { white-space: pre-wrap; }
+.griot-report-preview footer { margin-top: 35px; padding-top: 15px; border-top: 1px solid var(--griot-line); font-size: 10px; }
+.griot-print-tree-title { display: none; }
+.griot-family-tree-zoom .griot-print-tree-button { width: auto; padding: 6px 12px; font-size: 12px; }
+@media (max-width: 720px) {
+  .griot-live-map { height: 340px; }
+  .griot-report-preview { padding: 18px; }
+  .griot-offline-page { padding-inline: 16px; }
+  .griot-settings-card { padding: 18px; }
+}
+@media print {
+  @page { size: A4 landscape; margin: 12mm; }
+  html, html[data-griot-mode="dark"] { color-scheme: light; --griot-paper: #fff; --griot-cream: #fff; --griot-ink: #111; --griot-ink-soft: #333; --griot-line: #aaa; }
+  * { animation: none !important; transition: none !important; box-shadow: none !important; }
+  body { margin: 0; background: white !important; color: #111 !important; }
+  .griot-sidebar,.griot-topbar,.griot-detail-header,.griot-detail-tabs,.griot-mobile-nav,.griot-mobile-drawer,.griot-mobile-company-footer,.griot-network-status,.griot-welcome-guide { display: none !important; }
+  .griot-report-controls,.griot-family-tree-filters,.griot-family-tree-heading { display: none !important; }
+  .griot-shell,.griot-main-column,.griot-shell-content,.griot-tree-workspace,.griot-detail-content { display: block !important; min-height: 0 !important; width: 100% !important; height: auto !important; margin: 0 !important; padding: 0 !important; }
+  body[data-print-target="report"] .griot-detail-content > :not(.griot-report-panel), body[data-print-target="report"] .griot-report-controls { display: none !important; }
+  .griot-report-preview { padding: 0; border: 0; border-radius: 0; color: #111 !important; background: #fff !important; }
+  .griot-report-preview thead { display: table-header-group; }
+  .griot-report-preview tr, .griot-report-preview h2, .griot-report-preview h3 { break-inside: avoid; }
+  .griot-report-preview h2,.griot-report-preview h3 { break-after: avoid; }
+  .griot-report-preview h1 { font-size: 24px; }
+  .griot-report-preview h2 { margin-top: 16px; font-size: 18px; }
+  .griot-report-preview header { padding-bottom: 10px; }
+  .griot-report-preview :is(p,li,td,th) { font-size: 10px; line-height: 1.5; }
+  .griot-report-preview :is(td,th) { padding: 6px; }
+  .griot-report-preview footer { margin-top: 16px; padding-top: 8px; }
+  body[data-print-target="tree"] .griot-detail-content > :not(.griot-family-tree) { display: none !important; }
+  body[data-print-target="tree"] .griot-family-tree-filters,body[data-print-target="tree"] .griot-family-tree-heading { display: none !important; }
+  .griot-print-tree-title { display: block; color: #111; }
+  .griot-print-tree-title h1 { margin: 0 0 5px; font: 600 23px Georgia,serif; }
+  .griot-print-tree-title p { margin: 0 0 18px; font-size: 11px; }
+  .griot-family-tree-canvas { overflow: visible !important; border: 0 !important; background: white !important; }
+  .griot-family-tree-canvas > div { width: 100% !important; height: var(--tree-print-height) !important; }
+  .griot-family-tree-layer { transform: scale(var(--tree-print-scale)) !important; transform-origin: top left !important; }
+  .griot-family-tree-node { color: #111 !important; background: #fff !important; border-color: #555 !important; }
+  .griot-family-tree-name,.griot-family-tree-origin { color: #111 !important; }
+  .griot-family-tree { break-inside: avoid; }
+}
 .griot-site-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; padding: 26px max(24px, calc((100% - 1140px) / 2)); border-top: 1px solid var(--griot-line); color: var(--griot-ink-soft); background: var(--griot-paper); font-size: 11px; line-height: 1.8; }
 .griot-site-footer p { margin: 0; }
 .griot-site-footer nav, .griot-sidebar-footer nav { display: flex; flex-wrap: wrap; gap: 14px; }

@@ -6,6 +6,7 @@ import SiteFooter from './SiteFooter';
 const navigation = [
   { id: 'tableau', label: 'Tableau de bord' },
   { id: 'genealogie', label: 'Arbre généalogique' },
+  { id: 'rapports', label: 'Rapports & impression' },
   { id: 'personnes', label: 'Fiche personne' },
   { id: 'membres', label: 'Rôles & permissions' },
   { id: 'origines', label: 'Carte des origines' },
@@ -16,10 +17,13 @@ const navigation = [
   { id: 'style', label: 'Charte graphique' },
   { id: 'compte', label: 'Mon compte' },
   { id: 'guide', label: 'Guide de navigation' },
+  { id: 'offline', label: 'Mode hors ligne' },
 ];
 
 function NavigationIcon({ name }) {
   const icons = {
+    rapports: <><path d="M6 9V3h12v6M6 17H3v-8h18v8h-3M6 14h12v7H6z" /></>,
+    offline: <><path d="M3 8a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0m-9 4a5 5 0 0 1 6 0M12 20h.01M3 3l18 18" /></>,
     guide: <><circle cx="12" cy="12" r="9" /><path d="M9.5 8a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1-1.5 3m0 3h.01" /></>,
     tableau: <><path d="m3 10 9-7 9 7" /><path d="M5 9v11h14V9M9 20v-6h6v6" /></>,
     genealogie: <><circle cx="12" cy="5" r="2" /><circle cx="6" cy="19" r="2" /><circle cx="18" cy="19" r="2" /><path d="M12 7v5m-6 5v-2a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3v2" /></>,

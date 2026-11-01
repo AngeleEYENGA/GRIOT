@@ -18,9 +18,11 @@ export function AuthProvider({ children }) {
         const profile = await api.getProfile();
         setUser(profile);
       }
-    } catch {
-      api.clearToken();
-      setUser(null);
+    } catch (error) {
+      if ([401, 403].includes(error.status) && api.offlineEnabled()) {
+        try { setUser(await api.cachedResponse('/auth/me')); }
+        catch { api.clearToken(); setUser(null); }
+      } else { if ([401, 403].includes(error.status)) api.clearToken(); setUser(null); }
     } finally {
       setLoading(false);
     }
@@ -71,9 +73,12 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    const drafts = await api.pendingDrafts().catch(() => []);
+    if (drafts.length && !window.confirm('Des brouillons locaux ne sont pas encore transmis. La déconnexion les effacera. Annuler pour les sauvegarder depuis « Mode hors ligne » ? Confirmer pour se déconnecter et les effacer.')) return false;
     api.clearToken();
     setUser(null);
+    return true;
   };
 
   const updateProfile = async (data) => {
@@ -81,9 +86,13 @@ export function AuthProvider({ children }) {
     setUser(profile);
     return profile;
   };
+  const renewOfflineSession = async (credentials) => {
+    const profile = await api.renewOfflineSession(credentials);
+    setUser(profile);
+  };
 
   return (
-    <AuthContext.Provider value={{ user, loading, error, register, login, loginWithGoogle, logout, updateProfile }}>
+    <AuthContext.Provider value={{ user, loading, error, register, login, loginWithGoogle, logout, updateProfile, renewOfflineSession }}>
       {children}
     </AuthContext.Provider>
   );

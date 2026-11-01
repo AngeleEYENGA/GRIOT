@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import api from '../api/client';
 import PlaceFields from './PlaceFields';
+import { useTheme } from '../contexts/useTheme';
+const OriginsMap = lazy(() => import('./OriginsMap'));
 
 function PageIntro({ eyebrow, title, description, children }) {
   return (
@@ -14,7 +16,7 @@ function PageIntro({ eyebrow, title, description, children }) {
   );
 }
 
-export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }) {
+export function OriginsPanel({ arbreId, migrations: allMigrations, personnes, role, onRefresh }) {
   const [formOpen, setFormOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -22,14 +24,10 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
   const [replayPlaying, setReplayPlaying] = useState(false);
   const [draft, setDraft] = useState({ personneId: '', lieu: '', pays: '', dateEvenement: '', latitude: '', longitude: '' });
   const canEdit = ['admin', 'editeur', 'contributeur'].includes(role);
-  const mapped = migrations.flatMap((item, index) => (
-    item.lieu.latitude !== null && item.lieu.longitude !== null
-      ? [{ ...item, routeIndex: index }]
-      : []
-  ));
-  const visibleMapped = replayIndex < 0
-    ? mapped
-    : mapped.filter((item) => item.routeIndex <= replayIndex);
+  const [personFilter, setPersonFilter] = useState('');
+  const migrations = useMemo(() => allMigrations
+    .filter((item) => !personFilter || (item.personneId || item.personne?.id) === personFilter)
+    .slice().sort((a, b) => (a.dateEvenement ? new Date(a.dateEvenement).getTime() : Infinity) - (b.dateEvenement ? new Date(b.dateEvenement).getTime() : Infinity) || (a.ordre || 0) - (b.ordre || 0)), [allMigrations, personFilter]);
 
   useEffect(() => {
     if (!replayPlaying) return undefined;
@@ -55,7 +53,7 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
         dateEvenement: draft.dateEvenement || undefined,
         latitude: draft.latitude === '' ? undefined : Number(draft.latitude),
         longitude: draft.longitude === '' ? undefined : Number(draft.longitude),
-        ordre: migrations.length,
+        ordre: allMigrations.length,
       });
       setDraft({ personneId: '', lieu: '', pays: '', dateEvenement: '', latitude: '', longitude: '' });
       setFormOpen(false);
@@ -101,6 +99,10 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
 
       {error && <p className="griot-inline-error" role="alert">{error}</p>}
 
+      {canEdit && personnes.some((person) => person.villageOrigine && !allMigrations.some((item) => (item.personneId || item.personne?.id) === person.id)) && <section className="griot-settings-card"><h3>Donner une place aux origines déjà renseignées</h3><p>Ces profils indiquent un lieu d’origine sans étape sur la carte. Confirmez le pays et les coordonnées pour le situer correctement.</p><div className="griot-setting-options">{personnes.filter((person) => person.villageOrigine && !allMigrations.some((item) => (item.personneId || item.personne?.id) === person.id)).map((person) => <button className="griot-button griot-button-outline" key={person.id} onClick={() => { setDraft({ personneId: person.id, lieu: person.villageOrigine, pays: '', dateEvenement: '', latitude: '', longitude: '' }); setFormOpen(true); }}>{person.prenom} · {person.villageOrigine}</button>)}</div></section>}
+
+      <label className="griot-map-filter">Parcours à afficher<select value={personFilter} onChange={(event) => { setPersonFilter(event.target.value); setReplayPlaying(false); setReplayIndex(-1); }}><option value="">Toute la famille</option>{personnes.map((person) => <option key={person.id} value={person.id}>{person.prenom} {person.nom}</option>)}</select></label>
+      <Suspense fallback={<p role="status">Chargement de la carte…</p>}><OriginsMap migrations={migrations} replayIndex={replayIndex} /></Suspense>
       {migrations.length > 0 && (
         <div className="griot-route-replay">
           <button type="button" className="griot-button griot-button-outline" onClick={toggleReplay}>
@@ -143,23 +145,6 @@ export function OriginsPanel({ arbreId, migrations, personnes, role, onRefresh }
         <div className="griot-empty-state"><span>⌖</span><h3>Le parcours familial commence ici</h3><p>Ajoutez les lieux associés aux personnes pour documenter les origines et les migrations.</p></div>
       ) : (
         <>
-          {mapped.length > 0 && (
-            <section className="griot-map-card" aria-label="Carte des lieux saisis">
-              <div className="griot-map-heading"><div><h3>Repères géographiques</h3><p>Coordonnées proposées ou saisies, puis confirmées par la famille.</p></div><span>{mapped.length} lieu{mapped.length === 1 ? '' : 'x'} géolocalisé{mapped.length === 1 ? '' : 's'}</span></div>
-              <svg className="griot-map" viewBox="0 0 720 280" role="img" aria-label="Carte des lieux familiaux">
-                <rect width="720" height="280" rx="14" fill="#efe4d0" />
-                {[1, 2, 3].map((line) => <line key={`v-${line}`} x1={line * 180} x2={line * 180} y1="0" y2="280" stroke="#ddcaa9" strokeDasharray="4 7" />)}
-                {[1, 2].map((line) => <line key={`h-${line}`} x1="0" x2="720" y1={line * 90} y2={line * 90} stroke="#ddcaa9" strokeDasharray="4 7" />)}
-                {visibleMapped.length > 1 && <polyline points={visibleMapped.map(({ lieu }) => `${((lieu.longitude + 180) / 360) * 680 + 20},${((90 - lieu.latitude) / 180) * 240 + 20}`).join(' ')} fill="none" stroke="#b5502a" strokeWidth="3" strokeDasharray="6 6" />}
-                {visibleMapped.map((item) => {
-                  const x = ((item.lieu.longitude + 180) / 360) * 680 + 20;
-                  const y = ((90 - item.lieu.latitude) / 180) * 240 + 20;
-                  return <g key={item.id}><circle cx={x} cy={y} r={item.routeIndex === replayIndex ? 11 : 8} fill="#b5502a" stroke="#fffbf3" strokeWidth="3" /><title>{item.lieu.nom} · {item.personne.prenom} {item.personne.nom}</title></g>;
-                })}
-              </svg>
-            </section>
-          )}
-
           <div className="griot-route-list">
             {migrations.map((item, index) => (
               <article key={item.id} className="griot-route-item">
@@ -378,17 +363,19 @@ export function AssistantPanel({ arbreId }) {
 }
 
 export function StylePanel() {
+  const { theme, setTheme } = useTheme();
   const colors = [
-    { title: 'Terre cuite', hex: '#B5502A', note: 'Héritage' },
-    { title: 'Or', hex: '#C9932E', note: 'Transmission' },
-    { title: 'Vert olive', hex: '#4B5D3B', note: 'Vie' },
-    { title: 'Encre', hex: '#2B1B12', note: 'Mémoire' },
-    { title: 'Crème', hex: '#F6EFE1', note: 'Accueil' },
+    { title: 'Accent principal', variable: '--griot-terracotta', note: 'Actions & repères' },
+    { title: 'Accent de transmission', variable: '--griot-gold', note: 'Transmission' },
+    { title: 'Accent de confiance', variable: '--griot-olive', note: 'Vie & collaboration' },
+    { title: 'Texte', variable: '--griot-ink', note: 'Lisibilité' },
+    { title: 'Fond', variable: '--griot-cream', note: 'Accueil' },
   ];
   return (
     <div className="griot-feature-screen">
       <PageIntro eyebrow="IDENTITÉ VISUELLE" title="Charte graphique GRIOT" description="Une interface chaleureuse, lisible et conçue pour mettre les récits familiaux au premier plan." />
-      <div className="griot-swatches">{colors.map((color) => <article key={color.hex}><span style={{ backgroundColor: color.hex }} /><h3>{color.title}</h3><p>{color.note} · {color.hex}</p></article>)}</div>
+      <section className="griot-settings-card"><h3>Personnaliser mon interface</h3><p>Les changements s’appliquent immédiatement à toute l’application et sont conservés sur cet appareil.</p><div className="griot-setting-options" role="group" aria-label="Mode d’affichage">{[['light', 'Clair'], ['dark', 'Sombre'], ['system', 'Selon l’appareil']].map(([mode, label]) => <button className="griot-button griot-button-outline" key={mode} aria-pressed={theme.mode === mode} onClick={() => setTheme({ ...theme, mode })}>{label}</button>)}</div><div className="griot-setting-options" role="group" aria-label="Palette de couleurs">{[['heritage', 'Terre & héritage'], ['forest', 'Forêt & racines'], ['ocean', 'Océan & diaspora']].map(([palette, label]) => <button className="griot-button griot-button-outline" key={palette} aria-pressed={theme.palette === palette} onClick={() => setTheme({ ...theme, palette })}>{label}</button>)}</div><button className="griot-dashboard-text-link" onClick={() => setTheme({ mode: 'system', palette: 'heritage' })}>Rétablir les préférences par défaut</button></section>
+      <div className="griot-swatches">{colors.map((color) => <article key={color.variable}><span style={{ backgroundColor: `var(${color.variable})` }} /><h3>{color.title}</h3><p>{color.note} · Couleur active</p></article>)}</div>
       <section className="griot-type-sample"><div><small>TITRES · SERIF</small><h2>Racines & mémoire</h2></div><div><small>INTERFACE · SANS SERIF</small><p>Moderne, lisible et chaleureux. Les personnes et leurs récits restent au centre de chaque écran.</p></div></section>
     </div>
   );
