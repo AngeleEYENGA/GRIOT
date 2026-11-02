@@ -10,8 +10,6 @@ Une mémoire familiale ne se résume pas à des noms et des dates. Elle comprend
 
 ## Pour qui ?
 
-GRIOT comprend aussi un **cercle familial privé** : salon de discussion, partage de contes/recettes/traditions, suggestions de langues selon les pays renseignés, fiches de mots/alphabet/grammaire avec voix et jeux adaptés à la découverte ou à la pratique. Les proches construisent et relisent les contenus ; Glottolog fournit le catalogue de langues, pas des cours complets. La lecture historique des parcours distingue les lieux/dates saisis, les repères sourcés et les questions à explorer, sans inventer une raison de migration. Voir [le fonctionnement et les limites](docs/CULTURE-ET-TRANSMISSION.md).
-
 - Les familles qui construisent leur arbre et transmettent leurs histoires.
 - Les membres de la diaspora qui documentent leurs origines et les parcours familiaux.
 - Les proches qui recueillent des récits, traditions, photos et archives.
@@ -37,10 +35,11 @@ Contact commun : **[contact.gamlabs@proton.me](mailto:contact.gamlabs@proton.me)
 5. Dans **Mémoire familiale**, conservez une histoire, une tradition ou un média.
 6. Dans **Carte des origines**, associez des lieux et des étapes à une personne.
 7. Invitez vos proches avec le rôle adapté. Ils doivent disposer d’un compte et accepter l’invitation depuis la cloche des notifications.
+8. Dans **Espace collaboratif & langues**, retrouvez le salon familial, les fiches et les jeux de langue, ainsi que **L’histoire de nos parcours**.
 
-Un **guide de navigation en huit étapes** est disponible avec le bouton **?**, le menu de gauche et le menu mobile **Plus**. Un encart de bienvenue l’indique aux nouveaux utilisateurs. Masquer cet encart conserve l’accès au guide ; ce choix est mémorisé localement par compte et navigateur.
+Un **guide de navigation par étapes** est disponible avec le bouton **?**, le menu de gauche et le menu mobile **Plus**. Un encart de bienvenue l’indique aux nouveaux utilisateurs. Masquer cet encart conserve l’accès au guide ; ce choix est mémorisé localement par compte et navigateur.
 
-Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourcis sont en bas et **Plus** affiche les autres écrans. Dans un arbre, **Retour** ramène à la liste des arbres. L’avatar ouvre **Mon compte**.
+Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourcis sont en bas et **Plus** affiche les autres écrans. Dans un arbre, **Mes arbres** ramène à la liste des arbres ; **Autres rubriques** donne accès aux espaces complémentaires, dont le cercle familial. L’avatar ouvre **Mon compte**.
 
 ## Fonctionnalités disponibles
 
@@ -50,16 +49,56 @@ Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourci
 | Tableau de bord d’un arbre | Chiffres, missions de démarrage, collaborateurs, souvenirs et derniers ajouts. |
 | Repères familiaux | Prochains anniversaires des personnes sans date de décès renseignée et complétude des profils : biographie, naissance, origine. |
 | Atelier de transmission | Amorces de récits sur les aînés, les traditions et les lieux de mémoire. |
-| Généalogie | Représentation des personnes et de leurs liens familiaux. |
+| Généalogie | Conjoints rapprochés, branches communes pour leurs enfants, libellés des liens et filtres de branche. |
 | Fiches personnes | Biographies, dates, liens et médias selon les droits attribués. |
 | Mémoire familiale | Souvenirs, traditions, commentaires et médias. |
 | Carte des origines | Lieux associés aux personnes et lecture des étapes d’un parcours familial. |
+| Salon familial privé | Publications et réponses par thèmes : langues, discussions, contes, cuisine, traditions et migrations. |
+| Atelier des langues | Suggestions par pays avec Glottolog, choix d’une langue ou variante, fiches de mots, alphabet et grammaire créées par les proches. |
+| Jeux et voix | Découverte par choix et écoute, pratique écrite, prononciations courtes et relecture familiale avant utilisation des fiches dans les jeux. |
+| Histoire des parcours | Récit des présences datées, repères historiques sourcés et questions à approfondir avec la famille. |
+| Rapports & impression | Arbre et rapport imprimables/PDF avec en-tête, filigrane GRIOT et pied de page ; exports CSV. |
+| Charte graphique | Modes clair/sombre/système et palettes appliqués immédiatement. |
+| Mode hors ligne | Copies préparées, consultation et brouillons de personnes, liens, lieux et souvenirs textuels. |
 | Rôles & permissions | Membres, invitations et gestion des rôles. |
 | Chefferie | Preuves, transmission institutionnelle et membres institutionnels selon les accès. |
 | Mon compte | Modification du prénom, du nom et du téléphone ; changement du mot de passe d’un compte local. |
 | Guide | Parcours de découverte et réponses aux questions de navigation. |
 
 L’interface est responsive. Les animations respectent la préférence système de réduction des mouvements. La fiche personne possède son propre défilement et peut être fermée avec sa croix, Échap ou un clic sur le fond.
+
+## Langues, cultures et histoire : première version
+
+Le **cercle familial** relie trois espaces au sein d’un arbre :
+
+- **Le salon familial** accueille les échanges, contes, anecdotes, recettes et traditions. Les publications ont un thème et des réponses ; les auteurs et les responsables peuvent modérer selon leurs droits. L’actualisation est manuelle dans cette première version.
+- **Apprendre nos langues** propose des langues à partir des pays explicitement renseignés dans les parcours. Le catalogue [Glottolog 5.3](https://github.com/glottolog/glottolog-cldf), sous CC BY 4.0, est intégré à GRIOT. Une suggestion géographique ne détermine pas la langue natale ni l’identité culturelle d’une personne. La famille confirme la langue ou indique une variante, puis crée les fiches avec un locuteur ou une référence.
+- **L’histoire de nos parcours** raconte les lieux et dates enregistrés pour une même personne et les rapproche de repères historiques. Un événement général n’est jamais présenté comme la cause prouvée d’un départ individuel. Les questions sur les études, le travail, la famille ou le contexte historique invitent à rechercher des témoignages et des archives.
+
+Les fiches peuvent contenir une expression, un signe ou une syllabe, un exemple grammatical, sa traduction, une explication et une source. Une voix peut être enregistrée pendant 15 secondes au maximum ou importée, avec une limite de 512 Kio. Les administrateurs et éditeurs relisent les fiches ; seules les fiches validées entrent dans les jeux. Les approches **découverte** et **pratique** proposent respectivement des choix/écoutes et des réponses écrites. Les accents et les tons sont conservés. La progression est personnelle à cet appareil ; le mode enfant suppose un accompagnement adulte.
+
+**Ce qui n’est pas encore fourni :** des cours complets prêts à l’emploi pour chaque langue, une correction automatique de la prononciation, un chat en temps réel et une base historique mondiale. Le premier catalogue de repères couvre l’Éthiopie de 1984 à 1986, le Cameroun d’octobre 2016 à mars 2019 et le séisme d’Haïti du 12 janvier 2010, avec leurs sources. L’absence de repère ne signifie pas absence d’événements.
+
+La préparation hors ligne conserve les fiches textuelles et la première page des échanges. Publier, répondre, valider et écouter les voix nécessite une connexion. Les données de la famille ne sont pas envoyées à une IA tierce pour produire les suggestions ou les rapprochements historiques. Voir [la documentation fonctionnelle et technique du cercle](docs/CULTURE-ET-TRANSMISSION.md).
+
+## Fonctionnalités prévues et feuille de route
+
+Cette feuille de route décrit les évolutions à implémenter. **Elle ne représente pas des fonctionnalités déjà disponibles et ne fixe pas de date de livraison.** Le périmètre et l’ordre de réalisation seront affinés avec les familles, les locuteurs et les besoins du projet.
+
+| Axe | Évolutions prévues | Conditions et précautions |
+| --- | --- | --- |
+| Cours de langues natales | Parcours progressifs : alphabet ou système d’écriture, sons, tons, vocabulaire quotidien, phrases, grammaire et conversations. | Choisir les langues prioritaires avec les familles ; travailler avec des locuteurs et des références ; distinguer les variantes. |
+| Apprentissage ludique | Jeux d’association son/image/mot, mémoire, écoute et répétition, défis coopératifs, activités adaptées aux enfants et aux adultes. | Contenus relus, accessibilité et respect du rythme de chacun ; ne pas confondre un score de jeu et la maîtrise d’une langue. |
+| Prononciation | Bibliothèque de voix de locuteurs, écoutes lentes, répétition et comparaison avec sa propre voix ; évaluation de prononciation à étudier. | Accord des locuteurs, maîtrise des enregistrements et vérification du support réel des langues avant toute notation automatique. |
+| Apprendre ensemble | Rendez-vous avec les aînés, ateliers familiaux, défis partagés et suivi des activités collectives. | Participation volontaire, droits par arbre et accompagnement des enfants. |
+| Réseau social familial | Échanges actualisés en temps réel, notifications des réponses, recherche dans le salon et partage de médias dans les discussions. | Maintenir un cercle privé, une modération familiale et des contrôles d’accès à chaque contenu. |
+| Bibliothèque culturelle | Fiches structurées de contes, proverbes, anecdotes, traditions, fêtes et recettes, reliées aux personnes, langues, lieux et périodes. | Conserver la source, le contexte et les variantes ; ne pas présenter une tradition familiale comme universelle à tout un pays. |
+| Histoire des peuples | Enrichir les repères sur les migrations de populations, les échanges culturels et linguistiques, les guerres, catastrophes et transformations sociales. | Sources historiques traçables, périmètres géographiques précis et relecture ; ne pas déduire une filiation à partir d’un pays ou d’une langue. |
+| Enquête sur les migrations familiales | Ajouter des témoignages, documents, sources et versions contradictoires ; produire des récits plus riches et comparer les motifs possibles aux éléments recueillis. | Séparer les faits établis, les témoignages et les hypothèses. Aucune cause individuelle ni probabilité ne doit être inventée à partir de deux lieux. |
+| Hors ligne au village | Téléchargement volontaire de petits packs de leçons et de voix, brouillons d’échanges et synchronisation culturelle avec gestion des conflits. | Prévoir la capacité de stockage, la confidentialité de l’appareil et une indication claire de ce qui est envoyé ou conservé localement. |
+| Rapports de transmission | Intégrer les récits culturels, les langues et les contextes historiques sourcés aux rapports familiaux, avec une sélection des éléments à partager. | Préserver les droits, le statut de vérification et les sources dans les documents exportés. |
+
+Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) constitue le point de départ ; la gestion du backlog GitLab sera organisée après confirmation de l’import du dépôt.
 
 ## Pays, villes et position actuelle
 
@@ -116,7 +155,7 @@ Les droits sont définis **dans chaque arbre**, plutôt que par un rôle global.
 
 Les profils, souvenirs et médias sont protégés par l’authentification et les contrôles d’appartenance. La recherche publique d’un arbre déclaré public montre son nom et son nombre de personnes ; elle n’ouvre pas ses profils et médias aux visiteurs.
 
-Les médias sont stockés dans un store Vercel Blob privé et servis via l’API authentifiée, avec vérification du type réel et une limite de 4 Mio par fichier. Les formats sont détaillés dans [DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md). La déconnexion retire le jeton de session de cet appareil. Ne partagez pas votre session et ne placez jamais de secrets dans Git.
+Les médias des personnes et souvenirs sont stockés dans un store Vercel Blob privé et servis via l’API authentifiée, avec vérification du type réel et une limite de 4 Mio par fichier. Les courtes voix des fiches linguistiques sont stockées séparément en PostgreSQL, limitées à 512 Kio et accessibles uniquement aux membres autorisés via l’API. Les formats des médias généraux sont détaillés dans [DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md). La déconnexion retire le jeton de session et les copies locales du compte sur cet appareil. Ne partagez pas votre session et ne placez jamais de secrets dans Git.
 
 ## Architecture
 
@@ -125,12 +164,13 @@ griot-frontend/     React, Vite, interface responsive et PWA
   src/components/  Navigation, dashboard, lieux et composants partagés
   src/pages/       Écrans familiaux, compte et guide
   src/api/         Client HTTP vers le backend
-  src/data/        Pays et territoires GeoNames
+  src/data/        Pays GeoNames, langues Glottolog et repères historiques sourcés
   public/data/     Villes et provenance du catalogue
 griot-backend/      NestJS, Prisma et PostgreSQL
   src/             Authentification et modules métier
   prisma/          Schéma de données et migrations
 scripts/            Actualisation du catalogue géographique
+docs/               Documentation des fonctionnalités et de leurs limites
 .github/workflows/ Contrôles automatiques frontend et backend
 ```
 
