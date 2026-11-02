@@ -149,7 +149,7 @@ class GriotAPI {
     if ((await this.pendingDrafts()).length) throw new Error('Envoyez vos brouillons avant de rafraîchir la copie locale.');
     const trees = await this.request('/arbres', {}, { requireNetwork: true });
     for (const tree of trees) {
-      for (const suffix of ['', '/personnes', '/relations', '/membres', '/souvenirs', '/migrations', '/preuves', '/institution', '/tableau-de-bord']) {
+      for (const suffix of ['', '/personnes', '/relations', '/membres', '/souvenirs', '/migrations', '/preuves', '/institution', '/tableau-de-bord', '/culture/cartes', '/culture/publications']) {
         await this.request(`/arbres/${tree.id}${suffix}`, {}, { allowEmptyResponse: true, requireNetwork: true });
       }
     }
@@ -407,6 +407,16 @@ class GriotAPI {
   getMigrations(arbreId) {
     return this.request(`/arbres/${arbreId}/migrations`);
   }
+
+  getCulturePosts(tree, query = {}) { const params = new URLSearchParams(query).toString(); return this.request(`/arbres/${tree}/culture/publications${params ? `?${params}` : ''}`); }
+  createCulturePost(tree, data) { return this.request(`/arbres/${tree}/culture/publications`, { method: 'POST', body: JSON.stringify(data) }); }
+  deleteCulturePost(tree, id) { return this.request(`/arbres/${tree}/culture/publications/${id}`, { method: 'DELETE' }); }
+  getLanguageCards(tree) { return this.request(`/arbres/${tree}/culture/cartes`); }
+  createLanguageCard(tree, data) { return this.request(`/arbres/${tree}/culture/cartes`, { method: 'POST', body: JSON.stringify(data) }); }
+  validateLanguageCard(tree, id, validee) { return this.request(`/arbres/${tree}/culture/cartes/${id}/validation`, { method: 'PATCH', body: JSON.stringify({ validee }) }); }
+  deleteLanguageCard(tree, id) { return this.request(`/arbres/${tree}/culture/cartes/${id}`, { method: 'DELETE' }); }
+  uploadLanguageAudio(tree, id, file) { const body = new FormData(); body.append('file', file); return this.request(`/arbres/${tree}/culture/cartes/${id}/audio`, { method: 'POST', body }); }
+  getLanguageAudio(tree, id) { return this.requestBlob(`/arbres/${tree}/culture/cartes/${id}/audio`); }
 
   createMigration(arbreId, data) {
     return this.request(`/arbres/${arbreId}/migrations`, {

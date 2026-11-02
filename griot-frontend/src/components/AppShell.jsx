@@ -11,6 +11,7 @@ const navigation = [
   { id: 'membres', label: 'Rôles & permissions' },
   { id: 'origines', label: 'Carte des origines' },
   { id: 'souvenirs', label: 'Mémoire familiale' },
+  { id: 'culture', label: 'Espace collaboratif & langues' },
   { id: 'chefferie', label: 'Espace chefferie' },
   { id: 'institutions', label: 'Console chefferie' },
   { id: 'assistant', label: 'Demander à GRIOT' },
@@ -22,6 +23,7 @@ const navigation = [
 
 function NavigationIcon({ name }) {
   const icons = {
+    culture: <><path d="M3 4h18v12H9l-6 5V4Z" /><path d="m8 12 3-5 3 5m-5-2h4m3-3h2m-1 0v5" /></>,
     rapports: <><path d="M6 9V3h12v6M6 17H3v-8h18v8h-3M6 14h12v7H6z" /></>,
     offline: <><path d="M3 8a15 15 0 0 1 18 0M6 12a10 10 0 0 1 12 0m-9 4a5 5 0 0 1 6 0M12 20h.01M3 3l18 18" /></>,
     guide: <><circle cx="12" cy="12" r="9" /><path d="M9.5 8a2.5 2.5 0 1 1 4 2c-1 .7-1.5 1-1.5 3m0 3h.01" /></>,

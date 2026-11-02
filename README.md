@@ -10,6 +10,8 @@ Une mémoire familiale ne se résume pas à des noms et des dates. Elle comprend
 
 ## Pour qui ?
 
+GRIOT comprend aussi un **cercle familial privé** : salon de discussion, partage de contes/recettes/traditions, suggestions de langues selon les pays renseignés, fiches de mots/alphabet/grammaire avec voix et jeux adaptés à la découverte ou à la pratique. Les proches construisent et relisent les contenus ; Glottolog fournit le catalogue de langues, pas des cours complets. La lecture historique des parcours distingue les lieux/dates saisis, les repères sourcés et les questions à explorer, sans inventer une raison de migration. Voir [le fonctionnement et les limites](docs/CULTURE-ET-TRANSMISSION.md).
+
 - Les familles qui construisent leur arbre et transmettent leurs histoires.
 - Les membres de la diaspora qui documentent leurs origines et les parcours familiaux.
 - Les proches qui recueillent des récits, traditions, photos et archives.

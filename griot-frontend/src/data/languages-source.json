@@ -1,0 +1,9 @@
+{
+  "source": "https://raw.githubusercontent.com/glottolog/glottolog-cldf/master/cldf/languages.csv",
+  "catalogue": "Glottolog 5.3 CLDF",
+  "license": "CC BY 4.0",
+  "attribution": "Hammarstrom, Harald; Forkel, Robert; Haspelmath, Martin; Bank, Sebastian. Glottolog 5.3. Max Planck Institute for Evolutionary Anthropology.",
+  "retrieved": "2026-11-02",
+  "sha256": "1a50a393bc81568b656f9522be18aa4f80f38e94309ba6c863d583234adfbb89",
+  "records": 8520
+}

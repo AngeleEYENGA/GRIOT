@@ -3,6 +3,7 @@ import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 
 const panelGuidance = {
+  culture: { eyebrow: 'CERCLE DE TRANSMISSION', title: 'Retrouvez vos proches et faites vivre vos langues', description: 'Choisissez un arbre pour ouvrir son salon privé, proposer des fiches de langue, jouer ensemble et replacer les parcours familiaux dans leur contexte historique.' },
   rapports: { eyebrow: 'RAPPORTS FAMILIAUX', title: 'Conservez une copie de votre histoire', description: 'Choisissez un arbre pour imprimer sa généalogie et préparer un rapport avec ses personnes, ses liens, ses parcours et ses récits.' },
   genealogie: {
     eyebrow: 'ARBRE GÉNÉALOGIQUE',

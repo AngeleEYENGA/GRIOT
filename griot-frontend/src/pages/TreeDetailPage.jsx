@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import MigrationHistory from '../components/MigrationHistory';
 import api from '../api/client';
 import { useAuth } from '../contexts/useAuth';
 import FamilyTreeView from '../components/FamilyTreeView';
@@ -18,12 +19,14 @@ import {
   relationGroups,
 } from '../utils/familyRelations';
 
+const CultureSpace = lazy(() => import('../components/CultureSpace'));
 const treeSections = [
   { id: 'tableau', label: 'Tableau de bord' },
   { id: 'genealogie', label: 'Généalogie' },
   { id: 'personnes', label: 'Personnes' },
   { id: 'souvenirs', label: 'Souvenirs' },
   { id: 'origines', label: 'Origines' },
+  { id: 'culture', label: 'Espace collaboratif & langues' },
   { id: 'relations', label: 'Relations familiales' },
   { id: 'membres', label: 'Équipe & permissions' },
   { id: 'rapports', label: 'Rapports & impression' },
@@ -630,6 +633,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
       {/* Main Content */}
       <main className="griot-detail-content">
+        {activeTab === 'culture' && <Suspense fallback={<p role="status">Ouverture du cercle familial…</p>}><CultureSpace key={treeId} treeId={treeId} treeName={tree.nom} migrations={migrations} personnes={personnes} user={user} role={roleCourant} onNavigate={setActiveTab} /></Suspense>}
         {activeTab === 'rapports' && <FamilyReports tree={tree} personnes={personnes} relations={relations} souvenirs={souvenirs} migrations={migrations} />}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
@@ -672,6 +676,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
 
             {dashboardLoading && <p className="griot-muted">Mise à jour de votre espace…</p>}
             <DashboardMetrics personnes={personnes} relations={relations} souvenirs={souvenirs} membres={membres} onNavigate={setActiveTab} />
+            <aside className="griot-culture-dashboard-callout"><div><p className="griot-eyebrow">APPRENDRE & TRANSMETTRE ENSEMBLE</p><h3>Et si nos langues devenaient un rendez-vous familial ?</h3><p>Échangez dans le salon, transmettez des mots et explorez l’histoire de vos parcours.</p></div><button className="griot-button griot-button-primary" onClick={() => setActiveTab('culture')}>Ouvrir le cercle familial →</button></aside>
             {dashboard && (
               <>
                 <div className="griot-dashboard-layout">
@@ -1365,6 +1370,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
           </section>
         )}
         {activeTab === 'origines' && (
+          <>
           <OriginsPanel
             treeName={tree.nom}
             onRecordMemory={(step) => {
@@ -1378,6 +1384,8 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
             role={roleCourant}
             onRefresh={() => loadTreeData({ quiet: true })}
           />
+          <details className="griot-culture-card griot-history-map-link"><summary>Comprendre le contexte historique de ces parcours</summary><MigrationHistory personnes={personnes} migrations={migrations} onNavigate={setActiveTab} /></details>
+          </>
         )}
         {activeTab === 'chefferie' && (
           <GovernancePanel

@@ -194,6 +194,8 @@ model Utilisateur {
   preferences       PreferenceAffichage[]
   identitesModifiees IdentiteFamiliale[] @relation("modifiePar")
   identitesOAuth     IdentiteOAuth[]
+  publicationsFamille PublicationFamille[]
+  cartesLangue       CarteLangue[]
 
   @@map("utilisateurs")
 }
@@ -231,6 +233,8 @@ model Arbre {
   institution          Institution?
   identiteFamiliale    IdentiteFamiliale?
   preferences          PreferenceAffichage[]
+  publicationsFamille PublicationFamille[]
+  cartesLangue        CarteLangue[]
 
   @@map("arbres")
 }
@@ -247,6 +251,43 @@ model MembreArbre {
 
   @@unique([utilisateurId, arbreId])
   @@map("membres_arbre")
+}
+
+model PublicationFamille {
+  id String @id @default(uuid())
+  arbreId String
+  arbre Arbre @relation(fields: [arbreId], references: [id], onDelete: Cascade)
+  auteurId String
+  auteur Utilisateur @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  parentId String?
+  parent PublicationFamille? @relation("reponses", fields: [parentId], references: [id], onDelete: Cascade)
+  reponses PublicationFamille[] @relation("reponses")
+  theme String @default("discussion")
+  contenu String
+  dateCreation DateTime @default(now())
+  @@index([arbreId, dateCreation])
+  @@map("publications_famille")
+}
+
+model CarteLangue {
+  id String @id @default(uuid())
+  arbreId String
+  arbre Arbre @relation(fields: [arbreId], references: [id], onDelete: Cascade)
+  auteurId String
+  auteur Utilisateur @relation(fields: [auteurId], references: [id], onDelete: Cascade)
+  langue String
+  nomLangue String
+  type String @default("mot")
+  expression String
+  traduction String
+  explication String?
+  source String
+  validee Boolean @default(false)
+  audio Bytes?
+  audioMime String?
+  dateCreation DateTime @default(now())
+  @@index([arbreId, langue])
+  @@map("cartes_langue")
 }
 
 // ---------------------------------------------------------

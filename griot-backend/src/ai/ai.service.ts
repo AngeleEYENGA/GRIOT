@@ -96,6 +96,13 @@ export class AiService {
       ? `Dans votre arbre actuel: ${context!.peopleCount} personnes, ${context!.relationCount} relations.`
       : "Je peux déjà vous guider, et je serai encore plus précis quand vous serez connecté à un arbre.";
 
+    if (/(langue|alphabet|prononciation|grammaire|conte|cuisine|culture|tradition)/.test(normalizedQuery)) {
+      return `${contextLine} Ouvrez l’Espace collaboratif & langues de votre arbre : choisissez une langue, transmettez des mots ou des exemples avec un proche, ajoutez une voix et faites relire les fiches avant de jouer. Le salon accueille aussi les contes, recettes et traditions. Les suggestions par pays ne déterminent pas la langue natale de votre famille.`;
+    }
+    if (/(migration|guerre|catastrophe|pourquoi.*parti)/.test(normalizedQuery)) {
+      return `${contextLine} Dans Espace collaboratif & langues, ouvrez L’histoire de nos parcours. GRIOT rapproche les lieux et dates renseignés de repères historiques sourcés. Ce contexte ne prouve pas le motif d’un départ : demandez des témoignages ou des archives, sans attribuer automatiquement une guerre ou une catastrophe au parcours d’un proche.`;
+    }
+
     if (/(arri[eè]re|anc[eê]tre|grand[- ]p[èe]re|grand[- ]m[èe]re|qui [eé]tait)/.test(normalizedQuery)) {
       return `${contextLine} Pour retrouver un ancêtre précis, commencez par la personne cible puis remontez parent par parent. Ajoutez les lieux, dates et témoins de chaque génération pour fiabiliser la lignée.`;
     }
