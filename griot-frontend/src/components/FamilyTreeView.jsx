@@ -1,73 +1,14 @@
 import { useMemo, useState } from 'react';
-import { getGenealogyEdge, getRelationLabel } from '../utils/familyRelations';
+import { getGenealogyEdge } from '../utils/familyRelations';
 import { printSection } from '../utils/exports';
-
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 106;
-const NODE_GAP = 48;
-const GENERATION_GAP = 210;
-
-function getGenerations(personnes, relations) {
-  const childrenByParent = new Map();
-  const parentIds = new Set();
-  const personIds = new Set(personnes.map((person) => person.id));
-
-  relations.forEach((relation) => {
-    const edge = getGenealogyEdge(relation.typeRelation, relation.personneId1, relation.personneId2);
-    if (!edge || edge.isSpouse) return;
-    const parentId = edge?.parentId;
-    const childId = edge?.childId;
-
-    if (parentId && childId && personIds.has(parentId) && personIds.has(childId)) {
-      const children = childrenByParent.get(parentId) || [];
-      children.push({ childId, generationDistance: edge.generationDistance });
-      childrenByParent.set(parentId, children);
-      parentIds.add(childId);
-    }
-  });
-
-  const generations = new Map();
-  const assignDescendants = (rootId) => {
-    const queue = [rootId];
-    for (let index = 0; index < queue.length; index += 1) {
-      const personId = queue[index];
-      (childrenByParent.get(personId) || []).forEach(({ childId, generationDistance }) => {
-        if (!generations.has(childId)) {
-          generations.set(childId, generations.get(personId) + generationDistance);
-          queue.push(childId);
-        }
-      });
-    }
-  };
-
-  personnes
-    .filter((person) => !parentIds.has(person.id))
-    .forEach((root) => {
-      if (!generations.has(root.id)) {
-        generations.set(root.id, 0);
-        assignDescendants(root.id);
-      }
-    });
-
-  personnes.forEach((person) => {
-    if (!generations.has(person.id)) {
-      generations.set(person.id, 0);
-      assignDescendants(person.id);
-    }
-  });
-
-  return generations;
-}
+import { buildTreeLayout, NODE_WIDTH, NODE_HEIGHT } from '../utils/treeLayout';
+import DocumentBrand from './DocumentBrand';
 
 export default function FamilyTreeView({ personnes, relations, onOpenProfile, treeName }) {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
   const [focusPersonId, setFocusPersonId] = useState('');
   const [zoom, setZoom] = useState(1);
-  const generations = useMemo(
-    () => getGenerations(personnes, relations),
-    [personnes, relations],
-  );
   const relatedIds = useMemo(() => new Set(
     relations.flatMap((relation) => [relation.personneId1, relation.personneId2]),
   ), [relations]);
@@ -127,52 +68,11 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
       return true;
     });
   }, [branchIds, filter, personnes, query, relatedIds, relations]);
-  const layout = useMemo(() => {
-    const rows = new Map();
-    visiblePeople.forEach((person) => {
-      const generation = generations.get(person.id) || 0;
-      const row = rows.get(generation) || [];
-      row.push(person);
-      rows.set(generation, row);
-    });
-
-    rows.forEach((row) => {
-      row.sort((first, second) => (
-        `${first.prenom} ${first.nom}`.localeCompare(`${second.prenom} ${second.nom}`, 'fr')
-      ));
-    });
-
-    const rowWidths = [...rows.values()].map((row) => (
-      row.length * NODE_WIDTH + Math.max(0, row.length - 1) * NODE_GAP
-    ));
-    const width = Math.max(760, ...rowWidths) + 48;
-    const height = Math.max(170, (Math.max(0, ...rows.keys()) + 1) * GENERATION_GAP + 24);
-    const positions = new Map();
-
-    rows.forEach((row, generation) => {
-      const rowWidth = row.length * NODE_WIDTH + Math.max(0, row.length - 1) * NODE_GAP;
-      const startX = (width - rowWidth) / 2;
-      row.forEach((person, index) => {
-        positions.set(person.id, {
-          x: startX + index * (NODE_WIDTH + NODE_GAP),
-          y: 20 + generation * GENERATION_GAP,
-        });
-      });
-    });
-
-    return { rows, positions, width, height };
-  }, [generations, visiblePeople]);
-  const visibleIds = useMemo(
-    () => new Set(visiblePeople.map((person) => person.id)),
-    [visiblePeople],
-  );
-  const visibleRelations = relations.filter((relation) => (
-    visibleIds.has(relation.personneId1) && visibleIds.has(relation.personneId2)
-  ));
+  const layout = useMemo(() => buildTreeLayout(visiblePeople, relations), [visiblePeople, relations]);
 
   return (
-    <section className="griot-family-tree" aria-labelledby="genealogy-title" style={{ '--tree-print-scale': Math.min(1, 980 / layout.width, 590 / layout.height), '--tree-print-height': `${layout.height * Math.min(1, 980 / layout.width, 590 / layout.height)}px` }}>
-      <div className="griot-print-tree-title"><h1>{treeName || 'Arbre familial'}</h1><p>GRIOT · Vue filtrée de {visiblePeople.length} personnes · {new Date().toLocaleDateString('fr-FR')}</p></div>
+    <section className="griot-family-tree" aria-labelledby="genealogy-title" style={{ '--tree-print-scale': Math.min(1, 980 / layout.width, 500 / layout.height), '--tree-print-height': `${layout.height * Math.min(1, 980 / layout.width, 500 / layout.height)}px` }}>
+      <div className="griot-print-tree-title"><DocumentBrand title={treeName || 'Arbre familial'} subtitle={`Arbre généalogique · ${visiblePeople.length} personnes affichées · ${new Date().toLocaleDateString('fr-FR')}`} /></div>
       <div className="griot-family-tree-heading">
         <div>
           <h2 id="genealogy-title">Arbre généalogique</h2>
@@ -202,6 +102,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
         </div>
       </div>
 
+      <p className="griot-tree-legend">Conjoints rapprochés · Une branche commune pour leurs enfants. Les autres liens restent consultables dans les profils et dans Relations familiales.</p>
       <div className={`griot-family-tree-filters${branchIds ? ' has-branch-filter' : ''}`}>
         <label className="sr-only" htmlFor="genealogy-search">Rechercher une personne</label>
         <input
@@ -266,91 +167,10 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
                 width={layout.width}
                 height={layout.height}
               >
-                {visibleRelations.map((relation) => {
-                  const edge = getGenealogyEdge(relation.typeRelation, relation.personneId1, relation.personneId2);
-                  const firstPosition = layout.positions.get(relation.personneId1);
-                  const secondPosition = layout.positions.get(relation.personneId2);
-                  if (!firstPosition || !secondPosition) return null;
-
-                  if (!edge) {
-                    const sameGeneration = firstPosition.y === secondPosition.y;
-                    const firstIsLeft = firstPosition.x <= secondPosition.x;
-                    const startX = sameGeneration
-                      ? firstPosition.x + (firstIsLeft ? NODE_WIDTH : 0)
-                      : firstPosition.x + NODE_WIDTH / 2;
-                    const startY = sameGeneration
-                      ? firstPosition.y + NODE_HEIGHT / 2
-                      : firstPosition.y + (firstPosition.y < secondPosition.y ? NODE_HEIGHT : 0);
-                    const endX = sameGeneration
-                      ? secondPosition.x + (firstIsLeft ? 0 : NODE_WIDTH)
-                      : secondPosition.x + NODE_WIDTH / 2;
-                    const endY = sameGeneration
-                      ? secondPosition.y + NODE_HEIGHT / 2
-                      : secondPosition.y + (secondPosition.y < firstPosition.y ? NODE_HEIGHT : 0);
-                    const curveY = (startY + endY) / 2;
-                    return (
-                      <g key={relation.id}>
-                        <path
-                          d={`M ${startX} ${startY} Q ${(startX + endX) / 2} ${curveY}, ${endX} ${endY}`}
-                          fill="none"
-                          stroke="var(--griot-terracotta)"
-                          strokeDasharray="5 5"
-                          strokeWidth="1.5"
-                        />
-                        <text
-                          x={(startX + endX) / 2}
-                          y={curveY - 5}
-                          textAnchor="middle"
-                          fill="var(--griot-terracotta-deep)"
-                          fontSize="11"
-                        >
-                          {getRelationLabel(relation.typeRelation, relation.precision)}
-                        </text>
-                      </g>
-                    );
-                  }
-
-                  const isSpouse = edge.isSpouse;
-                  const spouseLeft = firstPosition.x <= secondPosition.x ? firstPosition : secondPosition;
-                  const spouseRight = firstPosition.x <= secondPosition.x ? secondPosition : firstPosition;
-                  const parentPosition = layout.positions.get(edge.parentId);
-                  const childPosition = layout.positions.get(edge.childId);
-                  const startX = isSpouse ? spouseLeft.x + NODE_WIDTH : parentPosition.x + NODE_WIDTH / 2;
-                  const startY = isSpouse
-                    ? spouseLeft.y + NODE_HEIGHT / 2
-                    : parentPosition.y + NODE_HEIGHT;
-                  const endX = isSpouse ? spouseRight.x : childPosition.x + NODE_WIDTH / 2;
-                  const endY = isSpouse ? spouseRight.y + NODE_HEIGHT / 2 : childPosition.y;
-                  const curveY = (startY + endY) / 2;
-
-                  return (
-                    <g key={relation.id}>
-                      <path
-                        d={`M ${startX} ${startY} C ${startX} ${curveY}, ${endX} ${curveY}, ${endX} ${endY}`}
-                        fill="none"
-                        stroke="var(--griot-gold)"
-                        strokeWidth="2"
-                      />
-                      <text
-                        x={(startX + endX) / 2}
-                        y={curveY - 5}
-                        textAnchor="middle"
-                        fill="var(--griot-ink-soft)"
-                        fontSize="12"
-                      >
-                        {getRelationLabel(relation.typeRelation, relation.precision)}
-                      </text>
-                    </g>
-                  );
-                })}
+                {layout.paths.map((path, index) => <path key={index} d={path.d} fill="none" stroke="var(--griot-gold)" strokeWidth={path.kind === 'spouse' ? 3 : 1.8} strokeDasharray={path.kind === 'ancestor' ? '5 5' : undefined}><title>{path.label}</title></path>)}
               </svg>
-              {[...layout.rows.entries()].map(([generation, row]) => (
-                <div
-                  key={generation}
-                  className="griot-family-tree-generation"
-                  style={{ top: 20 + generation * GENERATION_GAP }}
-                >
-                  {row.map((person) => {
+              <div className="griot-family-tree-people">
+                  {visiblePeople.map((person) => {
                     const initials = `${person.prenom?.[0] || ''}${person.nom?.[0] || ''}`.toLocaleUpperCase('fr');
                     return (
                       <button
@@ -359,7 +179,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
                         onClick={() => onOpenProfile(person)}
                         aria-label={`Ouvrir le profil de ${person.prenom} ${person.nom}`}
                         className="griot-family-tree-node"
-                        style={{ width: NODE_WIDTH, height: NODE_HEIGHT }}
+                        style={{ position: 'absolute', left: layout.positions.get(person.id).x, top: layout.positions.get(person.id).y, width: NODE_WIDTH, height: NODE_HEIGHT }}
                       >
                         <span className="griot-family-tree-avatar">
                           {initials}
@@ -377,12 +197,12 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
                       </button>
                     );
                   })}
-                </div>
-              ))}
+              </div>
             </div>
           </div>
         </div>
       )}
+      <footer className="griot-tree-print-footer"><DocumentBrand footer /></footer>
     </section>
   );
 }
