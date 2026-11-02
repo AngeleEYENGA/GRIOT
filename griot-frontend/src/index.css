@@ -1877,3 +1877,83 @@ html[data-griot-mode="dark"] .griot-setting-options button[aria-pressed="true"] 
  .griot-history-route > span { font-size: 16px; }
  .griot-culture-dashboard-callout { align-items: start; flex-direction: column; padding: 18px; }
 }
+/* Autonomous language lessons */
+.griot-tutor-invitation { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px; margin-bottom: 26px; border: 1px solid var(--griot-gold); border-radius: 16px; background: var(--griot-paper); }
+.griot-tutor-invitation h3 { margin: 8px 0; font: 600 25px var(--griot-serif); }
+.griot-tutor-invitation p { margin: 0; font-size: 12px; color: var(--griot-ink-soft); }
+.griot-tutor-invitation > button { flex-shrink: 0; }
+.griot-tutor-hero { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 28px; border-radius: 20px; background: var(--griot-paper); border: 1px solid var(--griot-line); }
+.griot-tutor-hero h3 { margin: 10px 0; font: 600 clamp(29px,3vw,38px) var(--griot-serif); }
+.griot-tutor-hero p { max-width: 600px; color: var(--griot-ink-soft); font-size: 13px; }
+.griot-tutor-hero > div > span { font-size: 11px; color: var(--griot-ink-soft); }
+.griot-tutor-mark { display: grid; place-items: center; flex: 0 0 132px; height: 132px; border-radius: 50%; color: var(--griot-olive); background: var(--griot-cream); font: 600 28px var(--griot-serif); border: 1px solid var(--griot-line); transform: rotate(-6deg); }
+.griot-tutor-stats { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin: 18px 0; }
+.griot-tutor-stats article { display: grid; gap: 8px; padding: 18px; border: 1px solid var(--griot-line); border-radius: 12px; background: var(--griot-paper); }
+.griot-tutor-stats strong { font: 600 29px var(--griot-serif); }
+.griot-tutor-stats span { color: var(--griot-ink-soft); font-size: 10px; }
+.griot-tutor-daily { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin: 24px 0; padding: 20px; border-radius: 14px; background: var(--griot-paper); border: 1px solid var(--griot-line); }
+.griot-tutor-daily strong { font-size: 13px; }
+.griot-tutor-daily p { font-size: 11px; color: var(--griot-ink-soft); }
+.griot-autonomous-tutor progress { display: block; width: 100%; height: 8px; border: 0; border-radius: 30px; accent-color: var(--griot-olive); overflow: hidden; }
+.griot-autonomous-tutor progress::-webkit-progress-bar { background: var(--griot-line); }
+.griot-autonomous-tutor progress::-webkit-progress-value { background: var(--griot-olive); }
+.griot-tutor-layout { display: grid; grid-template-columns: 270px minmax(0,1fr); gap: 24px; align-items: start; }
+.griot-tutor-path { display: grid; gap: 12px; }
+.griot-tutor-path button { display: flex; align-items: start; gap: 12px; padding: 16px; border: 1px solid var(--griot-line); border-radius: 14px; background: var(--griot-paper); color: var(--griot-ink); text-align: left; }
+.griot-tutor-path button[aria-current] { border-color: var(--griot-gold); box-shadow: inset 3px 0 var(--griot-gold); }
+.griot-tutor-path button:disabled { opacity: .5; cursor: not-allowed; }
+.griot-tutor-path button > span { display: grid; place-items: center; flex: 0 0 30px; height: 30px; border-radius: 50%; background: var(--griot-cream); font-size: 12px; }
+.griot-tutor-path strong { display: block; font-size: 12px; }
+.griot-tutor-path small { display: block; margin-top: 7px; font-size: 10px; line-height: 1.7; }
+.griot-tutor-unit { min-width: 0; }
+.griot-tutor-unit h4,.griot-tutor-summary h4 { margin: 8px 0 12px; font: 600 27px var(--griot-serif); }
+.griot-tutor-unit > p,.griot-tutor-summary p { font-size: 12px; color: var(--griot-ink-soft); }
+.griot-tutor-lesson-cards { display: grid; gap: 14px; margin: 22px 0; }
+.griot-tutor-lesson-cards > article { padding: 22px; border: 1px solid var(--griot-line); border-radius: 16px; background: var(--griot-paper); }
+.griot-tutor-lesson-cards > article > span { font-size: 9px; color: var(--griot-ink-soft); letter-spacing: 1.5px; }
+.griot-tutor-lesson-cards h5 { margin: 12px 0 5px; font: 600 30px var(--griot-serif); overflow-wrap: anywhere; }
+.griot-tutor-lesson-cards > article > p { font-size: 16px; margin: 0 0 12px; }
+.griot-tutor-lesson-cards small { display: block; color: var(--griot-ink-soft); line-height: 1.8; font-size: 11px; }
+.griot-tutor-source { display: block; margin-top: 12px; color: var(--griot-terracotta-deep); font-size: 10px; overflow-wrap: anywhere; }
+.griot-tutor-unit > label { max-width: 340px; margin: 20px 0 14px; }
+.griot-tutor-model { display: grid; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--griot-line); }
+.griot-tutor-model p,.griot-tutor-model a { font-size: 11px; color: var(--griot-ink-soft); margin: 0; }
+.griot-tutor-model > button { justify-self: start; }
+.griot-tutor-model iframe { width: 100%; max-width: 550px; height: 310px; border: 0; border-radius: 10px; }
+.griot-tutor-audio-missing { margin-top: 15px; font-size: 10px; color: var(--griot-ink-soft); }
+.griot-tutor-exercise,.griot-tutor-summary { max-width: 780px; margin: 26px auto; padding: 28px; border: 1px solid var(--griot-line); border-radius: 20px; background: var(--griot-paper); }
+.griot-tutor-exercise-top { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+.griot-tutor-exercise-top > span { font-size: 10px; color: var(--griot-ink-soft); }
+.griot-tutor-exercise h4 { margin: 26px 0 12px; font: 600 clamp(25px,3vw,36px)/1.3 var(--griot-serif); overflow-wrap: anywhere; }
+.griot-tutor-exercise > p { font-size: 12px; color: var(--griot-ink-soft); }
+.griot-tutor-options { display: grid; gap: 10px; margin: 24px 0; }
+.griot-tutor-options button { padding: 18px; border: 1px solid var(--griot-line); border-radius: 12px; background: var(--griot-cream); color: var(--griot-ink); font-size: 14px; text-align: left; }
+.griot-tutor-options button:focus-visible { outline: 3px solid var(--griot-gold); outline-offset: 2px; }
+.griot-tutor-options button:disabled { cursor: default; }
+.griot-tutor-exercise > form { display: grid; gap: 15px; }
+.griot-tutor-exercise input { font-size: 20px; }
+.griot-tutor-exercise > form > button { justify-self: start; }
+.griot-tutor-keyboard { display: flex; flex-wrap: wrap; gap: 7px; }
+.griot-tutor-keyboard button { min-width: 35px; padding: 8px; border-radius: 7px; border: 1px solid var(--griot-line); background: var(--griot-cream); color: var(--griot-ink); font-size: 17px; }
+.griot-tutor-feedback { display: grid; gap: 8px; border-left: 3px solid var(--griot-terracotta); padding: 16px; margin: 20px 0; background: var(--griot-cream); }
+.griot-tutor-feedback.is-correct { border-color: var(--griot-olive); }
+.griot-tutor-feedback p { margin: 0; font-size: 12px; }
+.griot-tutor-feedback > button { justify-self: start; margin-top: 8px; }
+.griot-tutor-speaking { display: grid; gap: 12px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--griot-line); }
+.griot-tutor-speaking h5 { margin: 0; font: 600 21px var(--griot-serif); }
+.griot-tutor-speaking p { font-size: 12px; margin: 0; color: var(--griot-ink-soft); }
+.griot-tutor-speaking button { justify-self: start; }
+.griot-tutor-speaking audio { max-width: 100%; }
+.griot-tutor-speaking small { font-size: 10px; line-height: 1.8; color: var(--griot-ink-soft); }
+.griot-tutor-coach { padding: 24px; border: 1px solid var(--griot-line); border-radius: 18px; background: var(--griot-paper); margin: 26px 0; }
+.griot-tutor-coach > div:first-child { display: flex; align-items: center; gap: 14px; }
+.griot-tutor-coach > div:first-child > span { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: var(--griot-olive); color: var(--griot-paper); font: 600 22px var(--griot-serif); }
+.griot-tutor-coach h4 { margin: 0 0 6px; font: 600 24px var(--griot-serif); }
+.griot-tutor-coach p { font-size: 12px; margin: 0; color: var(--griot-ink-soft); }
+.griot-tutor-coach-prompts { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+.griot-tutor-coach-prompts button { padding: 8px 12px; border: 1px solid var(--griot-line); border-radius: 20px; background: transparent; color: var(--griot-ink); font-size: 11px; }
+.griot-tutor-coach form { display: flex; align-items: end; gap: 12px; }
+.griot-tutor-coach form label { flex: 1; min-width: 0; }
+.griot-tutor-coach-answer { border-left: 3px solid var(--griot-gold); padding: 14px; margin-top: 18px; background: var(--griot-cream); }
+@media (max-width:1000px) { .griot-tutor-layout { grid-template-columns: 220px minmax(0,1fr); gap: 16px; } }
+@media (max-width:720px) { .griot-tutor-invitation { align-items: start; flex-direction: column; padding: 18px; } .griot-tutor-hero { padding: 20px; } .griot-tutor-mark { display: none; } .griot-tutor-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } .griot-tutor-layout { grid-template-columns: 1fr; } .griot-tutor-path { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; } .griot-tutor-path button { padding: 12px; flex-direction: column; } .griot-tutor-daily { align-items: start; flex-direction: column; } .griot-tutor-exercise { padding: 18px; } .griot-tutor-coach { padding: 18px; } .griot-tutor-coach form { align-items: stretch; flex-direction: column; } .griot-tutor-model iframe { height: 230px; } }

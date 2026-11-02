@@ -56,6 +56,7 @@ Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourci
 | Salon familial privé | Publications et réponses par thèmes : langues, discussions, contes, cuisine, traditions et migrations. |
 | Atelier des langues | Suggestions par pays avec Glottolog, choix d’une langue ou variante, fiches de mots, alphabet et grammaire créées par les proches. |
 | Jeux et voix | Découverte par choix et écoute, pratique écrite, prononciations courtes et relecture familiale avant utilisation des fiches dans les jeux. |
+| Professeur virtuel · Fang | Initiation autonome déjà préparée : quatre étapes, treize éléments sourcés, exercices, explications et révisions adaptées, même sans locuteur dans la famille. |
 | Histoire des parcours | Récit des présences datées, repères historiques sourcés et questions à approfondir avec la famille. |
 | Rapports & impression | Arbre et rapport imprimables/PDF avec en-tête, filigrane GRIOT et pied de page ; exports CSV. |
 | Charte graphique | Modes clair/sombre/système et palettes appliqués immédiatement. |
@@ -79,6 +80,20 @@ Les fiches peuvent contenir une expression, un signe ou une syllabe, un exemple 
 
 **Ce qui n’est pas encore fourni :** des cours complets prêts à l’emploi pour chaque langue, une correction automatique de la prononciation, un chat en temps réel et une base historique mondiale. Le premier catalogue de repères couvre l’Éthiopie de 1984 à 1986, le Cameroun d’octobre 2016 à mars 2019 et le séisme d’Haïti du 12 janvier 2010, avec leurs sources. L’absence de repère ne signifie pas absence d’événements.
 
+### Apprendre sans locuteur dans la famille : le professeur de fang
+
+Dans **Espace collaboratif & langues → Professeur virtuel · Fang**, un premier parcours autonome permet de partir de zéro. Il est aussi proposé dans **Apprendre nos langues**, sans attendre la création de fiches familiales. Le choix du fang comme première langue prioritaire ne détermine pas la langue natale des personnes de l’arbre.
+
+- **Quatre étapes et treize éléments** : salutations, premières formules d’échange, vocabulaire et repères grammaticaux du fang-ntumu. Le cours distingue cette variété des autres variétés fang et conserve les transcriptions de ses sources.
+- **Deux approches** : reconnaître le sens ou retrouver la forme écrite, avec un petit clavier de signes phonétiques et de tons. Les étapes suivantes s’ouvrent après une réussite sans aide pour chaque élément de l’étape précédente.
+- **Adaptation** : une erreur revient en priorité et programme une révision après cinq minutes ; les réussites sans aide espacent ensuite les révisions à un, trois, sept et quatorze jours. L’aide du coach ne compte pas comme une réussite sans aide.
+- **Rendez-vous personnel** : objectif quotidien de trois, cinq ou dix éléments, points de pratique et jours consécutifs. Un même élément ne rapporte des points qu’une fois par jour. Il ne s’agit pas d’un niveau de langue certifié.
+- **Coach de cours** : explications sourcées et conseils fondés sur les éléments enseignés. Ce moteur guidé n’appelle pas d’IA générative externe, ne traduit pas de phrases libres et indique lorsqu’une question dépasse le cours.
+- **Première pratique orale** : démonstration externe de « Mbóló » publiée par Dzaleu, chargée seulement après un clic, et enregistrement personnel de dix secondes pour se réécouter. Cet essai reste temporaire sur l’appareil, sans envoi ni partage. Les autres éléments n’ont pas encore de modèle oral vérifié ; aucune note automatique de prononciation n’est affichée et aucune voix française n’est présentée comme du fang.
+- **Au village** : les leçons et la progression fonctionnent sur l’appareil après préparation hors ligne ; la vidéo YouTube externe nécessite une connexion. La progression est séparée par compte et arbre et effacée à la déconnexion ou avec les données locales.
+
+Les sources du premier parcours sont la [fiche fang-ntoumou du LGIDF/CNRS](https://lacito.cnrs.fr/wp-content/uploads/2022/04/5.FANG_.NTOUMOU8oct21-copie_1.pdf), l’étude de [Pamphile Mebiame-Akono sur les rituels communicatifs fang-ntumu](https://publicrell.crelluob.com/uploads/Article8-No4%20Special.pdf) et la [démonstration de Mbóló par Dzaleu](https://dzaleu.net/mini-quiz-que-signifie-mbolo-en-langue-ekang/). Les consignes, exercices et règles de progression sont conçus pour GRIOT ; ils ne constituent pas une validation indépendante des transcriptions ni un cours complet équivalent au catalogue de Duolingo.
+
 La préparation hors ligne conserve les fiches textuelles et la première page des échanges. Publier, répondre, valider et écouter les voix nécessite une connexion. Les données de la famille ne sont pas envoyées à une IA tierce pour produire les suggestions ou les rapprochements historiques. Voir [la documentation fonctionnelle et technique du cercle](docs/CULTURE-ET-TRANSMISSION.md).
 
 ## Fonctionnalités prévues et feuille de route
@@ -87,7 +102,7 @@ Cette feuille de route décrit les évolutions à implémenter. **Elle ne repré
 
 | Axe | Évolutions prévues | Conditions et précautions |
 | --- | --- | --- |
-| Cours de langues natales | Parcours progressifs : alphabet ou système d’écriture, sons, tons, vocabulaire quotidien, phrases, grammaire et conversations. | Choisir les langues prioritaires avec les familles ; travailler avec des locuteurs et des références ; distinguer les variantes. |
+| Cours de langues natales | Enrichir l’initiation autonome au fang déjà disponible, puis ajouter d’autres langues et des parcours complets : écriture, sons, tons, vocabulaire, grammaire et conversations. | Priorité initiale : fang. Travailler avec des locuteurs et des références ; distinguer les variantes et les contenus encore sans modèle oral. |
 | Apprentissage ludique | Jeux d’association son/image/mot, mémoire, écoute et répétition, défis coopératifs, activités adaptées aux enfants et aux adultes. | Contenus relus, accessibilité et respect du rythme de chacun ; ne pas confondre un score de jeu et la maîtrise d’une langue. |
 | Prononciation | Bibliothèque de voix de locuteurs, écoutes lentes, répétition et comparaison avec sa propre voix ; évaluation de prononciation à étudier. | Accord des locuteurs, maîtrise des enregistrements et vérification du support réel des langues avant toute notation automatique. |
 | Apprendre ensemble | Rendez-vous avec les aînés, ateliers familiaux, défis partagés et suivi des activités collectives. | Participation volontaire, droits par arbre et accompagnement des enfants. |
