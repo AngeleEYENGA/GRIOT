@@ -168,6 +168,7 @@ export default function FamilyTreeView({ personnes, relations, onOpenProfile, tr
                 height={layout.height}
               >
                 {layout.paths.map((path, index) => <path key={index} d={path.d} fill="none" stroke="var(--griot-gold)" strokeWidth={path.kind === 'spouse' ? 3 : 1.8} strokeDasharray={path.kind === 'ancestor' ? '5 5' : undefined}><title>{path.label}</title></path>)}
+                {layout.labels.map((label, index) => <text key={`label-${index}`} className="griot-tree-edge-label" x={label.x} y={label.y} textAnchor="middle">{label.text}</text>)}
               </svg>
               <div className="griot-family-tree-people">
                   {visiblePeople.map((person) => {

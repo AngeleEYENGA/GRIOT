@@ -595,10 +595,13 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
           </button>
           <div className="griot-tree-detail-head-row">
             <div className="griot-tree-detail-heading">
+              <span className="griot-family-emblem" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 27V15M6 9v8h20V9M6 17v5m20-5v5" stroke="currentColor" strokeWidth="1.5"/><circle cx="6" cy="6" r="3" stroke="currentColor"/><circle cx="26" cy="6" r="3" stroke="currentColor"/><circle cx="16" cy="12" r="3" stroke="currentColor"/><circle cx="6" cy="25" r="3" stroke="currentColor"/><circle cx="26" cy="25" r="3" stroke="currentColor"/></svg></span>
+              <div className="griot-family-identity"><span className="griot-family-caption">Arbre familial</span>
               <h1>{tree.nom}</h1>
               <p className="griot-tree-detail-summary">
                 {personnes.length} personne{personnes.length !== 1 ? 's' : ''} · {membres.length} membre{membres.length !== 1 ? 's' : ''}
               </p>
+              </div>
             </div>
             <button className="griot-button griot-button-outline griot-tree-report-link" onClick={() => setActiveTab('rapports')}>Rapports & impression</button>
           </div>

@@ -1743,3 +1743,23 @@ html[data-griot-mode="dark"] .griot-setting-options button[aria-pressed="true"] 
  .griot-report-preview::before { position: fixed; top: 40%; }
  .griot-document-footer { font-size: 9px; }
 }
+/* Compact family identity, shared across the tree's sections. */
+.griot-detail-header-inner { display: grid; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 24px; padding-block: 18px; }
+.griot-tree-detail-head-row { display: contents; }
+.griot-tree-back-button { padding: 10px 18px 10px 0; border-right: 1px solid var(--griot-line); white-space: nowrap; }
+.griot-tree-detail-heading { display: flex; align-items: center; gap: 14px; }
+.griot-family-emblem { display: grid; place-items: center; flex: 0 0 52px; height: 52px; border: 1px solid var(--griot-line); border-radius: 14px; color: var(--griot-terracotta-deep); background: var(--griot-cream); }
+.griot-family-emblem svg { width: 30px; height: 30px; }
+.griot-family-identity { min-width: 0; }
+.griot-family-caption { display: block; margin-bottom: 3px; color: var(--griot-ink-soft); font-size: 9px; font-weight: 600; letter-spacing: 1.8px; text-transform: uppercase; }
+.griot-detail-header .griot-family-identity h1 { font-size: clamp(21px,2.2vw,27px); line-height: 1.15; }
+.griot-detail-header .griot-tree-detail-summary { margin-top: 5px; font-size: 10px; }
+.griot-tree-edge-label { fill: var(--griot-ink-soft); stroke: var(--griot-paper); stroke-width: 6px; stroke-linejoin: round; paint-order: stroke fill; font: 500 11px 'Work Sans','Segoe UI',sans-serif; }
+@media (max-width: 720px) {
+ .griot-detail-header-inner { grid-template-columns: minmax(0,1fr) auto; gap: 10px 14px; padding-block: 12px; }
+ .griot-tree-back-button { justify-self: start; border-right: 0; padding: 5px 0; }
+ .griot-tree-report-link { grid-column: 2; grid-row: 1; max-width: none; padding: 8px 10px; font-size: 10px; }
+ .griot-tree-detail-heading { grid-column: 1 / -1; grid-row: 2; gap: 12px; }
+ .griot-family-emblem { flex-basis: 44px; height: 44px; border-radius: 12px; }
+}
+@media print { .griot-tree-edge-label { fill: #463624; stroke: white; } }

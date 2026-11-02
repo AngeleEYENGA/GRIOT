@@ -13,6 +13,8 @@ test('couples stay adjacent and share one branch for children, including inverse
   assert.ok(layout.positions.get('c').y > layout.positions.get('a').y);
   assert.equal(layout.paths.filter((path) => path.kind === 'spouse').length, 1);
   assert.equal(layout.paths.filter((path) => path.kind === 'family').length, 1);
+  for (const role of ['Père', 'Mère', 'Fille']) assert.ok(layout.labels.some((label) => label.text === role), role);
+  assert.equal(layout.labels.filter((label) => label.text === 'Père').length, 1);
 });
 
 test('a partner with known ancestors sets the generation of the couple; blended families keep distinct branches', () => {
