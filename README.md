@@ -58,6 +58,7 @@ Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourci
 | Jeux et voix | Découverte par choix et écoute, pratique écrite, prononciations courtes et relecture familiale avant utilisation des fiches dans les jeux. |
 | Professeur virtuel · Fang | Initiation autonome déjà préparée : quatre étapes, treize éléments sourcés, exercices, explications et révisions adaptées, même sans locuteur dans la famille. |
 | Histoire des parcours | Récit des présences datées, repères historiques sourcés et questions à approfondir avec la famille. |
+| Explications culturelles illustrées | Différences entre ethnie, tribu, clan et lignage ; repères Fang–Ewondo–Bulu, sources, dessins symboliques, mode simple et récits pédagogiques en trois scènes. |
 | Rapports & impression | Arbre et rapport imprimables/PDF avec en-tête, filigrane GRIOT et pied de page ; exports CSV. |
 | Charte graphique | Modes clair/sombre/système et palettes appliqués immédiatement. |
 | Mode hors ligne | Copies préparées, consultation et brouillons de personnes, liens, lieux et souvenirs textuels. |
@@ -93,6 +94,16 @@ Dans **Espace collaboratif & langues → Professeur virtuel · Fang**, un premie
 - **Au village** : les leçons et la progression fonctionnent sur l’appareil après préparation hors ligne ; la vidéo YouTube externe nécessite une connexion. La progression est séparée par compte et arbre et effacée à la déconnexion ou avec les données locales.
 
 Les sources du premier parcours sont la [fiche fang-ntoumou du LGIDF/CNRS](https://lacito.cnrs.fr/wp-content/uploads/2022/04/5.FANG_.NTOUMOU8oct21-copie_1.pdf), l’étude de [Pamphile Mebiame-Akono sur les rituels communicatifs fang-ntumu](https://publicrell.crelluob.com/uploads/Article8-No4%20Special.pdf) et la [démonstration de Mbóló par Dzaleu](https://dzaleu.net/mini-quiz-que-signifie-mbolo-en-langue-ekang/). Les consignes, exercices et règles de progression sont conçus pour GRIOT ; ils ne constituent pas une validation indépendante des transcriptions ni un cours complet équivalent au catalogue de Duolingo.
+
+### Comprendre ethnie, tribu, clan et lignage en images
+
+Dans **Demander à GRIOT**, posez une question sur ces notions ou utilisez les suggestions. Les réponses s’appuient sur un premier corpus éditorial de définitions et d’études, avec des liens vers les sources : ce n’est pas une recherche exhaustive du Web en temps réel.
+
+L’assistant distingue l’identité culturelle, l’organisation sociale et la filiation. Il ne classe pas automatiquement tous les groupes dans une hiérarchie unique et ne déduit pas une ethnie ou un clan d’un patronyme, d’un pays ou des personnes de l’arbre. Pour **Fang, Ewondo et Bulu**, il distingue un cadre linguistique du LGIDF/CNRS et un exemple de nomenclature historique situé en 1960. Une parenté entre langues n’est pas une preuve de filiation entre personnes. Les termes locaux, tels que *ayon* ou *mvog*, sont présentés avec leur source et leur contexte.
+
+Les réponses comprennent des fiches de notions avec dessins symboliques, une version simple à lire avec les enfants et une petite histoire en trois scènes. Les personnages sont fictifs ; les dessins n’attribuent pas de traits physiques ou de costume à une ethnie. Les conseils sur la généalogie, les parcours et la transmission disposent également de schémas adaptés à leur thème. Les animations restent facultatives selon la préférence système de réduction des mouvements.
+
+Références : [OQLF — ethnie](https://vitrinelinguistique.oqlf.gouv.qc.ca/fiche-gdt/fiche/17094349/ethnie), Académie française ([tribu](https://www.dictionnaire-academie.fr/article/A9T2178), [clan](https://www.dictionnaire-academie.fr/article/A9C2485), [lignage](https://www.dictionnaire-academie.fr/article/A9L0800)), [LGIDF/CNRS — fang boulou](https://lgidf.cnrs.fr/fang-boulou), [H.-M. Bôt Ba Njock, 1960](https://www.persee.fr/doc/jafr_0037-9166_1960_num_30_2_1922) et [Simon David Yana — parenté Fang-Béti-Bulu, IRD](https://horizon.documentation.ird.fr/exl-doc/pleins_textes/pleins_textes_6/colloques2/39916.pdf).
 
 La préparation hors ligne conserve les fiches textuelles et la première page des échanges. Publier, répondre, valider et écouter les voix nécessite une connexion. Les données de la famille ne sont pas envoyées à une IA tierce pour produire les suggestions ou les rapprochements historiques. Voir [la documentation fonctionnelle et technique du cercle](docs/CULTURE-ET-TRANSMISSION.md).
 

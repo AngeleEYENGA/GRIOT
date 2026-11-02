@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import api from '../api/client';
+import IllustratedAnswer from './IllustratedAnswer';
 import { useTheme } from '../contexts/useTheme';
 
 function PageIntro({ eyebrow, title, description, children }) {
@@ -172,19 +173,22 @@ export function GovernancePanel({ arbreId, institution, preuves, personnes, role
 export function AssistantPanel({ arbreId }) {
   const [question, setQuestion] = useState('');
   const [answer, setAnswer] = useState('');
+  const [explanation, setExplanation] = useState(null);
   const [suggestions, setSuggestions] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const prompts = ['Qui est la personne la plus ancienne ?', 'Quelles relations manquent dans mon arbre ?', 'Comment compléter les origines familiales ?'];
+  const prompts = ['Quelle différence entre ethnie, tribu, clan et lignage ?', 'Fang, Ewondo et Bulu : peuples ou langues ?', 'Quelles relations manquent dans mon arbre ?', 'Comment compléter les origines familiales ?'];
 
   const ask = async (value) => {
     if (value.trim().length < 2) return;
     setLoading(true);
     setError('');
     setAnswer('');
+    setExplanation(null);
     try {
       const response = await api.askAI(value.trim(), arbreId);
       setAnswer(response.answer);
+      setExplanation(response.explanation?.version === 1 ? response.explanation : null);
       setSuggestions(response.suggestions || []);
       setQuestion('');
     } catch (requestError) {
@@ -196,19 +200,19 @@ export function AssistantPanel({ arbreId }) {
 
   return (
     <div className="griot-feature-screen">
-      <PageIntro eyebrow="ASSISTANT FAMILIAL" title="Demander à GRIOT" description="Posez une question sur les informations déjà enregistrées dans cet arbre." />
+      <PageIntro eyebrow="ASSISTANT FAMILIAL" title="Demander à GRIOT" description="Explorez votre mémoire familiale et les notions culturelles avec des explications illustrées et leurs sources." />
       <section className="griot-assistant-card">
         <div className="griot-assistant-mark">G</div>
         <div className="griot-assistant-content">
           <h3>Votre mémoire familiale, à portée de question.</h3>
-          <p>Les réponses utilisent le contexte de cet arbre; elles ne remplacent pas une source ou une preuve.</p>
+          <p>Les conseils familiaux peuvent utiliser le contexte de l’arbre. Les notions culturelles sont expliquées avec un corpus sourcé et ne déterminent pas l’appartenance d’une personne.</p>
           <div className="griot-prompt-list">{prompts.map((prompt) => <button key={prompt} onClick={() => ask(prompt)} disabled={loading}>{prompt}</button>)}</div>
           <form className="griot-assistant-form" onSubmit={(event) => { event.preventDefault(); ask(question); }}>
             <input value={question} onChange={(event) => setQuestion(event.target.value)} minLength={2} maxLength={1000} placeholder="Écrivez votre question…" aria-label="Question à GRIOT" />
             <button className="griot-button griot-button-primary" disabled={loading}>{loading ? 'Réflexion…' : 'Envoyer'}</button>
           </form>
           {error && <p className="griot-inline-error" role="alert">{error}</p>}
-          {answer && <div className="griot-assistant-answer"><p>{answer}</p>{suggestions.length > 0 && <div>{suggestions.map((item) => <button key={item} onClick={() => ask(item)}>{item}</button>)}</div>}</div>}
+          {answer && <div className="griot-assistant-answer"><p>{answer}</p>{explanation && <IllustratedAnswer explanation={explanation} />}{suggestions.length > 0 && <div>{suggestions.map((item) => <button key={item} disabled={loading} onClick={() => ask(item)}>{item}</button>)}</div>}</div>}
         </div>
       </section>
     </div>

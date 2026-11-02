@@ -1957,3 +1957,67 @@ html[data-griot-mode="dark"] .griot-setting-options button[aria-pressed="true"] 
 .griot-tutor-coach-answer { border-left: 3px solid var(--griot-gold); padding: 14px; margin-top: 18px; background: var(--griot-cream); }
 @media (max-width:1000px) { .griot-tutor-layout { grid-template-columns: 220px minmax(0,1fr); gap: 16px; } }
 @media (max-width:720px) { .griot-tutor-invitation { align-items: start; flex-direction: column; padding: 18px; } .griot-tutor-hero { padding: 20px; } .griot-tutor-mark { display: none; } .griot-tutor-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } .griot-tutor-layout { grid-template-columns: 1fr; } .griot-tutor-path { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; } .griot-tutor-path button { padding: 12px; flex-direction: column; } .griot-tutor-daily { align-items: start; flex-direction: column; } .griot-tutor-exercise { padding: 18px; } .griot-tutor-coach { padding: 18px; } .griot-tutor-coach form { align-items: stretch; flex-direction: column; } .griot-tutor-model iframe { height: 230px; } }
+/* Illustrated, sourced explanations */
+.griot-assistant-card:has(.griot-illustrated-answer) { max-width: 100%; }
+.griot-illustrated-answer { margin-top: 24px; min-width: 0; }
+.griot-illustrated-answer > header h4 { margin: 8px 0 12px; font: 600 25px var(--griot-serif); }
+.griot-illustrated-answer > header > p:not(.griot-eyebrow) { color: var(--griot-ink-soft); font-size: 11px; }
+.griot-illustrated-answer > header label { display: flex; align-items: center; gap: 8px; margin: 15px 0; font-size: 11px; }
+.griot-concept-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 20px 0 14px; }
+.griot-concept-tabs button { padding: 10px 15px; font-size: 12px; }
+.griot-concept-tabs button[aria-pressed=true] { color: var(--griot-paper); background: var(--griot-ink); border-color: var(--griot-ink); }
+.griot-concept-card { display: grid; grid-template-columns: 190px minmax(0,1fr); align-items: center; gap: 18px; padding: 22px; border: 1px solid var(--griot-line); border-radius: 16px; background: var(--griot-paper); }
+.griot-concept-card > div > span { font-size: 9px; color: var(--griot-ink-soft); letter-spacing: 1px; text-transform: uppercase; }
+.griot-concept-card h5 { margin: 6px 0 12px; font: 600 29px var(--griot-serif); }
+.griot-concept-card p + p { margin-top: 10px; }
+.griot-concept-card blockquote { margin: 16px 0 0; padding: 10px 14px; border-left: 2px solid var(--griot-gold); color: var(--griot-ink-soft); font-size: 11px; }
+.griot-concept-references { display: grid; gap: 5px; margin-top: 14px; }
+.griot-concept-references a,.griot-concept-sources a,.griot-language-relations aside a { color: var(--griot-terracotta-deep); font-size: 10px; overflow-wrap: anywhere; }
+.griot-concept-warning { padding: 12px 0; color: var(--griot-ink-soft); font-size: 10px; }
+.griot-language-relations { margin: 24px 0; padding: 22px; border-radius: 16px; border: 1px solid var(--griot-line); background: var(--griot-paper); }
+.griot-language-relations figcaption strong { font: 600 20px var(--griot-serif); }
+.griot-language-relations figcaption p { font-size: 11px; color: var(--griot-ink-soft); margin-top: 10px; }
+.griot-language-network { display: grid; justify-items: center; margin: 24px 0; }
+.griot-language-network > strong { position: relative; padding: 12px 18px; border: 1px solid var(--griot-gold); border-radius: 12px; color: var(--griot-ink); background: var(--griot-cream); font-size: 12px; text-align: center; }
+.griot-language-network > strong::after { position: absolute; content: ''; height: 17px; width: 1px; background: var(--griot-gold); left: 50%; bottom: -18px; }
+.griot-language-network > div { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; width: 100%; margin-top: 17px; border-top: 1px solid var(--griot-gold); }
+.griot-language-network span { position: relative; margin-top: 16px; padding: 10px 6px; border: 1px solid var(--griot-line); border-radius: 10px; text-align: center; font-size: 11px; }
+.griot-language-network span::before { content: ''; position: absolute; width: 1px; height: 16px; background: var(--griot-gold); left: 50%; top: -17px; }
+.griot-language-relations aside { padding: 16px; margin-top: 18px; background: var(--griot-cream); border-radius: 10px; font-size: 11px; }
+.griot-language-relations aside p { margin: 8px 0; }
+.griot-answer-story { margin: 24px 0; padding: 22px; border: 1px solid var(--griot-line); border-radius: 18px; background: var(--griot-paper); }
+.griot-story-heading { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+.griot-story-heading h5 { font: 600 22px var(--griot-serif); margin: 6px 0; }
+.griot-story-heading > span { flex-shrink: 0; font-size: 11px; color: var(--griot-ink-soft); }
+.griot-answer-story figure { display: grid; grid-template-columns: minmax(180px,250px) minmax(0,1fr); align-items: center; gap: 22px; margin: 12px 0; }
+.griot-story-drawing { width: 100%; max-width: 300px; fill: none; stroke: var(--griot-ink-soft); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.griot-story-drawing.is-compact { max-width: 190px; }
+.griot-drawing-shadow { fill: var(--griot-line); stroke: none; opacity: .4; }
+.griot-drawing-paper { fill: var(--griot-paper); }
+.griot-drawing-gold { fill: var(--griot-gold); fill-opacity: .3; }
+.griot-drawing-green { fill: var(--griot-olive); fill-opacity: .25; }
+.griot-drawing-rust { fill: var(--griot-terracotta); fill-opacity: .25; }
+.griot-story-drawing .griot-drawing-link { stroke: var(--griot-gold); stroke-width: 3; }
+.griot-story-drawing .griot-drawing-route { stroke: var(--griot-gold); stroke-dasharray: 6 7; stroke-width: 3; }
+.griot-story-drawing .griot-drawing-bubble { stroke: var(--griot-terracotta-deep); stroke-width: 3; }
+.griot-answer-story figcaption strong { display: block; font: 600 21px var(--griot-serif); margin-bottom: 12px; }
+.griot-answer-story figcaption p { font-size: 12px; }
+.griot-story-controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid var(--griot-line); }
+.griot-story-controls > div { display: flex; gap: 6px; }
+.griot-story-controls button { font-size: 11px; padding: 8px 12px; }
+.griot-story-controls button[aria-pressed=true] { background: var(--griot-ink); color: var(--griot-paper); }
+.griot-story-controls button:disabled { opacity: .5; }
+.griot-answer-story > small { display: block; margin-top: 14px; color: var(--griot-ink-soft); font-size: 10px; }
+.griot-concept-sources { border-top: 1px solid var(--griot-line); padding-top: 15px; }
+.griot-concept-sources summary { cursor: pointer; font-size: 11px; font-weight: 600; }
+.griot-concept-sources p { margin: 12px 0; font-size: 11px; }
+.griot-concept-sources a { display: block; margin: 9px 0; }
+@media (prefers-reduced-motion:no-preference) { .griot-concept-card,.griot-answer-story figure { animation: griot-cultural-reveal .3s ease-out both; } .griot-drawing-route { animation: griot-route-dash 5s linear 2; } @keyframes griot-cultural-reveal { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } } @keyframes griot-route-dash { to { stroke-dashoffset: -52; } } }
+@media (max-width:720px) { .griot-assistant-card:has(.griot-illustrated-answer) { display: block; } .griot-assistant-card:has(.griot-illustrated-answer) > .griot-assistant-mark { display: none; } .griot-concept-card { grid-template-columns: 1fr; padding: 16px; gap: 4px; } .griot-concept-card .griot-story-drawing { max-width: 150px; justify-self: center; } .griot-answer-story { padding: 16px; } .griot-answer-story figure { grid-template-columns: 1fr; gap: 4px; } .griot-answer-story .griot-story-drawing { max-width: 210px; justify-self: center; } .griot-story-controls { flex-wrap: wrap; } .griot-story-controls > div { order: -1; flex-basis: 100%; justify-content: center; } .griot-language-relations { padding: 15px; } .griot-language-network > div { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width:720px) {
+ .griot-language-network > strong { display: block; width: 100%; }
+ .griot-language-network > strong::after { left: 12px; }
+ .griot-language-network > div { grid-template-columns: minmax(0,1fr); border-top: 0; border-left: 1px solid var(--griot-gold); padding-left: 20px; margin-left: 12px; width: calc(100% - 12px); }
+ .griot-language-network span { margin-top: 0; }
+ .griot-language-network span::before { left: -21px; top: 50%; width: 20px; height: 1px; }
+}

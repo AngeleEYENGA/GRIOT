@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../prisma/prisma.service';
 import { AskAiDto } from './dto/ask-ai.dto';
+import { culturalAnswer } from './cultural-knowledge';
 
 type TreeContext = {
   peopleCount: number;
@@ -19,6 +20,8 @@ export class AiService {
   async ask(dto: AskAiDto, authorization?: string) {
     const query = dto.query.trim();
     const normalized = query.toLowerCase();
+    const cultural = culturalAnswer(query);
+    if (cultural) return cultural;
 
     const userId = await this.getUserIdFromAuthHeader(authorization);
     const treeContext = await this.getTreeContext(dto.arbreId, userId);
@@ -33,6 +36,11 @@ export class AiService {
         'Comment améliorer la complétude de ma famille ?',
       ],
       contextUsed: Boolean(treeContext),
+      explanation: {
+        version: 1, kind: /migration|origine|village|carte|guerre|catastrophe/.test(normalized) ? 'journey' : /langue|alphabet|grammaire|conte|cuisine|culture|tradition/.test(normalized) ? 'transmission' : 'genealogy',
+        title: 'Le conseil en images',
+        notice: 'Illustration pédagogique du conseil, sans reconstitution d’une personne ni d’un événement réel.',
+      },
     };
   }
 
@@ -60,7 +68,7 @@ export class AiService {
     }
 
     const member = await this.prisma.membreArbre.findFirst({
-      where: { arbreId, utilisateurId: userId },
+      where: { arbreId, utilisateurId: userId, statut: 'actif' },
       select: { id: true },
     });
 

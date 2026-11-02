@@ -34,6 +34,18 @@ Sources : LGIDF/CNRS, Ondo Obame et Zribi-Hertz (2021), fiche « Le fang-ntoumou
 
 Tests spécifiques : démarrage sans fiche familiale, priorisation des erreurs, intervalles de répétition, crédits quotidiens, progression avec/sans aide, déblocage, respect des tons, restauration des données et changement d’heure. Le parcours navigateur vérifie aussi le lecteur non chargé sans clic, le refus du micro, l’absence d’envoi de voix, le mode lecteur et la pratique hors réseau.
 
+## Notions culturelles et explications illustrées
+
+`griot-backend/src/ai/cultural-knowledge.ts` contient un premier corpus de définitions et références pour ethnie, tribu, clan et lignage, un exemple de rapprochement entre langues Fang/Ewondo/Bulu et des éléments sur les mots *ayon/mvog*. Les définitions sont reformulées ; le cadre et la source de chaque exemple restent affichés. La classification linguistique du LGIDF/CNRS est distinguée de la nomenclature historique de Bôt Ba Njock (1960). Aucun de ces découpages n’est présenté comme une hiérarchie universelle ou comme l’identité imposée à une famille actuelle.
+
+Ces questions sont traitées avant tout accès au contexte familial : aucune lecture des personnes, noms, relations ou jetons n’est nécessaire pour définir un concept public. Les demandes de déduction personnelle à partir d’un nom ne produisent pas d’appartenance. Les autres conseils n’utilisent un contexte d’arbre qu’après vérification d’une appartenance active. Aucun champ ethnie/tribu/clan n’est automatiquement ajouté aux personnes et aucun profil sensible n’est calculé.
+
+La réponse API ajoute un objet `explanation` versionné, en plus du texte existant : concepts, sources, exemple linguistique facultatif, récit pédagogique et type de schéma. Le frontend `IllustratedAnswer.jsx` utilise des dessins SVG symboliques originaux, des fiches interactives et trois scènes à parcourir. Un mode simple réduit le texte pour une lecture accompagnée. Les personnes dessinées sont fictives et ne représentent ni un membre de l’arbre ni un peuple. Les autres conseils disposent de schémas de généalogie, parcours ou transmission ; ils n’inventent pas une reconstitution historique. Les animations respectent `prefers-reduced-motion`, sans lecture automatique de l’histoire.
+
+Le corpus est éditorial, fini et révisable. Il n’effectue pas de recherche Web à la volée et ne couvre pas tous les peuples ni toutes les acceptions locales. Enrichir un terme demande une source, un cadre géographique/historique et une relecture ; les désaccords entre auteurs restent contextualisés. Les questions nécessitant un témoignage familial ne sont pas résolues à partir d’une définition générale. Les sources principales sont reprises dans le README et dans chaque réponse illustrée.
+
+Validation : questions de définition et comparaison, distinction langues/identités/parenté, absence d’inférence personnelle, absence de lecture de données privées pour les concepts, exclusion des membres inactifs pour le contexte, sources liées aux notions. Le navigateur vérifie les scènes, le mode simple, les schémas mobiles et la réduction des mouvements.
+
 ## Histoire et migrations
 
 Le récit reprend deux présences consécutives, datées et à des lieux différents, pour une même personne. Il ne transforme pas l’intervalle en date de départ ni en itinéraire établi. Une présence renseignée dans l’arbre n’est pas en soi une preuve vérifiée. Les lieux sans date, dates invalides et présences simultanées ne suffisent pas à produire ce récit.
