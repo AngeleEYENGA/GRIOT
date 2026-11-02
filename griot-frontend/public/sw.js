@@ -1,4 +1,4 @@
-const CACHE_NAME = 'griot-shell-v3';
+const CACHE_NAME = 'griot-shell-v4';
 const APP_SHELL = [
   '/',
   '/index.html',
@@ -53,14 +53,16 @@ self.addEventListener('fetch', (event) => {
           }
           return response;
         })
-        .catch(async () => (await caches.match('/index.html')) || Response.error()),
+        .catch(async () => (await caches.match('/index.html', { ignoreVary: true })) || Response.error()),
     );
     return;
   }
 
   if (!/\.(?:js|css|svg|png|jpe?g|webmanifest|woff2?)$/i.test(url.pathname) && !['/data/cities.json', '/data/world.geojson'].includes(url.pathname)) return;
   event.respondWith(
-    caches.match(request).then((cached) => {
+    // These are public static files, never user-specific API responses.
+    // Module scripts can carry an Origin header absent from pre-cache requests.
+    caches.match(request, { ignoreVary: true }).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((response) => {
         if (response.ok) {

@@ -125,12 +125,23 @@ class GriotAPI {
     if (import.meta.env.PROD) {
       if (!('serviceWorker' in navigator)) throw new Error('Ce navigateur ne permet pas la préparation de l’interface hors ligne.');
       const registration = await Promise.race([navigator.serviceWorker.ready, new Promise((_, reject) => setTimeout(() => reject(new Error('L’interface hors ligne n’est pas prête. Rechargez la page en ligne puis réessayez.')), 20000))]);
-      await new Promise((resolve, reject) => {
+      const cacheName = await new Promise((resolve, reject) => {
         const channel = new MessageChannel();
         const timer = setTimeout(() => { channel.port1.close(); reject(new Error('La nouvelle interface hors ligne doit terminer sa mise à jour. Rechargez la page en ligne puis réessayez.')); }, 5000);
-        channel.port1.onmessage = ({ data }) => { clearTimeout(timer); channel.port1.close(); if (data.ready) resolve(); else reject(new Error('Interface hors ligne indisponible.')); };
+        channel.port1.onmessage = ({ data }) => { clearTimeout(timer); channel.port1.close(); if (data.ready && /^griot-shell-/.test(data.version)) resolve(data.version); else reject(new Error('Interface hors ligne indisponible.')); };
         (navigator.serviceWorker.controller || registration.active).postMessage({ type: 'GRIOT_OFFLINE_READY' }, [channel.port2]);
       });
+      // The worker itself may be unchanged between releases: refresh lazy chunks too.
+      const manifestResponse = await fetch('/offline-assets.json', { cache: 'reload' });
+      if (!manifestResponse.ok) throw new Error('Le manifeste de cette version est indisponible.');
+      const assets = await manifestResponse.json();
+      if (!Array.isArray(assets) || !assets.every((path) => typeof path === 'string' && /^\/assets\/[^/]+\.(js|css)$/.test(path))) throw new Error('Le manifeste hors ligne est invalide.');
+      const shellCache = await caches.open(cacheName);
+      for (const path of assets) if (!await caches.match(path, { ignoreVary: true })) await shellCache.add(path);
+      const shell = await fetch('/', { cache: 'reload' });
+      if (!shell.ok) throw new Error('Impossible de préparer cette version de l’interface.');
+      await shellCache.put('/index.html', shell.clone());
+      await shellCache.put('/', shell);
     }
     const profile = await this.request('/auth/me', {}, { requireNetwork: true });
     localStorage.setItem(`griot-offline-enabled:${profile.id}`, '1');
@@ -402,6 +413,10 @@ class GriotAPI {
       method: 'POST',
       body: JSON.stringify(data),
     });
+  }
+
+  updateMigration(arbreId, migrationId, data) {
+    return this.request(`/arbres/${arbreId}/migrations/${migrationId}`, { method: 'PATCH', body: JSON.stringify(data) });
   }
 
   deleteMigration(arbreId, migrationId) {

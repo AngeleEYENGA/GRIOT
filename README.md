@@ -97,6 +97,10 @@ Si la session a expiré pendant le séjour, utilisez **Reprendre la connexion sa
 
 Le fond **[Natural Earth](https://www.naturalearthdata.com/)** provient des limites de pays à petite échelle et relève du domaine public. Il est hébergé avec GRIOT ; aucune tuile cartographique externe n’est requise. La carte permet de zoomer, de se déplacer, de filtrer par personne et de rejouer les étapes chronologiquement. Les étapes sans date viennent ensuite, selon l’ordre saisi. Les lignes ne constituent pas des itinéraires routiers. Les villages mentionnés dans les profils peuvent être ajoutés comme étapes après confirmation du pays et des coordonnées.
 
+La page **Carte des origines** organise ces données comme un parcours de transmission : résumé des repères connus, parcours individuels distingués par couleur, carte et chronologie liées, puis questions à approfondir. Cliquer sur une étape ou un marqueur affiche la personne, la date et son contexte. Les lieux sans date restent dans une section distincte et ne sont pas intégrés à la lecture chronologique. Les liaisons ne relient jamais deux personnes différentes, deux étapes de même date, ni deux points séparés par une étape datée sans coordonnées.
+
+Les origines déclarées dans les fiches restent distinctes de la première étape datée : celle-ci n’est pas nécessairement un lieu de naissance ou une origine ancestrale. Les administrateurs et éditeurs peuvent compléter une étape existante (pays, date, position) sans en créer une autre ; les corrections nécessitent une connexion. Le bouton **Raconter ce passage** ouvre un souvenir prérempli, associé à la personne, pour recueillir le témoignage qui donnera du sens au lieu. L’utilisateur complète et enregistre ensuite ce récit.
+
 ## Rôles et confidentialité
 
 Les droits sont définis **dans chaque arbre**, plutôt que par un rôle global.

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Roles } from '../common/decorators/roles.decorator';
@@ -23,6 +23,12 @@ export class GeographieController {
   @Post()
   create(@Param('arbreId') arbreId: string, @Body() dto: CreateMigrationDto) {
     return this.geographieService.create(arbreId, dto);
+  }
+
+  @Roles('admin', 'editeur')
+  @Patch(':migrationId')
+  update(@Param('arbreId') arbreId: string, @Param('migrationId') migrationId: string, @Body() dto: CreateMigrationDto) {
+    return this.geographieService.update(arbreId, migrationId, dto);
   }
 
   @Roles('admin', 'editeur')

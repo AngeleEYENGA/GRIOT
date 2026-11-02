@@ -9,7 +9,7 @@ describe('GeographieService', () => {
   const prisma = {
     personne: { findFirst: jest.fn() },
     lieu: { findFirst: jest.fn(), create: jest.fn() },
-    migration: { create: jest.fn(), delete: jest.fn(), findFirst: jest.fn() },
+    migration: { create: jest.fn(), update: jest.fn(), delete: jest.fn(), findFirst: jest.fn() },
   };
 
   beforeEach(async () => {
@@ -61,5 +61,28 @@ describe('GeographieService', () => {
     })).rejects.toThrow(NotFoundException);
 
     expect(prisma.migration.create).not.toHaveBeenCalled();
+  });
+
+  it('matches coordinates as well as names so a positioned step cannot reuse an unlocated shared place', async () => {
+    await service.create('tree-1', { personneId: 'person-1', lieu: 'Yaoundé', pays: 'Cameroun', latitude: 3.8, longitude: 11.5 });
+    expect(prisma.lieu.findFirst).toHaveBeenCalledWith({ where: expect.objectContaining({ latitude: 3.8, longitude: 11.5 }) });
+    expect(prisma.lieu.create).toHaveBeenCalled();
+  });
+
+  it('updates only a step in the selected tree without modifying a shared place', async () => {
+    prisma.migration.findFirst.mockResolvedValue({ id: 'migration-1' });
+    prisma.migration.update.mockResolvedValue({ id: 'migration-1' });
+    await service.update('tree-1', 'migration-1', { personneId: 'person-1', lieu: 'Yaoundé', latitude: 3.8, longitude: 11.5 });
+    expect(prisma.migration.findFirst).toHaveBeenCalledWith({ where: { id: 'migration-1', personne: { arbreId: 'tree-1' } }, select: { id: true } });
+    expect(prisma.migration.update).toHaveBeenCalledWith(expect.objectContaining({ data: expect.objectContaining({ lieuId: 'place-1', dateEvenement: null }) }));
+  });
+
+  it('rejects edits of foreign steps or a reassignment to a person outside the tree', async () => {
+    prisma.migration.findFirst.mockResolvedValue(null);
+    await expect(service.update('tree-1', 'foreign-step', { personneId: 'person-1', lieu: 'Paris' })).rejects.toThrow(NotFoundException);
+    prisma.migration.findFirst.mockResolvedValue({ id: 'migration-1' });
+    prisma.personne.findFirst.mockResolvedValue(null);
+    await expect(service.update('tree-1', 'migration-1', { personneId: 'foreign-person', lieu: 'Paris' })).rejects.toThrow(NotFoundException);
+    expect(prisma.migration.update).not.toHaveBeenCalled();
   });
 });

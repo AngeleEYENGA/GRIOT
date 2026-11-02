@@ -1,16 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { datedConnections, hasJourneyDate, personIdOf, personLabel, placeLabel, validCoordinates } from '../utils/originsJourney';
 
-function validMapPoint(item) {
-  return Number.isFinite(item.lieu?.latitude) && Number.isFinite(item.lieu?.longitude) && Math.abs(item.lieu.latitude) <= 90 && Math.abs(item.lieu.longitude) <= 180;
-}
-
-export default function OriginsMap({ migrations, replayIndex }) {
+export default function OriginsMap({ migrations, selectedId, onSelectStep, personColors, fitKey }) {
   const host = useRef(null);
   const map = useRef(null);
   const routes = useRef(null);
   const [error, setError] = useState('');
+  const onSelect = useRef(onSelectStep);
+  onSelect.current = onSelectStep;
   useEffect(() => {
     const instance = L.map(host.current, { scrollWheelZoom: false, minZoom: 1, maxZoom: 12 }).setView([8, 15], 2);
     map.current = instance;
@@ -33,24 +32,24 @@ export default function OriginsMap({ migrations, replayIndex }) {
   useEffect(() => {
     if (!map.current || !routes.current) return;
     const layer = routes.current; layer.clearLayers();
-    const points = migrations.map((item, index) => ({ ...item, routeIndex: index })).filter(validMapPoint);
-    const visible = points.filter((point) => replayIndex < 0 || point.routeIndex <= replayIndex);
-    const groups = new Map();
-    visible.forEach((item) => {
-      const list = groups.get(item.personneId || item.personne?.id) || [];
-      list.push([item.lieu.latitude, item.lieu.longitude]);
-      groups.set(item.personneId || item.personne?.id, list);
-      const popup = document.createElement('div');
-      const title = document.createElement('strong'); title.textContent = `${item.routeIndex + 1}. ${item.lieu.nom}`; popup.append(title);
-      const detail = document.createElement('p'); detail.textContent = `${item.personne?.prenom || ''} ${item.personne?.nom || ''}${item.dateEvenement ? ` · ${new Date(item.dateEvenement).toLocaleDateString('fr-FR')}` : ' · Date non renseignée'}`; popup.append(detail);
-      const marker = L.circleMarker([item.lieu.latitude, item.lieu.longitude], { radius: item.routeIndex === replayIndex ? 11 : 7, color: '#fff', weight: 2, fillColor: item.routeIndex === replayIndex ? '#c9932e' : '#943f27', fillOpacity: 1 }).bindPopup(popup).addTo(layer);
-      if (item.routeIndex === replayIndex) marker.openPopup();
+    const points = migrations.filter(validCoordinates);
+    const dated = migrations.filter(hasJourneyDate);
+    datedConnections(migrations).forEach(([first, second]) => {
+      L.polyline([[first.lieu.latitude, first.lieu.longitude], [second.lieu.latitude, second.lieu.longitude]], { color: personColors[personIdOf(first)] || '#98502e', weight: 3, opacity: .7, dashArray: '7 7' }).addTo(layer);
     });
-    groups.forEach((positions) => { if (positions.length > 1) L.polyline(positions, { color: '#943f27', weight: 3, dashArray: '7 6' }).addTo(layer); });
-    if (replayIndex >= 0) {
-      const selected = visible.find((point) => point.routeIndex === replayIndex);
-      if (selected) map.current.panTo([selected.lieu.latitude, selected.lieu.longitude], { animate: !matchMedia('(prefers-reduced-motion: reduce)').matches });
+    points.forEach((item) => {
+      const color = personColors[personIdOf(item)] || '#98502e';
+      const popup = document.createElement('div');
+      const title = document.createElement('strong'); title.textContent = placeLabel(item); popup.append(title);
+      const detail = document.createElement('p'); detail.textContent = `${personLabel(item.personne)} · ${hasJourneyDate(item) ? new Date(item.dateEvenement).toLocaleDateString('fr-FR') : 'Date à retrouver'}`; popup.append(detail);
+      const pin = document.createElement('span'); pin.className = `griot-origin-pin${item.id === selectedId ? ' is-selected' : ''}${!hasJourneyDate(item) ? ' is-undated' : ''}`; pin.textContent = hasJourneyDate(item) ? String(dated.findIndex((step) => step.id === item.id) + 1) : '?'; pin.style.setProperty('--pin-color', color);
+      const marker = L.marker([item.lieu.latitude, item.lieu.longitude], { icon: L.divIcon({ html: pin, className: 'griot-origin-marker', iconSize: [30, 30], iconAnchor: [15, 15] }), title: `${placeLabel(item)} · ${personLabel(item.personne)}`, zIndexOffset: item.id === selectedId ? 1000 : 0 }).bindPopup(popup, { autoPan: false }).on('click', () => onSelect.current(item.id)).addTo(layer);
+      if (item.id === selectedId) marker.openPopup();
+    });
+    if (selectedId) {
+      const selected = points.find((point) => point.id === selectedId);
+      if (selected) map.current.setView([selected.lieu.latitude, selected.lieu.longitude], Math.max(map.current.getZoom(), 4), { animate: !matchMedia('(prefers-reduced-motion: reduce)').matches });
     } else if (points.length) map.current.fitBounds(points.map((point) => [point.lieu.latitude, point.lieu.longitude]), { padding: [30, 30], maxZoom: 6, animate: false });
-  }, [migrations, replayIndex]);
-  return <section className="griot-live-map-card"><h3>L’histoire de votre arbre, sur la carte</h3><p>Déplacez la carte, zoomez et touchez un point. Les traits relient les étapes d’une même personne ; ils ne décrivent pas un itinéraire routier.</p><div ref={host} className="griot-live-map" role="region" aria-label="Carte interactive des parcours familiaux" />{error && <p role="status">{error}</p>}<small>Fond : <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a> (domaine public), représentation simplifiée. Les étapes détaillées restent disponibles sous la carte.</small></section>;
+  }, [migrations, selectedId, personColors, fitKey]);
+  return <section className="griot-live-map-card griot-origins-map-card"><div ref={host} className="griot-live-map" role="region" aria-label="Carte interactive des parcours familiaux" />{!migrations.some(validCoordinates) && <div className="griot-origins-map-empty"><strong>Les lieux attendent leurs repères.</strong><span>{migrations.length ? 'Les étapes sont conservées dans la chronologie. Ajoutez leurs coordonnées pour les retrouver ici.' : 'Commencez par un village connu ou une étape transmise par un proche.'}</span></div>}{error && <p role="status">{error}</p>}<small>Fond simplifié : <a href="https://www.naturalearthdata.com/" target="_blank" rel="noreferrer">Natural Earth</a>. Les traits relient uniquement des étapes datées d’une même personne, sans reconstituer son trajet exact.</small></section>;
 }

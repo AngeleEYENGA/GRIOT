@@ -163,9 +163,9 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [selectedPerson]);
 
-  const loadTreeData = useCallback(async () => {
+  const loadTreeData = useCallback(async ({ quiet = false } = {}) => {
     try {
-      setLoading(true);
+      if (!quiet) setLoading(true);
       setError('');
       const [treeData, personnesData, relationsData, membresData, souvenirsData, migrationsData, preuvesData, institutionData] = await Promise.all([
         api.getArbre(treeId),
@@ -188,7 +188,7 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (!quiet) setLoading(false);
     }
   }, [treeId]);
 
@@ -1355,11 +1355,17 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
         )}
         {activeTab === 'origines' && (
           <OriginsPanel
+            treeName={tree.nom}
+            onRecordMemory={(step) => {
+              setNewSouvenir({ titre: `Souvenir de ${step.lieu.nom}`.slice(0, 100), categorie: 'histoire', personneId: step.personneId || step.personne?.id || '', contenu: `Quel souvenir est associé à ${step.lieu.nom} ? Qui y vivait, à quelle époque, et qu’aimeriez-vous transmettre de cette période ?\n\n` });
+              setActiveTab('souvenirs');
+              setShowAddSouvenirForm(true);
+            }}
             arbreId={treeId}
             migrations={migrations}
             personnes={personnes}
             role={roleCourant}
-            onRefresh={loadTreeData}
+            onRefresh={() => loadTreeData({ quiet: true })}
           />
         )}
         {activeTab === 'chefferie' && (
