@@ -95,7 +95,7 @@ function AppContent() {
       user={user}
     >
       <NetworkStatus onOpen={() => setActivePanel('offline')} />
-      {activePanel === 'tableau' && <WelcomeGuide key={user.id} onOpen={() => setActivePanel('guide')} />}
+      {activePanel === 'tableau' && !selectedTreeId && <WelcomeGuide key={user.id} onOpen={() => setActivePanel('guide')} />}
       {activePanel === 'offline' ? (
         <OfflinePage />
       ) : activePanel === 'guide' ? (

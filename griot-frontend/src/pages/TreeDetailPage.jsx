@@ -18,6 +18,20 @@ import {
   relationGroups,
 } from '../utils/familyRelations';
 
+const treeSections = [
+  { id: 'tableau', label: 'Tableau de bord' },
+  { id: 'genealogie', label: 'Généalogie' },
+  { id: 'personnes', label: 'Personnes' },
+  { id: 'souvenirs', label: 'Souvenirs' },
+  { id: 'origines', label: 'Origines' },
+  { id: 'relations', label: 'Relations familiales' },
+  { id: 'membres', label: 'Équipe & permissions' },
+  { id: 'rapports', label: 'Rapports & impression' },
+  { id: 'chefferie', label: 'Espace chefferie' },
+  { id: 'assistant', label: 'Demander à GRIOT' },
+  { id: 'style', label: 'Charte graphique' },
+];
+
 function TreeMotif({ size = 120 }) {
   const angles = [-58, -30, 0, 30, 58];
 
@@ -573,47 +587,41 @@ export default function TreeDetailPage({ treeId, onBack, activeTab: activeTabPro
       {/* Header */}
       <header className="griot-detail-header bg-white border-b border-gray-200">
         <div className="griot-detail-header-inner">
-          <div className="griot-tree-detail-head-row">
-            <button className="griot-button griot-button-outline" onClick={() => setActiveTab('rapports')}>Rapports & impression</button>
-            <button
+          <button
               onClick={onBack}
               className="griot-tree-back-button"
             >
-              ← Retour
-            </button>
+              ← Mes arbres
+          </button>
+          <div className="griot-tree-detail-head-row">
+            <div className="griot-tree-detail-heading">
+              <h1>{tree.nom}</h1>
+              <p className="griot-tree-detail-summary">
+                {personnes.length} personne{personnes.length !== 1 ? 's' : ''} · {membres.length} membre{membres.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+            <button className="griot-button griot-button-outline griot-tree-report-link" onClick={() => setActiveTab('rapports')}>Rapports & impression</button>
           </div>
-          <h1>{tree.nom}</h1>
-          <p className="griot-tree-detail-summary">
-            {personnes.length} personne{personnes.length !== 1 ? 's' : ''} • {membres.length} membre{membres.length !== 1 ? 's' : ''}
-          </p>
         </div>
       </header>
 
       {/* Tabs */}
       <div className="griot-detail-tabs">
         <div className="griot-detail-tabs-inner">
-          <div className="griot-detail-tab-list">
-            {['tableau', 'genealogie', 'rapports', 'personnes', 'relations', 'souvenirs', 'membres', 'origines', 'chefferie', 'assistant', 'style'].map((tab) => (
+          <nav className="griot-detail-tab-list" aria-label="Rubriques principales de cet arbre">
+            {treeSections.slice(0, 5).map((section) => (
               <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`griot-detail-tab${activeTab === tab ? ' is-active' : ''}`}
-                aria-current={activeTab === tab ? 'page' : undefined}
+                key={section.id}
+                onClick={() => setActiveTab(section.id)}
+                className={`griot-detail-tab${activeTab === section.id ? ' is-active' : ''}`}
+                aria-current={activeTab === section.id ? 'page' : undefined}
               >
-                {tab === 'tableau' && '📊 Tableau de bord'}
-                {tab === 'genealogie' && '🌳 Généalogie'}
-                {tab === 'rapports' && 'Rapports & impression'}
-                {tab === 'personnes' && '👤 Personnes'}
-                {tab === 'relations' && '🤝 Relations'}
-                {tab === 'souvenirs' && '📜 Souvenirs'}
-                {tab === 'membres' && '👥 Équipe'}
-                {tab === 'origines' && '⌖ Carte des origines'}
-                {tab === 'chefferie' && '⌂ Espace chefferie'}
-                {tab === 'assistant' && '✦ Demander à GRIOT'}
-                {tab === 'style' && '◐ Charte graphique'}
+                {section.label}
               </button>
             ))}
-          </div>
+            <label className="griot-tree-more-sections"><span className="griot-visually-hidden">Autres rubriques de cet arbre</span><select value={treeSections.slice(5).some((section) => section.id === activeTab) ? activeTab : ''} onChange={(event) => setActiveTab(event.target.value)}><option value="" disabled>Autres rubriques</option>{treeSections.slice(5).map((section) => <option key={section.id} value={section.id}>{section.label}</option>)}</select></label>
+          </nav>
+          <label className="griot-tree-mobile-section"><span>Dans cet arbre</span><select value={activeTab} onChange={(event) => setActiveTab(event.target.value)}>{treeSections.map((section) => <option key={section.id} value={section.id}>{section.label}</option>)}</select></label>
         </div>
       </div>
 
