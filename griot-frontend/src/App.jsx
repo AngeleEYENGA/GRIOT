@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { AuthProvider } from './contexts/AuthContext';
 import { useAuth } from './contexts/useAuth';
 import LoginPage from './pages/LoginPage';
@@ -16,16 +16,19 @@ import CompanyPages from './pages/CompanyPages';
 import OfflinePage, { NetworkStatus } from './pages/OfflinePage';
 import './index.css';
 
+const PublicDemoPage = lazy(() => import('./pages/PublicDemoPage'));
+const publicPageFromHash = () => window.location.hash.startsWith('#/demonstrations') ? 'demonstrations' : window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null;
+
 function AppContent() {
   const { user, loading, logout } = useAuth();
   const [authMode, setAuthMode] = useState('home');
   const [selectedTreeId, setSelectedTreeId] = useState(null);
   const [activePanel, setActivePanel] = useState('tableau');
-  const [publicPage, setPublicPage] = useState(() => window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null);
+  const [publicPage, setPublicPage] = useState(publicPageFromHash);
 
   useEffect(() => {
     const syncPage = () => {
-      setPublicPage(window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null);
+      setPublicPage(publicPageFromHash());
       window.scrollTo({ top: 0, behavior: 'instant' });
     };
     window.addEventListener('hashchange', syncPage);
@@ -45,6 +48,8 @@ function AppContent() {
     setActivePanel('tableau');
     setAuthMode('home');
   };
+
+  if (publicPage === 'demonstrations') return <Suspense fallback={<p>Chargement des exemples publics…</p>}><PublicDemoPage /></Suspense>;
 
   if (publicPage) {
     return <CompanyPages page={publicPage} loggedIn={Boolean(user)} onLogin={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('login'); }} onRegister={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('register'); }} />;

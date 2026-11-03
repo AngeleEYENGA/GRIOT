@@ -28,6 +28,8 @@ Contact commun : **[contact.gamlabs@proton.me](mailto:contact.gamlabs@proton.me)
 
 ## Premiers pas et navigation
 
+**Pour vérifier la carte et les récits sans compte : [ouvrir les quatre arbres publics de démonstration](https://griot-frontend-teal.vercel.app/#/demonstrations).** Ces exemples fictifs, en lecture seule, utilisent les mêmes composants de généalogie, carte et histoire que les arbres familiaux. Ils couvrent Éthiopie–Cameroun, une diaspora dans quatre pays, des données incomplètes et un aller-retour Haïti–France. Ils sont intégrés à l’application comme jeux de démonstration et ne sont pas des comptes ou dossiers de personnes réelles dans la base. Voir [les cas et les vérifications attendues](docs/DEMONSTRATIONS-PUBLIQUES.md).
+
 1. Créez un compte ou connectez-vous. Google OAuth nécessite la configuration décrite dans [DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md).
 2. Depuis le **tableau de bord**, choisissez un arbre ou créez votre premier espace familial.
 3. Dans **Fiche personne**, ajoutez prénom, nom, dates, biographie et lieu d’origine.

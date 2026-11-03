@@ -35,7 +35,7 @@ export default function OriginsMap({ migrations, selectedId, onSelectStep, perso
     const points = migrations.filter(validCoordinates);
     const dated = migrations.filter(hasJourneyDate);
     datedConnections(migrations).forEach(([first, second]) => {
-      L.polyline([[first.lieu.latitude, first.lieu.longitude], [second.lieu.latitude, second.lieu.longitude]], { color: personColors[personIdOf(first)] || '#98502e', weight: 3, opacity: .7, dashArray: '7 7' }).addTo(layer);
+      L.polyline([[first.lieu.latitude, first.lieu.longitude], [second.lieu.latitude, second.lieu.longitude]], { className: 'griot-origin-route', color: personColors[personIdOf(first)] || '#98502e', weight: 3, opacity: .7, dashArray: '7 7' }).addTo(layer);
     });
     points.forEach((item) => {
       const color = personColors[personIdOf(item)] || '#98502e';
