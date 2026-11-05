@@ -139,6 +139,10 @@ Cette feuille de route décrit les évolutions à implémenter. **Elle ne repré
 
 Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) décrit le socle ; [la gestion du projet](docs/GESTION-PROJET.md) définit le travail dans GitLab, les jalons proposés et les douze tickets déjà importés dans le groupe.
 
+## Dossier d’architecture documentaire à valider
+
+Le [dossier GRIOT Knowledge Core](docs/knowledge-core/README.md) réunit l’audit de l’existant, le modèle documentaire commun proposé, les quatre cahiers des charges et les dépendances d’Origins, Language et Peoples & Civilizations. Il prévoit notamment l’apprentissage et la découverte culturelle sans arbre, la provenance des assertions et la séparation des données privées. **Il s’agit d’une proposition, pas de fonctionnalités déjà implémentées.** Le développement attend la validation de cette architecture.
+
 ## Pays, villes et position actuelle
 
 Dans **Carte des origines → Ajouter un lieu**, commencez par un pays puis saisissez une ville. Les suggestions sont filtrées par pays, sans distinction de casse ou d’accents. Sélectionner une ville renseigne le pays et les coordonnées ; la région aide à distinguer les homonymes.
