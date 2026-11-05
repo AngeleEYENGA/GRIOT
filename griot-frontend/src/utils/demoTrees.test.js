@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { demoTrees } from '../data/demoTrees.js';
+import { demoTrees } from '../../../scripts/fixtures/publicTrees.js';
 import { ambiguousJourneyIds, datedConnections } from './originsJourney.js';
 import { historicalJourneys } from './migrationHistory.js';
 

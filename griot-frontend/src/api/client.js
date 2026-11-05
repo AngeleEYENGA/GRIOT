@@ -283,6 +283,9 @@ class GriotAPI {
     return this.request(`/arbres/publics${query ? `?recherche=${encodeURIComponent(query)}` : ''}`);
   }
 
+  getPublicPresentations() { return this.request('/arbres/presentations', {}, { requireNetwork: true }); }
+  getPublicPresentation(id) { return this.request(`/arbres/presentations/${encodeURIComponent(id)}`, {}, { requireNetwork: true }); }
+
   getArbre(arbreId) {
     return this.request(`/arbres/${arbreId}`);
   }

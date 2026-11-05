@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import api from '../api/client';
 import InstallAppButton from '../components/InstallAppButton';
 import SiteFooter from '../components/SiteFooter';
@@ -9,6 +9,12 @@ export default function HomePage({ onLogin, onRegister }) {
   const [searched, setSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [presentations, setPresentations] = useState([]); const [presentationsError, setPresentationsError] = useState(''); const [presentationsLoading, setPresentationsLoading] = useState(true); const [retry, setRetry] = useState(0);
+  useEffect(() => {
+    let active = true; setPresentationsLoading(true); setPresentationsError('');
+    api.getPublicPresentations().then((rows) => { if (active) setPresentations(rows); }).catch((e) => { if (active) setPresentationsError(e.message); }).finally(() => { if (active) setPresentationsLoading(false); });
+    return () => { active = false; };
+  }, [retry]);
 
   const searchFamilies = async (event) => {
     event.preventDefault();
@@ -85,6 +91,13 @@ export default function HomePage({ onLogin, onRegister }) {
           <div>
             <p className="griot-eyebrow">EXPLORATION PUBLIQUE</p>
             <h2>Une histoire de famille vous attend.</h2>
+            <section className="griot-home-public-trees" aria-label="Des arbres pour découvrir GRIOT">
+              <p>Entrez dans ces histoires et découvrez comment relier les générations, les lieux et les langues. Ces familles fictives sont de vrais arbres publics enregistrés dans GRIOT.</p>
+              {presentationsLoading && <p role="status">Les familles vous ouvrent leurs portes…</p>}
+              {presentationsError && <div role="alert"><p>Les arbres publics n’ont pas pu être chargés.</p><button className="griot-button griot-button-outline" onClick={() => setRetry((value) => value + 1)}>Réessayer</button></div>}
+              {!presentationsLoading && !presentationsError && !presentations.length && <p>Les premières histoires publiques arrivent bientôt.</p>}
+              <div className="griot-home-public-grid">{presentations.map((tree, index) => <article key={tree.id}><span className="griot-eyebrow">HISTOIRE 0{index + 1}</span><h3>{tree.nom}</h3><p>{tree.introductionPublique}</p><small>{tree._count.personnes} personnes · Arbre public</small><a className="griot-button griot-button-primary" href={`#/arbres-publics/${tree.id}`}>Découvrir cette famille →</a></article>)}</div>
+            </section>
             <p>Seuls les arbres que leurs propriétaires ont rendus publics apparaissent ici.</p>
           </div>
           <form className="griot-search-form" onSubmit={searchFamilies}>

@@ -30,7 +30,7 @@ Contact commun : **[contact.gamlabs@proton.me](mailto:contact.gamlabs@proton.me)
 
 ## Premiers pas et navigation
 
-**Pour vérifier la carte et les récits sans compte : [ouvrir les quatre arbres publics de démonstration](https://griot-frontend-teal.vercel.app/#/demonstrations).** Ces exemples fictifs, en lecture seule, utilisent les mêmes composants de généalogie, carte et histoire que les arbres familiaux. Ils couvrent Éthiopie–Cameroun, une diaspora dans quatre pays, des données incomplètes et un aller-retour Haïti–France. Ils sont intégrés à l’application comme jeux de démonstration et ne sont pas des comptes ou dossiers de personnes réelles dans la base. Voir [les cas et les vérifications attendues](docs/DEMONSTRATIONS-PUBLIQUES.md).
+**Pour découvrir GRIOT sans compte : [ouvrez l’accueil](https://griot-frontend-teal.vercel.app/#/), puis choisissez un arbre sous « Une histoire de famille vous attend ».** Quatre familles fictives sont enregistrées comme de vrais arbres publics, administrés par un compte de test à connexion classique. Les personnes, relations et lieux proviennent de la base. La généalogie, les origines et les premiers cours sont consultables en lecture seule. L’ancienne page de démonstrations a été retirée. Voir [la recette des familles publiques](docs/DEMONSTRATIONS-PUBLIQUES.md).
 
 1. Créez un compte ou connectez-vous. Google OAuth nécessite la configuration décrite dans [DEPLOYMENT-VERCEL.md](DEPLOYMENT-VERCEL.md).
 2. Depuis le **tableau de bord**, choisissez un arbre ou créez votre premier espace familial.
@@ -93,7 +93,7 @@ Le panneau **Les langues à explorer ensemble** considère les pays de toutes le
 
 **Anglais, allemand, espagnol et chinois mandarin** disposent chacun de **trois étapes et neuf éléments** : six expressions/formes et trois questions de compréhension ou de grammaire. Ils reprennent les mécanismes de progression décrits ci-dessous. Ces initiations ne sont pas des formations complètes de niveau A1. Le mandarin est nommé explicitement : il ne représente pas toutes les langues parlées en Chine. Pour les autres langues, le catalogue Glottolog permet l’exploration géographique et la création de fiches familiales ; il ne fournit pas automatiquement des cours.
 
-**Essayer sans compte :** ouvrez [l’arbre public de la diaspora](https://griot-frontend-teal.vercel.app/#/demonstrations/diaspora), puis **Personnages et langues**. Londres, Berlin, Madrid et Shanghai proposent les quatre cours pratiques ; le fang reste une langue déclarée distincte. Les cours publics conservent seulement une progression locale au navigateur, avec un bouton d’effacement par langue dans leurs détails.
+**Essayer sans compte :** ouvrez [l’accueil](https://griot-frontend-teal.vercel.app/#/), choisissez **Une famille, quatre horizons**, puis **Langues et premiers pas**. Londres, Berlin, Madrid et Shanghai proposent les quatre cours pratiques ; le fang reste une langue déclarée distincte. Les cours publics conservent une progression locale au navigateur, avec effacement possible par langue dans leurs détails.
 
 - **Fang : quatre étapes et treize éléments** : salutations, premières formules d’échange, vocabulaire et repères grammaticaux du fang-ntumu. Le cours distingue cette variété des autres variétés fang et conserve les transcriptions de ses sources.
 - **Deux approches** : reconnaître le sens ou retrouver la forme écrite, avec un petit clavier de signes phonétiques et de tons. Les étapes suivantes s’ouvrent après une réussite sans aide pour chaque élément de l’étape précédente.

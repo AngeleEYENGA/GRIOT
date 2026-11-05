@@ -223,6 +223,9 @@ model Arbre {
   proprietaireId String
   proprietaire   Utilisateur @relation("proprietaire", fields: [proprietaireId], references: [id])
   visibilite     String   @default("prive")
+  presentationPublique Boolean @default(false)
+  introductionPublique String?
+  languesPubliques String[] @default([])
   dateCreation   DateTime @default(now())
 
   membres              MembreArbre[]

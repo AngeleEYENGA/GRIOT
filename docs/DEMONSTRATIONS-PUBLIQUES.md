@@ -1,20 +1,38 @@
-# Vérifier GRIOT avec des arbres publics fictifs
+﻿# Familles publiques pour découvrir GRIOT
 
-Les exemples sont publics sans connexion, en lecture seule, à partir de `#/demonstrations`. Ils utilisent les composants réels de généalogie, de carte Leaflet et de récit historique. Ils ne rendent pas publics les profils des arbres d’utilisateurs : les jeux de données fictifs sont distincts, embarqués dans l’application, sans compte de démonstration ni insertion de faux membres dans PostgreSQL.
+Les quatre scénarios sont de vrais arbres enregistrés dans la base GRIOT, administrés par un compte de test à connexion classique (email et mot de passe, sans Google). Les identifiants sont remis à la responsable du projet et restent hors du dépôt. La mention « compte local » désigne ce mode d’authentification ; pour être visibles sur le site Vercel, les arbres doivent être enregistrés sur son API de production.
 
-| Exemple | Lien | Vérifications attendues |
-| --- | --- | --- |
-| Deux pays, trois générations | https://griot-frontend-teal.vercel.app/#/demonstrations/ethiopie-cameroun | Trois liaisons individuelles ; filtre Nadir : une liaison. Repère Éthiopie 1984–1986 sans cause de départ affirmée. |
-| Une famille, quatre horizons | https://griot-frontend-teal.vercel.app/#/demonstrations/diaspora | Quatre branches séparées, du Gabon vers Londres, Berlin, Madrid et Shanghai ; aucun trajet reliant les frères et sœurs entre eux. |
-| Les traces incomplètes | https://griot-frontend-teal.vercel.app/#/demonstrations/incertitudes | Une seule liaison cartographique fiable (Paris, France → Paris au Texas). Un lieu daté sans position interrompt le tracé ; un lieu sans date reste à part ; les présences d’Alix à même date ne sont pas ordonnées arbitrairement. |
-| Partir, puis revenir | https://griot-frontend-teal.vercel.app/#/demonstrations/retour-haiti | Cinq liaisons pour l’ensemble de la famille ; Ari : aller-retour Haïti → France → Haïti. Le séisme de 2010 ne doit pas devenir la cause affirmée du départ ni être affecté à une arrivée après sa période. |
+Ils apparaissent dès l’accueil, après **Une histoire de famille vous attend**. Chaque carte ouvre `#/arbres-publics/<identifiant>` avec trois rubriques : généalogie, origines et récits, langues et premiers pas. Aucun compte n’est requis pour consulter cette présentation. Le visiteur ne peut pas modifier l’arbre. Le propriétaire retrouve les mêmes données dans son espace familial connecté.
 
-Les personnes, biographies, liens, dates de naissance et présences individuelles sont inventés. Les lieux et événements du catalogue sont réels. Les langues déclarées dans ces scénarios sont des données fictives explicites : elles ne sont pas attribuées à tous les habitants d’un pays. Aucun contrôle d’écriture, invitation ou publication n’est offert aux visiteurs.
+L’ancienne page `#/demonstrations` et son lien de pied de page sont retirés. Les anciennes adresses reviennent à l’accueil. Le frontend ne contient plus les jeux de données comme source de la présentation publique : il lit les données de l’API.
 
-Dans **Personnages et langues**, le panneau de propositions utilise les pays du scénario. Dans la diaspora, quatre propositions pratiques doivent apparaître : anglais pour le Royaume-Uni, allemand pour l’Allemagne, espagnol pour l’Espagne et mandarin pour la Chine. Le fang déclaré apparaît séparément. Les cinq initiations peuvent être essayées sans compte. Leurs progrès sont stockés localement, séparés par scénario et cours ; ils ne modifient pas les arbres et ne sont pas partagés avec les autres visiteurs. Chaque cours propose un effacement de cette progression dans ses détails. Les sources des leçons et les lecteurs externes ne sont contactés que sur action du visiteur.
+## Scénarios et recette
 
-Les récits suivent les présences datées d’une seule personne. Des lieux différents à une même date indiquent un ordre à clarifier, pas nécessairement une erreur : un déplacement le même jour reste possible. Sans précision, aucune liaison ne part de ces présences et aucun récit de déplacement ne les ordonne. La carte conserve les points pour permettre de les examiner.
+| Famille | Vérifications attendues |
+| --- | --- |
+| Deux pays, trois générations | Trois liaisons individuelles ; filtre Nadir : une liaison. Repère Éthiopie 1984–1986 sans cause de départ affirmée. |
+| Une famille, quatre horizons | Quatre branches séparées du Gabon vers Londres, Berlin, Madrid et Shanghai ; anglais, allemand, espagnol et mandarin proposés, fang déclaré distinct. |
+| Les traces incomplètes | Une liaison fiable Paris, France → Paris au Texas. Un lieu daté sans coordonnées interrompt le tracé ; les étapes sans date restent à part ; les présences simultanées d’Alix ne sont pas ordonnées arbitrairement. |
+| Partir, puis revenir | Cinq liaisons pour la famille ; Ari : aller-retour Haïti → France → Haïti. Le séisme de 2010 n’est pas présenté comme une cause individuelle certaine ni attribué à une première arrivée après sa période. |
 
-Les repères historiques sont recherchés dans le pays du premier repère pendant l’intervalle ; pour le pays d’arrivée, l’événement doit encore couvrir la date d’arrivée. Cela évite d’associer automatiquement une catastrophe passée à une personne dont la première présence connue dans ce pays est plus tardive. La portée nationale/régionale du repère reste à vérifier ; aucune causalité personnelle n’est déduite.
+Les personnages, biographies, relations et dates individuelles sont fictifs. Les lieux et événements historiques cités sont réels ; leur présence n’établit pas le motif d’un déplacement personnel. Le compte de test contient uniquement ces données fictives.
 
-Chaque exemple expose une liste de points à contrôler. Les tests automatisés comparent les liaisons et les contextes aux attentes explicites du jeu de données, vérifient les retours, les homonymes et les dates ambiguës. Le test navigateur ouvre les quatre exemples sans jeton ni réponses API simulées, utilise la carte réelle, compte les liaisons, filtre et rejoue les étapes et vérifie l’absence de requêtes d’écriture. Les anciennes données et médias privés ne sont jamais utilisés dans ces scénarios.
+## Accès public et confidentialité
+
+La recherche historique `GET /api/arbres/publics` reste limitée au nom et aux effectifs. La nouvelle liste `GET /api/arbres/presentations` et la consultation `GET /api/arbres/presentations/:id` exigent à la fois `visibilite=public` et `presentationPublique=true`. Cette seconde autorisation vaut `false` pour les anciens arbres. Un arbre privé ou public sans cette autorisation ne livre pas ses fiches détaillées.
+
+Seuls les champs de présentation des personnes, les relations internes à cet arbre et les étapes géographiques sont sélectionnés. Les comptes, emails, membres, conversations, souvenirs privés, preuves et médias ne font pas partie de la réponse publique. Créer une présentation détaillée est une publication explicite de ces champs ; les quatre familles fictives ont cette autorisation.
+
+Les cours publics sauvegardent uniquement une progression locale au navigateur, distincte des comptes connectés. La voix de synthèse dépend de l’appareil et les médias externes se chargent sur action du visiteur. Aucun mot de passe de test n’est publié sur l’accueil ou dans le code.
+
+## Préparation reproductible
+
+Les scénarios source et leurs attentes de cohérence sont conservés pour la recette dans `scripts/fixtures/publicTrees.js`. Ils ne sont pas importés par les pages de production.
+
+Après déploiement de la migration `20261105160000_public_tree_presentations`, exécuter explicitement le script vers l’API choisie :
+
+```powershell
+node scripts/create-public-introduction.mjs https://griot-backend-bice.vercel.app/api "$env:TEMP/griot-introduction-account.json"
+```
+
+Le script génère les identifiants une seule fois, les conserve dans le fichier indiqué hors du dépôt, puis réutilise ce compte lors d’une reprise. Il crée les arbres, personnes, relations et lieux manquants et vérifie les effectifs via les présentations publiques. Il ne supprime aucun arbre utilisateur et n’affiche ni mot de passe ni jeton. Un fichier voisin `.trees.json` relève les identifiants des quatre arbres ; lui aussi reste hors du dépôt. Réutiliser le même fichier de compte pour éviter la création d’un autre compte lors d’une reprise.

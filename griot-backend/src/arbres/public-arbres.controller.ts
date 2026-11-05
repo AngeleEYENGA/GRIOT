@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ArbresService } from './arbres.service';
 
@@ -12,4 +12,12 @@ export class PublicArbresController {
   findPublic(@Query('recherche') recherche?: string) {
     return this.arbresService.findPublic(recherche);
   }
+
+  @Get('presentations')
+  @ApiOperation({ summary: 'Présentations publiques consultables sans compte' })
+  presentations() { return this.arbresService.findPresentations(); }
+
+  @Get('presentations/:id')
+  @ApiOperation({ summary: 'Consulter un arbre dont le propriétaire a autorisé la présentation détaillée' })
+  presentation(@Param('id', new ParseUUIDPipe()) id: string) { return this.arbresService.findPresentation(id); }
 }

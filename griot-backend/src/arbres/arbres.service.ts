@@ -12,11 +12,15 @@ export class ArbresService {
    * arbre doit toujours avoir au moins un administrateur actif.
    */
   async create(utilisateurId: string, dto: CreateArbreDto) {
+    if (dto.presentationPublique && dto.visibilite !== 'public') throw new BadRequestException('Une présentation publique nécessite un arbre public.');
     return this.prisma.$transaction(async (tx) => {
       const arbre = await tx.arbre.create({
         data: {
           nom: dto.nom,
           visibilite: dto.visibilite ?? 'prive',
+          presentationPublique: dto.presentationPublique ?? false,
+          introductionPublique: dto.introductionPublique,
+          languesPubliques: dto.languesPubliques ?? [],
           proprietaireId: utilisateurId,
         },
       });
@@ -81,6 +85,31 @@ export class ArbresService {
       throw new NotFoundException('Arbre introuvable.');
     }
     return arbre;
+  }
+
+  async findPresentations() {
+    return this.prisma.arbre.findMany({
+      where: { presentationPublique: true, visibilite: 'public' },
+      select: { id: true, nom: true, introductionPublique: true, _count: { select: { personnes: true } } },
+      orderBy: { dateCreation: 'asc' }, take: 12,
+    });
+  }
+
+  async findPresentation(id: string) {
+    // Public search has always exposed only aggregate counts. Detailed reading
+    // requires a separate, explicit opt-in; old public trees stay protected.
+    const arbre = await this.prisma.arbre.findFirst({
+      where: { id, presentationPublique: true, visibilite: 'public' },
+      select: { id: true, nom: true, introductionPublique: true, languesPubliques: true,
+        personnes: { select: { id: true, nom: true, prenom: true, dateNaissance: true, dateDeces: true, villageOrigine: true, biographie: true } },
+      },
+    });
+    if (!arbre) throw new NotFoundException('Cet arbre ne propose pas de présentation publique.');
+    const [relations, migrations] = await Promise.all([
+      this.prisma.relationFamiliale.findMany({ where: { personne1: { arbreId: id }, personne2: { arbreId: id } }, select: { id: true, personneId1: true, personneId2: true, typeRelation: true, precision: true } }),
+      this.prisma.migration.findMany({ where: { personne: { arbreId: id } }, select: { id: true, personneId: true, dateEvenement: true, ordre: true, lieu: { select: { nom: true, pays: true, latitude: true, longitude: true } } } }),
+    ]);
+    return { ...arbre, relations, migrations };
   }
 
   async getDashboard(id: string, utilisateurId: string) {

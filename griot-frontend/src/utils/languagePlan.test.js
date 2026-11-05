@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { demoTrees } from '../data/demoTrees.js';
+import { demoTrees } from '../../../scripts/fixtures/publicTrees.js';
 import { worldCourses } from '../data/worldCourses.js';
 import { buildLanguagePlan } from './languagePlan.js';
 import { emptyLearning, recordLearning, sanitizeLearning, learningStats, isUnitOpen, gradeTutor, askTutor } from './languageTutor.js';

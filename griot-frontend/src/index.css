@@ -265,6 +265,15 @@ a { color: var(--griot-terracotta-deep); }
 .griot-home-features p { margin: 0; color: var(--griot-ink-soft); font-size: 12px; line-height: 1.6; }
 .griot-explorer { max-width: 1140px; margin: 4px auto 48px; padding: 34px; border: 1px solid var(--griot-line); border-radius: 16px; background: var(--griot-paper); }
 .griot-explorer h2 { margin: 0 0 7px; font: 700 27px var(--griot-serif); }
+.griot-home-public-trees { margin: 20px 0 30px; }
+.griot-home-public-trees > p { max-width: 780px; color: var(--griot-ink-soft); line-height: 1.8; }
+.griot-home-public-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; margin: 24px 0; }
+.griot-home-public-grid article { display: flex; align-items: start; flex-direction: column; padding: 24px; border: 1px solid var(--griot-line); border-radius: 18px; background: var(--griot-cream); }
+.griot-home-public-grid h3 { font: 600 25px var(--griot-serif); margin: 12px 0; }
+.griot-home-public-grid p { flex: 1; line-height: 1.8; }
+.griot-home-public-grid small { display: block; margin-bottom: 20px; color: var(--griot-ink-soft); }
+.griot-home-public-grid .griot-button { white-space: normal; text-decoration: none; }
+@media(max-width:720px) { .griot-home-public-grid { grid-template-columns: 1fr; } .griot-home-public-grid article { padding: 20px; } }
 .griot-explorer > div:first-child > p:last-child { margin: 0; color: var(--griot-ink-soft); font-size: 13px; }
 .griot-search-form { margin-top: 24px; }
 .griot-search-form label, .griot-form-card label { display: flex; flex-direction: column; gap: 6px; color: var(--griot-ink-soft); font-size: 11px; font-weight: 700; }

@@ -16,8 +16,8 @@ import CompanyPages from './pages/CompanyPages';
 import OfflinePage, { NetworkStatus } from './pages/OfflinePage';
 import './index.css';
 
-const PublicDemoPage = lazy(() => import('./pages/PublicDemoPage'));
-const publicPageFromHash = () => window.location.hash.startsWith('#/demonstrations') ? 'demonstrations' : window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null;
+const PublicTreePage = lazy(() => import('./pages/PublicTreePage'));
+const publicPageFromHash = () => window.location.hash.startsWith('#/arbres-publics/') ? 'arbre-public' : window.location.hash === '#/a-propos' ? 'apropos' : window.location.hash === '#/contact' ? 'contact' : null;
 
 function AppContent() {
   const { user, loading, logout } = useAuth();
@@ -25,10 +25,14 @@ function AppContent() {
   const [selectedTreeId, setSelectedTreeId] = useState(null);
   const [activePanel, setActivePanel] = useState('tableau');
   const [publicPage, setPublicPage] = useState(publicPageFromHash);
+  const [publicTreeId, setPublicTreeId] = useState(() => window.location.hash.split('/')[2] || '');
 
   useEffect(() => {
+    if (window.location.hash.startsWith('#/demonstrations')) window.location.hash = '/';
     const syncPage = () => {
+      if (window.location.hash.startsWith('#/demonstrations')) { window.location.hash = '/'; return; }
       setPublicPage(publicPageFromHash());
+      setPublicTreeId(window.location.hash.split('/')[2] || '');
       window.scrollTo({ top: 0, behavior: 'instant' });
     };
     window.addEventListener('hashchange', syncPage);
@@ -49,7 +53,7 @@ function AppContent() {
     setAuthMode('home');
   };
 
-  if (publicPage === 'demonstrations') return <Suspense fallback={<p>Chargement des exemples publics…</p>}><PublicDemoPage /></Suspense>;
+  if (publicPage === 'arbre-public') return <Suspense fallback={<p>Ouverture de l’arbre public…</p>}><PublicTreePage treeId={publicTreeId} /></Suspense>;
 
   if (publicPage) {
     return <CompanyPages page={publicPage} loggedIn={Boolean(user)} onLogin={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('login'); }} onRegister={() => { window.location.hash = '/'; setPublicPage(null); setAuthMode('register'); }} />;
