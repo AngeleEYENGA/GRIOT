@@ -137,7 +137,7 @@ Cette feuille de route décrit les évolutions à implémenter. **Elle ne repré
 | Hors ligne au village | Téléchargement volontaire de petits packs de leçons et de voix, brouillons d’échanges et synchronisation culturelle avec gestion des conflits. | Prévoir la capacité de stockage, la confidentialité de l’appareil et une indication claire de ce qui est envoyé ou conservé localement. |
 | Rapports de transmission | Intégrer les récits culturels, les langues et les contextes historiques sourcés aux rapports familiaux, avec une sélection des éléments à partager. | Préserver les droits, le statut de vérification et les sources dans les documents exportés. |
 
-Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) décrit le socle ; [la gestion du projet](docs/GESTION-PROJET.md) définit le travail dans GitLab, les jalons et le backlog à importer.
+Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) décrit le socle ; [la gestion du projet](docs/GESTION-PROJET.md) définit le travail dans GitLab, les jalons proposés et les douze tickets déjà importés dans le groupe.
 
 ## Pays, villes et position actuelle
 
