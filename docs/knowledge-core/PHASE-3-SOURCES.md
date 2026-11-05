@@ -82,6 +82,14 @@ Le script refuse une API ou une base hébergées : il ne doit pas créer ces fix
 
 ## Limites et suites
 
+### Livraison vérifiée le 5 novembre 2026
+
+Le commit applicatif `add4d83` est présent sur les branches `main` de GitLab et GitHub. Les contrôles GitHub frontend/backend et les deux déploiements Vercel sont réussis.
+
+Une recette Chrome sur le site de production, avec le compte de découverte existant, confirme : quatre arbres publics toujours présents sur l’accueil ; connexion et ouverture du registre documentaire d’un arbre ; réponse HTTP 200 de l’API réelle ; commande d’ajout disponible pour son administrateur ; absence d’erreur navigateur et de débordement horizontal aux largeurs 320 et 390 pixels. Aucune écriture documentaire n’a été réalisée en production pendant cette recette.
+
+Le découpage du prochain lot est décrit dans [PHASE-4-STRUCTURATION.md](PHASE-4-STRUCTURATION.md). Ce document décrit du travail à réaliser, pas des fonctions déjà disponibles.
+
 - Les états autres que « à examiner » et « archivé » sont préparés pour la suite ; ce lot n’invente pas une procédure de validation scientifique.
 - Pas d’extraction, de segments/pages, de copie de PDF, d’audio documentaire, de contrôle réseau automatique ni de tâche longue.
 - Pas d’assertions, appuis, contradictions structurées, recherche sémantique ou RAG à partir de ces nouvelles sources.
