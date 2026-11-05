@@ -2,15 +2,17 @@
 
 ## Références et transition
 
-- Projet de gestion : https://gitlab.com/AngeleEYENGA/griot
-- Projet GitLab : `88388452`, privé lors de la vérification du 5 novembre 2026.
+- Projet de gestion actif : https://gitlab.com/griot-gamlab/GRIOT
+- Ancien projet personnel : `AngeleEYENGA/griot`, identifiant `88388452`. Il ne sert plus de cible de gestion.
 - Dépôt de livraison actuel : https://github.com/AngeleEYENGA/GRIOT
 - Site : https://griot-frontend-teal.vercel.app/
 - Base produit vérifiée avant transition : `d74f766` (cinq initiations et quatre arbres fictifs publics).
 
-Le projet GitLab examiné le 5 novembre contenait uniquement un README initial et les configurations SAST / Secret Detection, dans un historique distinct. L’intégration conserve ces commits et l’historique complet de GRIOT. Le README produit remplace le modèle de démarrage. Les analyses de sécurité sont conservées ; les contrôles frontend et backend sont ajoutés à la CI GitLab.
+Le projet personnel examiné le 5 novembre contenait uniquement un README initial et les configurations SAST / Secret Detection, dans un historique distinct. L’intégration `445ec2f` conserve ces commits et l’historique complet de GRIOT. Le README produit remplace le modèle de démarrage. Les analyses de sécurité sont conservées ; les contrôles frontend et backend sont ajoutés à la CI GitLab.
 
-GitLab sert à organiser le travail. GitHub reste le point de déclenchement de Vercel pendant cette transition. Ne pas relier un second mécanisme de déploiement avant d’avoir défini le chemin de livraison. Les deux remotes locaux sont `gitlab` et `origin` (GitHub).
+Le dépôt du groupe transmis ensuite contenait un import au commit `da4e5ec`, ancêtre de la version actuelle. Sa mise à jour reprend donc l’historique existant par avance directe, sans push forcé. Les cours, démonstrations et documents préparés sont apportés au groupe ; aucun ticket n’est supposé créé par la seule présence du CSV.
+
+GitLab sert à organiser le travail. GitHub reste le point de déclenchement de Vercel pendant cette transition. Ne pas relier un second mécanisme de déploiement avant d’avoir défini le chemin de livraison. Les remotes locaux sont `gitlab` (groupe), `origin` (GitHub) et `gitlab-personnel` (ancienne référence conservée). Les prochaines modifications sont publiées dans le groupe puis synchronisées vers GitHub.
 
 Après fusion d’une modification, récupérer la branche GitLab puis publier le même commit sur GitHub, sans réécriture d’historique :
 

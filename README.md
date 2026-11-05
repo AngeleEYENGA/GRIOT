@@ -8,7 +8,7 @@ Une mémoire familiale ne se résume pas à des noms et des dates. Elle comprend
 
 **[Ouvrir GRIOT](https://griot-frontend-teal.vercel.app/)** · **[Documentation API](https://griot-backend-bice.vercel.app/docs)**
 
-**Gestion du projet : [GitLab](https://gitlab.com/AngeleEYENGA/griot)** · [Organisation, jalons et backlog](docs/GESTION-PROJET.md) · [Contribuer](CONTRIBUTING.md) · [Index documentaire](docs/README.md). GitHub reste relié aux déploiements Vercel pendant la transition.
+**Gestion du projet : [GitLab GRIOT-GAMLab](https://gitlab.com/griot-gamlab/GRIOT)** · [Organisation, jalons et backlog](docs/GESTION-PROJET.md) · [Contribuer](CONTRIBUTING.md) · [Index documentaire](docs/README.md). GitHub reste relié aux déploiements Vercel pendant la transition.
 
 ## Pour qui ?
 

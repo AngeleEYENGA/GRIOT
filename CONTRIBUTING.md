@@ -1,6 +1,6 @@
 # Contribuer à GRIOT
 
-La gestion du travail est centralisée dans [le projet GitLab](https://gitlab.com/AngeleEYENGA/griot). Le dépôt GitHub reste relié aux déploiements Vercel pendant la transition. Voir [l’organisation et les jalons](docs/GESTION-PROJET.md).
+La gestion du travail est centralisée dans [le projet GitLab du groupe GRIOT-GAMLab](https://gitlab.com/griot-gamlab/GRIOT). Le dépôt GitHub reste relié aux déploiements Vercel pendant la transition. Voir [l’organisation et les jalons](docs/GESTION-PROJET.md).
 
 1. Partir d’un ticket avec un objectif concret, les rôles concernés et des critères vérifiables. Choisir le modèle évolution, anomalie ou contenu pédagogique.
 2. Créer une branche courte : `feat/<numero>-sujet`, `fix/<numero>-sujet` ou `docs/<numero>-sujet`.
