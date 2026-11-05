@@ -7,7 +7,8 @@
 | Contribuer et vérifier une modification | [Guide de contribution](../CONTRIBUTING.md) |
 | Tester les cartes et les récits publics | [Arbres de démonstration](DEMONSTRATIONS-PUBLIQUES.md) |
 | Comprendre cours, salon et récits historiques | [Culture et transmission](CULTURE-ET-TRANSMISSION.md) |
-| Examiner le futur socle documentaire et son audit | [Knowledge Core — architecture à valider](knowledge-core/README.md) |
+| Examiner le socle documentaire et son audit | [Knowledge Core — architecture validée](knowledge-core/README.md) |
+| Utiliser le premier registre des sources | [Phase 3 — fonctionnement et recette](knowledge-core/PHASE-3-SOURCES.md) |
 | Articuler les futurs modules Origins, Language et Peoples | [Architecture partagée et cahiers des charges](modules/ARCHITECTURE-PARTAGEE.md) |
 | Installer et configurer le projet | [Démarrage](../GETTING_STARTED.md), [démarrage rapide](../QUICKSTART.md) |
 | Préparer Vercel et les migrations | [Déploiement Vercel](../DEPLOYMENT-VERCEL.md) |

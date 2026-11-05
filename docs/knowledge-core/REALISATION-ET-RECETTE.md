@@ -1,6 +1,6 @@
 # Réalisation, validation et recette — Knowledge Core et modules
 
-**Plan proposé, non exécuté.** L’audit et le dossier de conception sont les livrables de cette étape. La validation de l’architecture est requise avant toute migration ou développement. Chaque phase aura un rapport séparant réalisé, tests effectivement exécutés, limites et suite proposée.
+**Architecture validée le 5 novembre 2026.** L’audit et la conception commune précèdent le premier lot de gestion des sources, détaillé dans [PHASE-3-SOURCES.md](PHASE-3-SOURCES.md). Les phases suivantes restent planifiées. Chaque phase sépare réalisé, tests effectivement exécutés, limites et suite proposée.
 
 ## 1. Phases Knowledge Core
 
@@ -133,4 +133,4 @@ Prévoir des tests unitaires des règles, des tests d’intégration sur une bas
 
 ## 10. État à la remise de ce dossier
 
-Audit du code et inventaire local en lecture seule réalisés. Architecture, contrats des modules et recette proposés. Les quatre cahiers des charges sont conservés. Les nouvelles sources, tables, interfaces, index, traitements asynchrones et intégrations de modèles restent **à développer après validation**. Aucun nouveau service n’est activé, aucun contenu protégé ingéré, aucune permission familiale changée.
+Audit du code et inventaire initial local réalisés. Architecture approuvée et quatre cahiers des charges conservés. Le registre des sources fait l’objet du rapport de phase 3 ; les passages, assertions/appuis, traitements asynchrones, recherche hybride, génération et intégration complète des trois modules restent à développer. Aucun contenu protégé n’est ingéré et les droits familiaux existants sont conservés.

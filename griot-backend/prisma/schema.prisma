@@ -82,6 +82,7 @@ enum TypeMedia {
 }
 
 enum TypeSource {
+  autre
   acte_civil
   archive_nationale
   chefferie
@@ -105,6 +106,36 @@ enum StatutPreuve {
   en_attente
   validee
   rejetee
+}
+
+enum PerimetreSource {
+  legacy_restreint
+  arbre
+  editorial
+}
+
+enum NatureDocumentaire {
+  indeterminee
+  primaire
+  secondaire
+  tertiaire
+}
+
+enum StatutDocumentaire {
+  a_examiner
+  source_identifiee
+  contenu_extrait
+  attente_verification
+  verifie
+  conteste
+  obsolete
+  archive
+}
+
+enum RoleDocumentaire {
+  curateur
+  validateur
+  administrateur
 }
 
 enum TypeRelation {
@@ -196,6 +227,7 @@ model Utilisateur {
   identitesOAuth     IdentiteOAuth[]
   publicationsFamille PublicationFamille[]
   cartesLangue       CarteLangue[]
+  habilitationsDocumentaires HabilitationDocumentaire[]
 
   @@map("utilisateurs")
 }
@@ -238,6 +270,7 @@ model Arbre {
   preferences          PreferenceAffichage[]
   publicationsFamille PublicationFamille[]
   cartesLangue        CarteLangue[]
+  sourcesDocumentaires Source[]
 
   @@map("arbres")
 }
@@ -376,10 +409,96 @@ model Source {
   nom        String
   reference  String?
   fiabilite  FiabiliteSource @default(non_verifiee)
+  perimetre PerimetreSource @default(legacy_restreint)
+  arbreId String?
+  arbre Arbre? @relation(fields: [arbreId], references: [id], onDelete: Restrict)
+  auteurId String?
+  auteurs String[] @default([])
+  organisme String?
+  categorieDocument String @default("autre")
+  nature NatureDocumentaire @default(indeterminee)
+  publication String?
+  langueDocument String?
+  url String?
+  doi String?
+  territoires String[] @default([])
+  periode String?
+  themes String[] @default([])
+  licence String?
+  droitsUsage String?
+  statutDocumentaire StatutDocumentaire @default(a_examiner)
+  publie Boolean @default(false)
+  revision Int @default(1)
+  cleDedup String? @unique
+  dateCreation DateTime @default(now())
+  dateModification DateTime @default(now())
+  versions VersionSource[]
+  consultations ConsultationSource[]
+  journal JournalDocumentaire[]
 
   preuves Preuve[]
 
+  @@index([arbreId, dateCreation, id])
+  @@index([perimetre, publie, statutDocumentaire])
+
   @@map("sources")
+}
+
+model VersionSource {
+  id String @id @default(uuid())
+  sourceId String
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  numero Int
+  metadonnees Json
+  empreinteMetadonnees String
+  motif String
+  acteurId String
+  dateCreation DateTime @default(now())
+  consultations ConsultationSource[]
+  @@unique([sourceId, numero])
+  @@unique([id, sourceId])
+  @@map("versions_source")
+}
+
+model ConsultationSource {
+  id String @id @default(uuid())
+  sourceId String
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  versionId String
+  version VersionSource @relation(fields: [versionId, sourceId], references: [id, sourceId], onDelete: Restrict)
+  acteurId String
+  operation String
+  accessibilite String
+  contenuConsulte Boolean @default(false)
+  provenance String @default("declaration_manuelle")
+  note String?
+  dateEnregistrement DateTime @default(now())
+  @@index([sourceId, dateEnregistrement])
+  @@map("consultations_source")
+}
+
+model JournalDocumentaire {
+  id String @id @default(uuid())
+  sourceId String
+  source Source @relation(fields: [sourceId], references: [id], onDelete: Restrict)
+  acteurId String
+  action String
+  revision Int
+  motif String
+  dateCreation DateTime @default(now())
+  @@index([sourceId, dateCreation])
+  @@map("journal_documentaire")
+}
+
+model HabilitationDocumentaire {
+  id String @id @default(uuid())
+  utilisateurId String
+  utilisateur Utilisateur @relation(fields: [utilisateurId], references: [id], onDelete: Restrict)
+  role RoleDocumentaire
+  active Boolean @default(true)
+  dateCreation DateTime @default(now())
+  @@unique([utilisateurId, role])
+  @@map("habilitations_documentaires")
 }
 
 model Preuve {

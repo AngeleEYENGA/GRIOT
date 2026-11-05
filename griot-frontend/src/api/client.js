@@ -284,6 +284,12 @@ class GriotAPI {
   }
 
   getPublicPresentations() { return this.request('/arbres/presentations', {}, { requireNetwork: true }); }
+  getKnowledgeSources(query) { const params = new URLSearchParams(Object.entries(query).filter(([, value]) => value)); return this.request(`/knowledge/sources?${params}`, {}, { requireNetwork: true }); }
+  getKnowledgeSource(id) { return this.request(`/knowledge/sources/${id}`, {}, { requireNetwork: true }); }
+  createKnowledgeSource(body) { return this.request('/knowledge/sources', { method: 'POST', body: JSON.stringify(body) }, { requireNetwork: true, skipOfflineQueue: true }); }
+  updateKnowledgeSource(id, body) { return this.request(`/knowledge/sources/${id}`, { method: 'PATCH', body: JSON.stringify(body) }, { requireNetwork: true, skipOfflineQueue: true }); }
+  archiveKnowledgeSource(id, body) { return this.request(`/knowledge/sources/${id}/archive`, { method: 'POST', body: JSON.stringify(body) }, { requireNetwork: true, skipOfflineQueue: true }); }
+  declareKnowledgeConsultation(id, body) { return this.request(`/knowledge/sources/${id}/consultations`, { method: 'POST', body: JSON.stringify(body) }, { requireNetwork: true, skipOfflineQueue: true }); }
   getPublicPresentation(id) { return this.request(`/arbres/presentations/${encodeURIComponent(id)}`, {}, { requireNetwork: true }); }
 
   getArbre(arbreId) {

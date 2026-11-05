@@ -59,6 +59,7 @@ Sur ordinateur, le menu de gauche ouvre les rubriques. Sur mobile, les raccourci
 | Carte des origines | Lieux associés aux personnes et lecture des étapes d’un parcours familial. |
 | Salon familial privé | Publications et réponses par thèmes : langues, discussions, contes, cuisine, traditions et migrations. |
 | Atelier des langues | Suggestions par pays avec Glottolog, choix d’une langue ou variante, fiches de mots, alphabet et grammaire créées par les proches. |
+| Sources documentaires | Registre familial privé : références, versions des métadonnées, consultations déclarées et journal des opérations, selon les droits de l’arbre. |
 | Jeux et voix | Découverte par choix et écoute, pratique écrite, prononciations courtes et relecture familiale avant utilisation des fiches dans les jeux. |
 | Mes parcours de langues | Fang, anglais, allemand, espagnol et chinois mandarin : initiations préparées, exercices, explications et révisions adaptées, même sans locuteur dans la famille. Propositions selon toutes les branches géographiques. |
 | Histoire des parcours | Récit des présences datées, repères historiques sourcés et questions à approfondir avec la famille. |
@@ -139,9 +140,11 @@ Cette feuille de route décrit les évolutions à implémenter. **Elle ne repré
 
 Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) décrit le socle ; [la gestion du projet](docs/GESTION-PROJET.md) définit le travail dans GitLab, les jalons proposés et les douze tickets déjà importés dans le groupe.
 
-## Dossier d’architecture documentaire à valider
+## GRIOT Knowledge Core : première brique documentaire
 
-Le [dossier GRIOT Knowledge Core](docs/knowledge-core/README.md) réunit l’audit de l’existant, le modèle documentaire commun proposé, les quatre cahiers des charges et les dépendances d’Origins, Language et Peoples & Civilizations. Il prévoit notamment l’apprentissage et la découverte culturelle sans arbre, la provenance des assertions et la séparation des données privées. **Il s’agit d’une proposition, pas de fonctionnalités déjà implémentées.** Le développement attend la validation de cette architecture.
+L’[architecture Knowledge Core](docs/knowledge-core/README.md) a été validée le 5 novembre 2026. Dans un arbre, ouvrez **Espace collaboratif & langues → Sources documentaires** pour référencer des documents, conserver les modifications et déclarer une consultation humaine. Une URL ne vaut pas lecture du document ; les références ne deviennent pas automatiquement des connaissances vérifiées. Voir [le rapport de la première phase de développement](docs/knowledge-core/PHASE-3-SOURCES.md).
+
+Le socle cible reste à compléter : extraction de passages, assertions et preuves documentaires, validation éditoriale, recherche hybride et RAG. L’autonomie complète sans arbre de Language et Peoples & Civilizations reste également une évolution prévue. Aucun modèle externe ni recherche automatique sur Internet n’est activé par ce premier lot.
 
 ## Pays, villes et position actuelle
 

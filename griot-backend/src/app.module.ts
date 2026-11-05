@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { KnowledgeModule } from './knowledge/knowledge.module';
 import { CultureModule } from './culture/culture.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './prisma/prisma.module';
@@ -18,6 +19,7 @@ import { NotificationsModule } from './notifications/notifications.module';
 @Module({
   controllers: [AppController],
   imports: [
+    KnowledgeModule,
     CultureModule,
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,

@@ -1,6 +1,6 @@
 # Architecture proposée — GRIOT Knowledge Core
 
-**Proposition soumise à validation. Aucun des composants nouveaux décrits ici n’est implémenté.**
+**Architecture validée le 5 novembre 2026.** Ce document décrit la cible ; le [rapport de phase 3](PHASE-3-SOURCES.md) distingue le registre des sources implémenté des composants futurs. La recherche sémantique, le RAG et les connaissances extraites restent à développer.
 
 ## 1. Un référentiel, trois usages
 

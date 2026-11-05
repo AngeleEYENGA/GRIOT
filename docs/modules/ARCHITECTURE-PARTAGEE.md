@@ -1,6 +1,6 @@
 # Origins, Language, Peoples & Civilizations — articulation des trois modules
 
-**Proposition à valider, sans développement fonctionnel.** Ce document complète [Knowledge Core](../knowledge-core/README.md) à partir des trois cahiers des charges transmis le 5 novembre 2026 : [Origins](ORIGINS-CAHIER-DES-CHARGES.md), [Language](LANGUAGE-CAHIER-DES-CHARGES.md), [Peoples & Civilizations](PEOPLES-CAHIER-DES-CHARGES.md).
+**Architecture commune validée le 5 novembre 2026.** Ce document décrit la cible à partir des trois cahiers des charges : [Origins](ORIGINS-CAHIER-DES-CHARGES.md), [Language](LANGUAGE-CAHIER-DES-CHARGES.md), [Peoples & Civilizations](PEOPLES-CAHIER-DES-CHARGES.md). Le premier lot livré concerne les [sources documentaires](../knowledge-core/PHASE-3-SOURCES.md) ; les nouveaux parcours complets de chaque module restent à développer.
 
 ## 1. Répartition des responsabilités
 
