@@ -1,0 +1,241 @@
+title,description
+[GRIOT-PM-001] Finaliser la transition GitLab et vérifier la livraison,"Identifiant de suivi : GRIOT-PM-001
+Priorité proposée : P0
+Jalon proposé : M0
+
+## Objectif et état actuel
+
+Le projet GitLab initial ne contenait pas le code. Réunir les historiques en conservant SAST et Secret Detection ; garder GitHub relié à Vercel.
+
+## Critères d’acceptation
+
+- [ ] Code frontend, backend et migrations présents dans GitLab.
+- [ ] Commits GitLab initiaux et historique GRIOT conservés, sans push forcé.
+- [ ] Pipelines GitLab examinés, anomalies ou limites consignées.
+- [ ] Même commit publié sur GitHub ; Vercel et API vérifiés.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-002] Installer le suivi de projet et relier tickets et documentation,"Identifiant de suivi : GRIOT-PM-002
+Priorité proposée : P1
+Jalon proposé : M0
+
+## Objectif et état actuel
+
+Matérialiser les jalons et étiquettes de GESTION-PROJET.md, puis affecter les tickets.
+
+## Critères d’acceptation
+
+- [ ] Backlog importé une seule fois, identifiants GRIOT-PM vérifiés.
+- [ ] Tableau avec états À qualifier, Prêt, En cours et À vérifier ; fermeture pour Terminé.
+- [ ] Jalons M0 à M4 et priorités affectés sans date inventée.
+- [ ] Un exemple de ticket utilise les critères et une merge request liée.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-003] Recetter les quatre arbres publics et les trajets individuels,"Identifiant de suivi : GRIOT-PM-003
+Priorité proposée : P1
+Jalon proposé : M1
+
+## Objectif et état actuel
+
+Les exemples existent déjà. Vérifier leur pertinence dans le navigateur avec les attentes de DEMONSTRATIONS-PUBLIQUES.md.
+
+## Critères d’acceptation
+
+- [ ] Liaisons 3/4/1/5 pour Éthiopie-Cameroun, diaspora, incertitudes et retour Haïti.
+- [ ] Filtre individuel, marqueurs, chronologie et lecture animée concordent.
+- [ ] Pas de liaison entre personnes ni de saut par-dessus un lieu daté sans coordonnées.
+- [ ] Homonymes, mêmes dates et vue mobile vérifiés ; preuves de recette consignées.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-004] Préciser les sources et la portée géographique des récits historiques,"Identifiant de suivi : GRIOT-PM-004
+Priorité proposée : P1
+Jalon proposé : M1
+
+## Objectif et état actuel
+
+Enrichir la lecture existante sans attribuer une cause à un départ individuel.
+
+## Critères d’acceptation
+
+- [ ] Chaque repère possède source, période et portée géographique.
+- [ ] Événement antérieur à la première arrivée non attribué automatiquement à la destination.
+- [ ] Faits, témoignages et hypothèses distingués dans le récit.
+- [ ] Absence de source présentée comme une limite du catalogue, sans récit inventé.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-005] Enrichir le fang avec un parcours pédagogique progressif,"Identifiant de suivi : GRIOT-PM-005
+Priorité proposée : P1
+Jalon proposé : M2
+
+## Objectif et état actuel
+
+L’initiation fang-ntumu existe : quatre étapes et treize éléments. Définir puis produire le prochain module, priorité validée par la direction produit.
+
+## Critères d’acceptation
+
+- [ ] Objectifs de compréhension et de production définis pour le module.
+- [ ] Variété, transcriptions et traductions relues avec références précises.
+- [ ] Activités de reconnaissance, écriture et révision adaptées aux enfants accompagnés et adultes.
+- [ ] Dépendance aux voix et limites de validation explicites ; progrès existants conservés.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-006] Constituer des modèles oraux fang avec accord des locuteurs,"Identifiant de suivi : GRIOT-PM-006
+Priorité proposée : P1
+Jalon proposé : M2
+
+## Objectif et état actuel
+
+Une vidéo de Mbóló et un auto-enregistrement local sont déjà proposés. Ajouter des voix documentées pour les éléments prioritaires.
+
+## Critères d’acceptation
+
+- [ ] Accord et conditions de réutilisation documentés pour chaque enregistrement.
+- [ ] Variété, expression, source et date associées à la voix.
+- [ ] Écoute et répétition testées sur téléphone et ordinateur réels.
+- [ ] Absence d’audio et absence de notation automatique restent explicites.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-007] Recetter les langues proposées à partir de toutes les branches,"Identifiant de suivi : GRIOT-PM-007
+Priorité proposée : P1
+Jalon proposé : M2
+
+## Objectif et état actuel
+
+Le moteur distingue les langues déclarées et les propositions géographiques ; il existe cinq cours autonomes.
+
+## Critères d’acceptation
+
+- [ ] Diaspora : anglais, allemand, espagnol et mandarin proposés pour les quatre destinations ; fang déclaré distinct.
+- [ ] Pays anciens conservés et dernière présence calculée par personne.
+- [ ] Derniers pays contradictoires signalés ; une présence sans date ne remplace pas une date connue.
+- [ ] Catalogue des autres langues accessible ; aucune langue natale ou appartenance culturelle imposée.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-008] Enrichir et relire les quatre initiations pour la diaspora,"Identifiant de suivi : GRIOT-PM-008
+Priorité proposée : P2
+Jalon proposé : M2
+
+## Objectif et état actuel
+
+Anglais, allemand, espagnol et mandarin possèdent chacun trois étapes et neuf éléments ; définir leurs suites.
+
+## Critères d’acceptation
+
+- [ ] Séquences utiles pour les échanges familiaux et la vie quotidienne définies.
+- [ ] Références, variantes, réponses acceptées et scripts de saisie relus.
+- [ ] Voix dans la langue annoncée et absence de voix vérifiées sur appareils réels.
+- [ ] Progressions séparées par compte, arbre et cours ; changement de cours sans perte.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-009] Définir et tester de petits packs de leçons et de voix hors ligne,"Identifiant de suivi : GRIOT-PM-009
+Priorité proposée : P1
+Jalon proposé : M3
+
+## Objectif et état actuel
+
+La pratique textuelle fonctionne déjà hors ligne après préparation. Étudier le téléchargement volontaire de packs incluant les voix autorisées.
+
+## Critères d’acceptation
+
+- [ ] Taille et disponibilité du pack annoncées avant téléchargement.
+- [ ] Téléchargement incomplet, stockage insuffisant et effacement gérés.
+- [ ] Rechargement sans réseau et reprise de progression vérifiés sur téléphone.
+- [ ] Aucune voix privée téléchargée ou partagée sans droits adaptés.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-010] Préparer les brouillons culturels et la reprise après coupure,"Identifiant de suivi : GRIOT-PM-010
+Priorité proposée : P2
+Jalon proposé : M3
+
+## Objectif et état actuel
+
+Les écritures du salon et des fiches nécessitent actuellement Internet. Concevoir une synchronisation culturelle avec gestion des conflits.
+
+## Critères d’acceptation
+
+- [ ] Statuts local, en attente, envoyé et conflit visibles.
+- [ ] Droits revérifiés côté serveur lors de l’envoi.
+- [ ] Coupure pendant réponse et reprise ne créent pas de doublon.
+- [ ] Conflits conservés pour résolution ; brouillons sauvegardables.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+[GRIOT-PM-011] Améliorer les échanges et les défis coopératifs du cercle familial,"Identifiant de suivi : GRIOT-PM-011
+Priorité proposée : P2
+Jalon proposé : M4
+
+## Objectif et état actuel
+
+Le salon privé possède publications et réponses avec actualisation manuelle. Préparer une première amélioration ciblée.
+
+## Critères d’acceptation
+
+- [ ] Parcours choisi décrit : nouvelles réponses ou défi familial.
+- [ ] Accès limité aux membres actifs de l’arbre ; modération maintenue.
+- [ ] Participation volontaire et usage accompagné des enfants prévus.
+- [ ] États vide, déconnexion et mobile vérifiés avant généralisation.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."
+"[GRIOT-PM-012] Enrichir les rapports avec les récits, langues et sources choisis","Identifiant de suivi : GRIOT-PM-012
+Priorité proposée : P2
+Jalon proposé : M4
+
+## Objectif et état actuel
+
+Les rapports imprimables et CSV existent déjà. Préparer la restitution des contenus culturels sélectionnés.
+
+## Critères d’acceptation
+
+- [ ] Choix explicite des personnes, récits, langues et sources à exporter.
+- [ ] En-tête, pagination, filigrane et pied de page lisibles sur le fichier obtenu.
+- [ ] Incertitudes et sources conservées dans le document.
+- [ ] Aucune donnée non sélectionnée ou hors droits incluse ; recette PDF sur plusieurs pages.
+
+## Preuves attendues
+
+Merge request liée, contrôles exécutés, compte rendu de recette et commit/URL de livraison si l’application change.
+
+Référence : docs/GESTION-PROJET.md. Aucun responsable ou délai affecté automatiquement."

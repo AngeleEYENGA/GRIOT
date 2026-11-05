@@ -1,0 +1,61 @@
+# You can override the included template(s) by including variable overrides
+# SAST customization: https://docs.gitlab.com/user/application_security/sast/#available-cicd-variables
+# Secret Detection customization: https://docs.gitlab.com/user/application_security/secret_detection/pipeline/configure/
+# Dependency Scanning customization: https://docs.gitlab.com/user/application_security/dependency_scanning/dependency_scanning_sbom/#customizing-analyzer-behavior
+# Container Scanning customization: https://docs.gitlab.com/user/application_security/container_scanning/#customizing-analyzer-behavior
+# Note that environment variables can be set in several places
+# See https://docs.gitlab.com/ci/variables/#cicd-variable-precedence
+stages:
+- test
+- secret-detection
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS && $CI_PIPELINE_SOURCE == "push"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH'
+
+.node_checks:
+  image: node:22-bookworm
+  cache:
+    key:
+      files:
+        - griot-frontend/package-lock.json
+        - griot-backend/package-lock.json
+    paths:
+      - .npm/
+  interruptible: true
+
+frontend:
+  extends: .node_checks
+  stage: test
+  script:
+    - cd griot-frontend
+    - npm ci --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
+    - npm audit --omit=dev --audit-level=high
+    - npm run lint
+    - npm test
+    - npm run build
+
+backend:
+  extends: .node_checks
+  stage: test
+  variables:
+    DATABASE_URL: postgresql://griot:griot@localhost:5432/griot?schema=public
+    DATABASE_URL_UNPOOLED: postgresql://griot:griot@localhost:5432/griot?schema=public
+  script:
+    - cd griot-backend
+    - npm ci --cache "$CI_PROJECT_DIR/.npm" --prefer-offline
+    - npm audit --omit=dev --audit-level=high
+    - npm run prisma:generate
+    - npm run build
+    - npm test -- --runInBand
+
+sast:
+  stage: test
+include:
+- template: Security/SAST.gitlab-ci.yml
+- template: Security/Secret-Detection.gitlab-ci.yml
+secret_detection:
+  stage: secret-detection

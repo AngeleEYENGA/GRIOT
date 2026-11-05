@@ -8,6 +8,8 @@ Une mémoire familiale ne se résume pas à des noms et des dates. Elle comprend
 
 **[Ouvrir GRIOT](https://griot-frontend-teal.vercel.app/)** · **[Documentation API](https://griot-backend-bice.vercel.app/docs)**
 
+**Gestion du projet : [GitLab](https://gitlab.com/AngeleEYENGA/griot)** · [Organisation, jalons et backlog](docs/GESTION-PROJET.md) · [Contribuer](CONTRIBUTING.md) · [Index documentaire](docs/README.md). GitHub reste relié aux déploiements Vercel pendant la transition.
+
 ## Pour qui ?
 
 - Les familles qui construisent leur arbre et transmettent leurs histoires.
@@ -135,7 +137,7 @@ Cette feuille de route décrit les évolutions à implémenter. **Elle ne repré
 | Hors ligne au village | Téléchargement volontaire de petits packs de leçons et de voix, brouillons d’échanges et synchronisation culturelle avec gestion des conflits. | Prévoir la capacité de stockage, la confidentialité de l’appareil et une indication claire de ce qui est envoyé ou conservé localement. |
 | Rapports de transmission | Intégrer les récits culturels, les langues et les contextes historiques sourcés aux rapports familiaux, avec une sélection des éléments à partager. | Préserver les droits, le statut de vérification et les sources dans les documents exportés. |
 
-Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) constitue le point de départ ; la gestion du backlog GitLab sera organisée après confirmation de l’import du dépôt.
+Pour préparer une évolution, documenter son objectif, les rôles concernés, les données et sources nécessaires, les critères d’acceptation, les tests et les limites. La [documentation du cercle](docs/CULTURE-ET-TRANSMISSION.md) décrit le socle ; [la gestion du projet](docs/GESTION-PROJET.md) définit le travail dans GitLab, les jalons et le backlog à importer.
 
 ## Pays, villes et position actuelle
 
